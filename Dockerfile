@@ -4,7 +4,7 @@
 
 # --- Stage 1: Cài đặt dependencies ---
 FROM node:20-alpine AS deps
-RUN apk add --no-cache libc6-compat
+RUN apk add --no-cache libc6-compat openssl
 WORKDIR /app
 
 # Sao chép package manifests và schema Prisma để cache layer
@@ -12,9 +12,11 @@ COPY package.json package-lock.json* ./
 COPY prisma ./prisma/
 
 RUN npm ci
+RUN npx prisma generate
 
 # --- Stage 2: Xây dựng ứng dụng (Builder) ---
 FROM node:20-alpine AS builder
+RUN apk add --no-cache libc6-compat openssl
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
@@ -23,15 +25,14 @@ COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_ENV=production
 
-# Sinh Prisma Client và đóng gói Next.js standalone
-RUN npx prisma generate
-RUN npm run build
+# Đóng gói Next.js standalone (Prisma client đã được sinh sẵn ở stage deps)
+RUN npx next build
 
 # --- Stage 3: Chạy môi trường Production (Runner) ---
 FROM node:20-alpine AS runner
 WORKDIR /app
 
-RUN apk add --no-cache su-exec
+RUN apk add --no-cache su-exec openssl libc6-compat
 
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
