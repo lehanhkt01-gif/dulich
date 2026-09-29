@@ -57,12 +57,12 @@ export default async function HomePage() {
           </div>
 
           <div className="relative z-10 max-w-3xl space-y-6">
-            {/* Tag hành chính & logo xã Ea Súp */}
+            {/* Tag hành chính & logo Đoàn thanh niên */}
             <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-[#0066CC] text-white text-xs font-bold uppercase tracking-wider shadow-md backdrop-blur-sm">
               <img
-                src="/logo-easup-official.png"
-                alt="Logo Xã Ea Súp"
-                className="w-5 h-5 rounded-full object-cover border border-white/80 shrink-0 shadow-sm"
+                src="/logo-doan-thanh-nien.png"
+                alt="Huy hiệu Đoàn Thanh Niên Cộng Sản Hồ Chí Minh"
+                className="w-5 h-5 object-contain shrink-0 drop-shadow-sm"
               />
               <span>ĐOÀN THANH NIÊN EA SÚP - ĐĂK LĂK</span>
             </div>

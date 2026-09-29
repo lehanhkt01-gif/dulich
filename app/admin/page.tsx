@@ -510,9 +510,9 @@ export default function AdminPage() {
         <div>
           <div className="flex items-center gap-2.5 mb-2">
             <img
-              src="/logo-easup-official.png"
-              alt="Logo Xã Ea Súp"
-              className="w-7 h-7 rounded-full border border-[#0066CC] shrink-0"
+              src="/logo-doan-thanh-nien.png"
+              alt="Huy hiệu Đoàn Thanh Niên"
+              className="w-7 h-7 object-contain shrink-0 drop-shadow-sm"
             />
             <span className="text-xs font-bold text-[#0066CC] uppercase tracking-wider">
               ĐOÀN THANH NIÊN EA SÚP - ĐĂK LĂK (XÃ EA SÚP)
