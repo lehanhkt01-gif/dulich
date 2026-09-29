@@ -1,0 +1,78 @@
+[
+  {
+    "id": "itin-1",
+    "title": "Hành Trình 1 Ngày: Dấu Ấn Tháp Cổ & Biển Hồ Vùng Biên",
+    "durationDays": "1 Ngày",
+    "targetAudience": "Gia đình & Du khách tham quan trong ngày",
+    "coverImage": "https://images.unsplash.com/photo-1548013146-72479768bada?auto=format&fit=crop&w=800&q=80",
+    "routeDetails": [
+      {
+        "time": "07:30 - 09:30",
+        "title": "Chiêm ngưỡng Tháp Cổ Yang PRông",
+        "destinationSlug": "thap-cham-yang-prong",
+        "description": "Đón bình minh qua ngọn tháp cổ chìm trong sương sớm rừng Ea Rốk, lắng nghe audio thuyết minh về mối tình vua Chế Mân và công chúa Huyền Trân.",
+        "culinaryTip": "Ăn sáng bánh ướt thịt nướng tại trung tâm Ea Rốk."
+      },
+      {
+        "time": "10:00 - 12:00",
+        "title": "Ghé thăm Vườn Xoài Cát OCOP Ea Súp",
+        "destinationSlug": "vung-xoai-cat-ea-sup-ocop",
+        "description": "Tận mắt thấy những chùm xoài trĩu cành, trải nghiệm hái xoài và nhâm nhi nước ép xoài tươi thanh mát.",
+        "culinaryTip": "Thưởng thức gỏi xoài khô bò cá lóc đồng quê."
+      },
+      {
+        "time": "12:30 - 14:30",
+        "title": "Nghỉ trưa & Ẩm thực lòng hồ Ea Súp Thượng",
+        "destinationSlug": "ho-ea-sup-thuong",
+        "description": "Dừng chân tại nhà chòi ven hồ ngắm mặt nước mênh mông như biển hồ giữa thung lũng.",
+        "culinaryTip": "Món cá bống kho nghệ, gà nướng cơm lam chấm muối ớt é rừng."
+      },
+      {
+        "time": "15:00 - 17:30",
+        "title": "Du thuyền đón Hoàng Hôn trên Hồ Ea Súp Thượng",
+        "destinationSlug": "ho-ea-sup-thuong",
+        "description": "Thuê thuyền độc mộc hoặc cano dạo lòng hồ, ngắm đàn chim trời bay về tổ lúc chiều buông.",
+        "culinaryTip": "Mua khô cá lóc hồ Ea Súp và xoài sấy dẻo làm quà biếu."
+      }
+    ],
+    "createdAt": "2025-01-25T08:00:00.000Z"
+  },
+  {
+    "id": "itin-2",
+    "title": "Hành Trình 2 Ngày 1 Đêm: Khám Phá Đại Ngàn Rừng Khộp & Đêm Hội Cồng Chiêng",
+    "durationDays": "2 Ngày 1 Đêm",
+    "targetAudience": "Người yêu thiên nhiên, Nhiếp ảnh & Văn hóa bản địa",
+    "coverImage": "https://images.unsplash.com/photo-1533105079780-92b9be482077?auto=format&fit=crop&w=800&q=80",
+    "routeDetails": [
+      {
+        "time": "Ngày 1 - Sáng",
+        "title": "Theo chân đàn Voi Thân Thiện tại Vườn Quốc Gia Yok Đôn",
+        "destinationSlug": "vuon-quoc-gia-yok-don-tram-ea-sup",
+        "description": "Đi bộ trekking dưới tán rừng khộp rụng lá vàng, tận mắt quan sát voi tìm thức ăn hoang dã một cách an lành.",
+        "culinaryTip": "Cơm nắm lá dong mang theo trong rừng."
+      },
+      {
+        "time": "Ngày 1 - Chiều & Tối",
+        "title": "Buôn A2 - Trải nghiệm nếp Nhà Dài & Giao lưu Lửa Thiêng Cồng Chiêng",
+        "destinationSlug": "khong-gian-buon-a2-cong-chieng",
+        "description": "Check-in buôn làng cổ, nghe già làng kể khan, hòa mình vào điệu múa Xoang và vít cong cần rượu.",
+        "culinaryTip": "Canh thụt ống nứa, vếch bò nướng, rượu cần nếp thơm truyền thống."
+      },
+      {
+        "time": "Ngày 2 - Sáng",
+        "title": "Khám phá huyền tích Tháp Yang PRông",
+        "destinationSlug": "thap-cham-yang-prong",
+        "description": "Thăm tháp cổ Chăm Pa độc nhất Tây Nguyên trong không gian u tịch của rừng cổ thụ Ea H'leo.",
+        "culinaryTip": "Cà phê nguyên chất rang xay Ea Súp đón nắng mai."
+      },
+      {
+        "time": "Ngày 2 - Chiều",
+        "title": "Check-in Cửa Khẩu Bu Prăng & Vành đai Biên giới Ea Súp",
+        "destinationSlug": "ho-ea-sup-thuong",
+        "description": "Ngắm cột mốc biên cương, những đồi cỏ lau bao la và mua sắm đặc sản tiêu hạt Ea Súp.",
+        "culinaryTip": "Hạt điều rang củi, mật ong rừng hoa tràm Ea Súp."
+      }
+    ],
+    "createdAt": "2025-01-26T09:00:00.000Z"
+  }
+]
