@@ -4,9 +4,9 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 
 export const metadata: Metadata = {
-  title: 'DU LỊCH EA SÚP | BẢN SẮC, DẤU ẤN ĐẠI NGÀN TÂY NGUYÊN',
+  title: 'KHÁM PHÁ EA SÚP | ĐIỂM HẸN SINH THÁI & DI SẢN',
   description:
-    'Cổng thông tin du lịch và số hóa di tích lịch sử, danh lam thắng cảnh, văn hóa cồng chiêng buôn làng xã Ea Súp, tỉnh Đắk Lắk. Bản đồ GIS du lịch tương tác tọa độ 13.070029, 107.883355.',
+    'Ea Súp mở ra hành trình trải nghiệm độc đáo với ngọn tháp Chăm duy nhất trên cao nguyên Tây Nguyên, công trình biển hồ Ea Súp Thượng trù phú và bức tranh giao thoa văn hóa đa sắc tộc rực rỡ.',
   keywords: [
     'Du lịch Ea Súp',
     'Bản sắc dấu ấn đại ngàn Tây Nguyên',

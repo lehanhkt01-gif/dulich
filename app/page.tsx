@@ -69,16 +69,16 @@ export default async function HomePage() {
             </div>
 
             {/* Tiêu đề chính */}
-            <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#1C1917] tracking-tight leading-[1.15] drop-shadow-sm">
-              DU LỊCH EA SÚP
+            <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#1C1917] tracking-tight leading-[1.18] drop-shadow-sm">
+              KHÁM PHÁ EA SÚP
               <span className="block text-[#A64B2A] text-2xl sm:text-3xl lg:text-4xl mt-2 font-bold tracking-normal">
-                BẢN SẮC, DẤU ẤN ĐẠI NGÀN TÂY NGUYÊN
+                ĐIỂM HẸN SINH THÁI & DI SẢN
               </span>
             </h1>
 
-            {/* Dẫn nhập súc tích (Dưới 20 từ) */}
+            {/* Dẫn nhập */}
             <p className="text-base sm:text-lg text-stone-800 leading-relaxed font-normal max-w-2xl">
-              Khám phá ngọn tháp Chàm Yang PRông cổ kính, biển hồ Ea Súp Thượng mênh mông và hồn cồng chiêng buôn làng.
+              Ea Súp mở ra hành trình trải nghiệm độc đáo với ngọn tháp Chăm duy nhất trên cao nguyên Tây Nguyên, công trình &apos;biển hồ&apos; Ea Súp Thượng trù phú và bức tranh giao thoa văn hóa đa sắc tộc rực rỡ. Nơi thiên nhiên nguyên sơ, di tích lịch sử và lòng hiếu khách của con người miền biên giới sẵn sàng chào đón bước chân bạn.
             </p>
 
             {/* THANH TRA CỨU NHANH & BỘ LỌC NGAY TẦM MẮT */}
@@ -109,33 +109,41 @@ export default async function HomePage() {
               </form>
             </div>
 
-            {/* Danh mục nhanh */}
-            <div className="flex flex-wrap items-center gap-2 pt-2">
-              <span className="text-xs font-bold text-stone-700 mr-1 drop-shadow-sm">Chủ đề:</span>
-              <a
-                href="#danh-thang"
-                className="px-3 py-1 rounded-full text-xs font-semibold bg-white/95 backdrop-blur-md border border-[#E7E2D7] text-[#0066CC] hover:border-[#0066CC] shadow-sm transition-colors"
-              >
-                🏛️ Di tích Lịch sử
-              </a>
-              <a
-                href="#danh-thang"
-                className="px-3 py-1 rounded-full text-xs font-semibold bg-white/95 backdrop-blur-md border border-[#E7E2D7] text-[#0066CC] hover:border-[#0066CC] shadow-sm transition-colors"
-              >
-                🌊 Hồ sinh thái Ea Súp Thượng
-              </a>
-              <a
-                href="#danh-thang"
-                className="px-3 py-1 rounded-full text-xs font-semibold bg-white/95 backdrop-blur-md border border-[#E7E2D7] text-[#0066CC] hover:border-[#0066CC] shadow-sm transition-colors"
-              >
-                🔥 Cồng chiêng Buôn A2
-              </a>
-              <a
-                href="#danh-thang"
-                className="px-3 py-1 rounded-full text-xs font-semibold bg-white/95 backdrop-blur-md border border-[#E7E2D7] text-[#0066CC] hover:border-[#0066CC] shadow-sm transition-colors"
-              >
-                🐘 Voi thân thiện Yok Đôn
-              </a>
+            {/* Điểm nhấn trải nghiệm (Tags/Badges) */}
+            <div className="space-y-2 pt-1">
+              <span className="text-xs font-bold text-stone-700 block drop-shadow-sm">
+                Điểm nhấn trải nghiệm:
+              </span>
+              <div className="flex flex-wrap items-center gap-2">
+                <a
+                  href="#danh-thang"
+                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-white/95 backdrop-blur-md border border-[#E7E2D7] text-[#1C1917] hover:text-[#0066CC] hover:border-[#0066CC] shadow-sm transition-all hover:scale-105"
+                >
+                  <span>🏛️</span>
+                  <span>Di tích quốc gia Tháp Yang Prông</span>
+                </a>
+                <a
+                  href="#danh-thang"
+                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-white/95 backdrop-blur-md border border-[#E7E2D7] text-[#1C1917] hover:text-[#0066CC] hover:border-[#0066CC] shadow-sm transition-all hover:scale-105"
+                >
+                  <span>🌊</span>
+                  <span>Sinh thái Hồ Ea Súp Thượng</span>
+                </a>
+                <a
+                  href="#danh-thang"
+                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-white/95 backdrop-blur-md border border-[#E7E2D7] text-[#1C1917] hover:text-[#0066CC] hover:border-[#0066CC] shadow-sm transition-all hover:scale-105"
+                >
+                  <span>🌿</span>
+                  <span>Rừng khộp Yok Đôn nguyên sinh</span>
+                </a>
+                <a
+                  href="#danh-thang"
+                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-white/95 backdrop-blur-md border border-[#E7E2D7] text-[#1C1917] hover:text-[#0066CC] hover:border-[#0066CC] shadow-sm transition-all hover:scale-105"
+                >
+                  <span>🍲</span>
+                  <span>Ẩm thực & Hương sắc buôn làng</span>
+                </a>
+              </div>
             </div>
           </div>
         </div>
