@@ -41,7 +41,7 @@ export default function BentoGrid({ destinations }: BentoGridProps) {
   };
 
   return (
-    <section className="py-8" id="thuyet-minh-so">
+    <section className="pt-0 pb-8" id="thuyet-minh-so">
       {/* Audio element ẩn */}
       <audio
         ref={audioRef}
@@ -51,7 +51,7 @@ export default function BentoGrid({ destinations }: BentoGridProps) {
       />
 
       {/* Header của Bento */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
+      <div className="flex flex-col md:flex-row md:items-end justify-between mb-6 gap-3">
         <div>
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#0066CC]/10 text-[#0066CC] text-xs font-semibold uppercase tracking-wider mb-2">
             <Sparkles className="w-3.5 h-3.5" />

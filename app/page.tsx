@@ -30,14 +30,14 @@ export default async function HomePage() {
   ]);
 
   return (
-    <div className="space-y-16 pb-20">
+    <div className="space-y-8 sm:space-y-10 pb-20">
       {/* ====================================================================
           PHẦN 1: HERO SECTION - CHUẨN TASTE SKILL (HERO DISCIPLINE)
           - Tiêu đề tối đa 2 dòng, font Serif trang trọng
           - Dẫn nhập súc tích dưới 20 từ
           - Thanh tra cứu nhanh và định vị bản đồ trong tầm mắt đầu tiên
           ==================================================================== */}
-      <section className="relative pt-6 pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+      <section className="relative pt-4 sm:pt-6 pb-0 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         <div className="relative rounded-3xl overflow-hidden border border-[#E7E2D7] shadow-heritage p-8 sm:p-12 lg:p-14 min-h-[480px] flex items-center">
           {/* Ảnh nền Hồ Ea Súp Thượng (Đập Thủy Lợi) được hòa trộn mỹ thuật */}
           <div className="absolute inset-0 z-0">

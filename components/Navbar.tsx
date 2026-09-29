@@ -20,7 +20,7 @@ export default function Navbar() {
 
   const navLinks = [
     { name: 'Di sản & Danh thắng', href: '/#danh-thang', icon: Landmark },
-    { name: 'Bản đồ GIS', href: '/#ban-do-du-lich', icon: MapPin },
+    { name: 'Bản đồ', href: '/#ban-do-du-lich', icon: MapPin },
     { name: 'Lịch trình du lịch', href: '/#lich-trinh', icon: Calendar },
     { name: 'Thuyết minh số', href: '/#thuyet-minh-so', icon: Headphones },
   ];
