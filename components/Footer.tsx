@@ -79,24 +79,19 @@ export default function Footer() {
               </div>
               <div className="flex items-center gap-2">
                 <Phone className="w-4 h-4 text-[#0066CC] shrink-0" />
-                <span>Hotline Thanh Niên Du Lịch: (0262) 3688.xxx</span>
+                <span>Hotline: <a href="tel:0819701678" className="text-white font-medium hover:text-[#0066CC] transition-colors">0819701678</a> Đặng Văn Tình</span>
               </div>
               <div className="flex items-center gap-2">
                 <Mail className="w-4 h-4 text-[#0066CC] shrink-0" />
-                <span>doanthanhnien@easup.daklak.gov.vn</span>
+                <span>Gmail: <a href="mailto:Dangvantinht@gmail.com" className="text-white font-medium hover:text-[#0066CC] transition-colors">Dangvantinht@gmail.com</a></span>
               </div>
             </div>
           </div>
         </div>
 
         {/* Bản quyền */}
-        <div className="pt-8 flex flex-col sm:flex-row items-center justify-between text-xs text-stone-500 gap-4">
+        <div className="pt-8 text-center text-xs text-stone-500">
           <p>© 2025 - 2026 DU LỊCH EA SÚP. Bản quyền thuộc ĐOÀN THANH NIÊN EA SÚP - ĐĂK LĂK (Xã Ea Súp, Tỉnh Đắk Lắk).</p>
-          <p className="flex items-center gap-2">
-            <span>Thiết kế theo chuẩn Taste Skill di sản</span>
-            <span className="w-1.5 h-1.5 rounded-full bg-[#0066CC]"></span>
-            <span>Next.js 15 Standalone</span>
-          </p>
         </div>
       </div>
     </footer>
