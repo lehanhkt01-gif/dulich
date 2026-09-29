@@ -1,0 +1,334 @@
+import React from 'react';
+import { getDbCategories, getDbDestinations, getDbItineraries } from '@/lib/prisma';
+import BentoGrid from '@/components/BentoGrid';
+import InteractiveMap from '@/components/InteractiveMap';
+import Link from 'next/link';
+import {
+  Compass,
+  Search,
+  MapPin,
+  Clock,
+  Sparkles,
+  Calendar,
+  ChevronRight,
+  Headphones,
+  CheckCircle2,
+  Trees,
+  Landmark,
+  Waves,
+  Flame,
+} from 'lucide-react';
+
+export const revalidate = 60; // ISR cache revalidation
+
+export default async function HomePage() {
+  const [destinations, categories, itineraries] = await Promise.all([
+    getDbDestinations(),
+    getDbCategories(),
+    getDbItineraries(),
+  ]);
+
+  return (
+    <div className="space-y-16 pb-20">
+      {/* ====================================================================
+          PHẦN 1: HERO SECTION - CHUẨN TASTE SKILL (HERO DISCIPLINE)
+          - Tiêu đề tối đa 2 dòng, font Serif trang trọng
+          - Dẫn nhập súc tích dưới 20 từ
+          - Thanh tra cứu nhanh và định vị bản đồ trong tầm mắt đầu tiên
+          ==================================================================== */}
+      <section className="relative pt-6 pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <div className="relative rounded-3xl overflow-hidden bg-gradient-to-b from-[#2D5A43]/10 to-[#F5F2EB] border border-[#E7E2D7] p-8 sm:p-12 lg:p-14">
+          <div className="max-w-3xl space-y-6">
+            {/* Tag hành chính & văn hóa */}
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#2D5A43] text-amber-100 text-xs font-semibold uppercase tracking-wider shadow-sm">
+              <Compass className="w-4 h-4 text-amber-300" />
+              <span>Cổng Thông Tin Số Hóa Di Sản Văn Hóa & Du Lịch Ea Súp</span>
+            </div>
+
+            {/* Tiêu đề chính (Tối đa 2 dòng desktop) */}
+            <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#1C1917] tracking-tight leading-[1.15]">
+              Danh Thắng Ký: Dấu Ấn Đại Ngàn & Trầm Tích Di Sản Ea Súp
+            </h1>
+
+            {/* Dẫn nhập súc tích (Dưới 20 từ) */}
+            <p className="text-base sm:text-lg text-stone-700 leading-relaxed font-normal">
+              Khám phá ngọn tháp Chàm Yang PRông cổ kính, biển hồ Ea Súp Thượng mênh mông và hồn cồng chiêng buôn làng.
+            </p>
+
+            {/* THANH TRA CỨU NHANH & BỘ LỌC NGAY TẦM MẮT */}
+            <div className="pt-2">
+              <form
+                action="#danh-thang"
+                method="GET"
+                className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 bg-white p-2.5 rounded-2xl border border-[#E7E2D7] shadow-heritage"
+              >
+                <div className="flex-1 flex items-center gap-3 px-3">
+                  <Search className="w-5 h-5 text-[#2D5A43]" />
+                  <input
+                    type="text"
+                    name="q"
+                    placeholder="Tìm kiếm: Tháp Yang PRông, Hồ Ea Súp, Buôn A2, Yok Đôn..."
+                    className="w-full bg-transparent text-sm text-[#1C1917] placeholder:text-stone-400 focus:outline-none"
+                  />
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <a
+                    href="#ban-do-du-lich"
+                    className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-[#F5F2EB] hover:bg-stone-200 text-[#1C1917] text-xs font-semibold transition-colors"
+                  >
+                    <MapPin className="w-4 h-4 text-[#A64B2A]" />
+                    <span>Mở Bản Đồ GIS</span>
+                  </a>
+                  <button
+                    type="submit"
+                    className="flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-[#2D5A43] hover:bg-[#234634] text-white text-xs font-bold transition-all shadow-md hover:scale-[1.02]"
+                  >
+                    <span>Tra Cứu</span>
+                  </button>
+                </div>
+              </form>
+            </div>
+
+            {/* Danh mục nhanh */}
+            <div className="flex flex-wrap items-center gap-2 pt-2">
+              <span className="text-xs font-medium text-stone-500 mr-1">Chủ đề:</span>
+              <a
+                href="#danh-thang"
+                className="px-3 py-1 rounded-full text-xs font-semibold bg-white border border-[#E7E2D7] text-[#2D5A43] hover:border-[#2D5A43] transition-colors"
+              >
+                🏛️ Di tích Lịch sử
+              </a>
+              <a
+                href="#danh-thang"
+                className="px-3 py-1 rounded-full text-xs font-semibold bg-white border border-[#E7E2D7] text-[#2D5A43] hover:border-[#2D5A43] transition-colors"
+              >
+                🌊 Hồ sinh thái Ea Súp Thượng
+              </a>
+              <a
+                href="#danh-thang"
+                className="px-3 py-1 rounded-full text-xs font-semibold bg-white border border-[#E7E2D7] text-[#2D5A43] hover:border-[#2D5A43] transition-colors"
+              >
+                🔥 Cồng chiêng Buôn A2
+              </a>
+              <a
+                href="#danh-thang"
+                className="px-3 py-1 rounded-full text-xs font-semibold bg-white border border-[#E7E2D7] text-[#2D5A43] hover:border-[#2D5A43] transition-colors"
+              >
+                🐘 Voi thân thiện Yok Đôn
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ====================================================================
+          PHẦN 2: BENTO GRID BẤT ĐỐI XỨNG - ANTI-SLOP (MINI AUDIO THUYẾT MINH)
+          ==================================================================== */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <BentoGrid destinations={destinations} />
+      </div>
+
+      {/* ====================================================================
+          PHẦN 3: BẢN ĐỒ DU LỊCH TƯƠNG TÁC GIS LEAFLET.JS
+          ==================================================================== */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 scroll-mt-24" id="ban-do-du-lich">
+        <div className="bg-white rounded-3xl border border-[#E7E2D7] p-6 sm:p-8 shadow-heritage space-y-6">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+            <div>
+              <div className="inline-flex items-center gap-1.5 text-xs font-bold text-[#A64B2A] uppercase tracking-wider mb-2">
+                <MapPin className="w-4 h-4" />
+                <span>Hệ thống Định vị Địa không gian</span>
+              </div>
+              <h2 className="font-serif text-2xl sm:text-3xl font-bold text-[#1C1917]">
+                Bản Đồ Không Gian Du Lịch Xã & Huyện Ea Súp
+              </h2>
+            </div>
+            <p className="text-xs sm:text-sm text-stone-600 max-w-md">
+              Chấm tọa độ chính xác từng di tích, hồ chứa nước và buôn làng. Nhấn vào điểm đánh dấu để xem tóm lược và kích hoạt dẫn đường Google Maps.
+            </p>
+          </div>
+
+          {/* Map Leaflet */}
+          <InteractiveMap destinations={destinations} height="520px" />
+        </div>
+      </section>
+
+      {/* ====================================================================
+          PHẦN 4: TOÀN BỘ DANH THẮNG & BỘ LỌC CHUYÊN ĐỀ
+          ==================================================================== */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 scroll-mt-24" id="danh-thang">
+        <div className="space-y-8">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+            <div>
+              <span className="text-xs font-bold text-[#2D5A43] uppercase tracking-wider block mb-1">
+                Khám phá chuyên sâu
+              </span>
+              <h2 className="font-serif text-2xl sm:text-3xl font-bold text-[#1C1917]">
+                Hệ Thống Di Sản & Điểm Đến Du Lịch
+              </h2>
+            </div>
+            <span className="text-xs text-stone-500">
+              Hiển thị {destinations.length} danh thắng đã được kiểm chứng & biên tập
+            </span>
+          </div>
+
+          {/* Lưới danh mục 2 cột lớn - Anti-Slop (thay vì 3 card bằng nhau) */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {destinations.map((dest, idx) => (
+              <div
+                key={dest.id}
+                className="group bg-white rounded-2xl border border-[#E7E2D7] overflow-hidden shadow-heritage hover:border-[#2D5A43] transition-all flex flex-col"
+              >
+                <div className="relative h-64 sm:h-72 w-full overflow-hidden">
+                  <img
+                    src={dest.thumbnail}
+                    alt={dest.title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
+
+                  {/* Badges */}
+                  <div className="absolute top-4 left-4 flex gap-2">
+                    <span className="px-3 py-1 rounded-full bg-[#2D5A43] text-white text-xs font-bold shadow">
+                      {dest.category?.name || 'Di sản'}
+                    </span>
+                    {dest.isFeatured && (
+                      <span className="px-3 py-1 rounded-full bg-[#A64B2A] text-white text-xs font-bold shadow">
+                        ★ Tiêu biểu
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="absolute bottom-3 left-4 right-4 text-white">
+                    <p className="text-xs text-amber-200 flex items-center gap-1.5 mb-1">
+                      <MapPin className="w-3.5 h-3.5 shrink-0" />
+                      <span className="truncate">{dest.address}</span>
+                    </p>
+                    <h3 className="font-serif text-lg sm:text-xl font-bold leading-snug">
+                      {dest.title}
+                    </h3>
+                  </div>
+                </div>
+
+                <div className="p-6 flex-1 flex flex-col justify-between space-y-4">
+                  <p className="text-stone-600 text-sm leading-relaxed line-clamp-3">
+                    {dest.content}
+                  </p>
+
+                  <div className="space-y-3 pt-3 border-t border-[#E7E2D7]">
+                    <div className="flex items-center justify-between text-xs text-stone-500">
+                      <span className="flex items-center gap-1 text-[#2D5A43] font-medium">
+                        <Headphones className="w-3.5 h-3.5" />
+                        Có thuyết minh AI
+                      </span>
+                      {dest.bestSeason && (
+                        <span className="truncate max-w-[200px]" title={dest.bestSeason}>
+                          Mùa đẹp: {dest.bestSeason.split('(')[0]}
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="flex items-center justify-between pt-1">
+                      <a
+                        href={`https://www.google.com/maps/dir/?api=1&destination=${dest.latitude},${dest.longitude}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-xs text-stone-500 hover:text-[#A64B2A] underline underline-offset-4"
+                      >
+                        Chỉ đường GPS ({dest.latitude.toFixed(4)}, {dest.longitude.toFixed(4)})
+                      </a>
+
+                      <Link
+                        href={`/destinations/${dest.slug}`}
+                        className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#2D5A43] hover:bg-[#234634] text-white text-xs font-semibold transition-all shadow-sm group-hover:translate-x-0.5"
+                      >
+                        <span>Chi tiết khảo cứu</span>
+                        <ChevronRight className="w-3.5 h-3.5" />
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ====================================================================
+          PHẦN 5: GỢI Ý LỊCH TRÌNH DU LỊCH ĐỊA PHƯƠNG
+          ==================================================================== */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 scroll-mt-24" id="lich-trinh">
+        <div className="bg-[#F5F2EB] rounded-3xl border border-[#E7E2D7] p-8 sm:p-12 space-y-8">
+          <div>
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#A64B2A]/10 text-[#A64B2A] text-xs font-bold uppercase tracking-wider mb-2">
+              <Calendar className="w-3.5 h-3.5" />
+              <span>Cẩm Nang Lộ Trình</span>
+            </div>
+            <h2 className="font-serif text-2xl sm:text-3xl font-bold text-[#1C1917]">
+              Lịch Trình Khám Phá Ea Súp Tối Ưu
+            </h2>
+            <p className="text-sm text-stone-600 mt-2 max-w-xl">
+              Được nghiên cứu bởi ban cán bộ văn hóa và hướng dẫn viên bản địa, giúp du khách trải nghiệm trọn vẹn di tích và hương vị ẩm thực trong từng khung giờ vàng.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {itineraries.map((itinerary) => (
+              <div
+                key={itinerary.id}
+                className="bg-white rounded-2xl border border-[#E7E2D7] p-6 shadow-sm space-y-6"
+              >
+                <div className="flex items-start justify-between border-b border-[#E7E2D7] pb-4">
+                  <div>
+                    <span className="px-3 py-1 rounded-full bg-[#2D5A43] text-white text-xs font-bold inline-block mb-2">
+                      {itinerary.durationDays}
+                    </span>
+                    <h3 className="font-serif text-lg sm:text-xl font-bold text-[#1C1917]">
+                      {itinerary.title}
+                    </h3>
+                  </div>
+                  <span className="text-xs text-stone-500 font-medium shrink-0 bg-stone-100 px-3 py-1 rounded-lg">
+                    {itinerary.targetAudience}
+                  </span>
+                </div>
+
+                {/* Timeline stops */}
+                <div className="space-y-4">
+                  {itinerary.routeDetails.map((stop, sIdx) => (
+                    <div key={sIdx} className="flex gap-4 items-start group">
+                      <div className="flex flex-col items-center">
+                        <div className="w-6 h-6 rounded-full bg-[#2D5A43]/15 text-[#2D5A43] flex items-center justify-center text-xs font-bold shrink-0">
+                          {sIdx + 1}
+                        </div>
+                        {sIdx !== itinerary.routeDetails.length - 1 && (
+                          <div className="w-0.5 h-12 bg-[#E7E2D7] mt-1" />
+                        )}
+                      </div>
+                      <div className="flex-1 space-y-1">
+                        <div className="flex items-center justify-between">
+                          <h4 className="text-sm font-bold text-[#1C1917]">{stop.title}</h4>
+                          <span className="text-[11px] font-mono text-stone-500 bg-stone-100 px-2 py-0.5 rounded">
+                            {stop.time}
+                          </span>
+                        </div>
+                        <p className="text-xs text-stone-600 leading-relaxed">
+                          {stop.description}
+                        </p>
+                        {stop.culinaryTip && (
+                          <p className="text-xs text-[#A64B2A] font-medium pt-0.5">
+                            🍴 Ẩm thực: {stop.culinaryTip}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}

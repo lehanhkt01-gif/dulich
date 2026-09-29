@@ -1,0 +1,97 @@
+version: '3.8'
+
+services:
+  # ----------------------------------------------------------------------------
+  # CƠ SỞ DỮ LIỆU POSTGRESQL 16 (BẢO MẬT TUYỆT ĐỐI NỘI BỘ, KHÔNG MỞ CỔNG RA HOST)
+  # ----------------------------------------------------------------------------
+  db:
+    image: postgres:16-alpine
+    container_name: danhthangky_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${DB_USER:-danhthangky_user}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME:-danhthangky_db}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - app_net
+    # Không dùng "ports: - '5432:5432'" để ngăn chặn tấn công brute-force từ Internet
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-danhthangky_user} -d ${DB_NAME:-danhthangky_db}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ----------------------------------------------------------------------------
+  # ỨNG DỤNG WEB NEXT.JS 15 STANDALONE
+  # ----------------------------------------------------------------------------
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: danhthangky_web
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://${DB_USER:-danhthangky_user}:${DB_PASSWORD}@db:5432/${DB_NAME:-danhthangky_db}?schema=public
+      AUTH_SECRET: ${AUTH_SECRET}
+      NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:-http://localhost}
+      UPLOAD_DIR: /app/public/uploads
+      NODE_ENV: production
+      PORT: 3000
+    volumes:
+      - uploads_data:/app/public/uploads
+    networks:
+      - app_net
+    expose:
+      - "3000"
+
+  # ----------------------------------------------------------------------------
+  # NGINX REVERSE PROXY - TỐI ƯU GZIP, CACHE TĨNH & SECURITY HEADERS
+  # ----------------------------------------------------------------------------
+  nginx:
+    image: nginx:alpine
+    container_name: danhthangky_nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - uploads_data:/var/www/uploads:ro
+    depends_on:
+      - web
+    networks:
+      - app_net
+
+  # ----------------------------------------------------------------------------
+  # DOZZLE - TRÌNH XEM LOG CONTAINER TRỰC QUAN QUA TRÌNH DUYỆT
+  # ----------------------------------------------------------------------------
+  dozzle:
+    image: amir20/dozzle:latest
+    container_name: danhthangky_dozzle
+    restart: unless-stopped
+    ports:
+      - "8888:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - app_net
+
+# ------------------------------------------------------------------------------
+# VOLUMES & MẠNG NỘI BỘ (PERSISTENT DATA & ISOLATION)
+# ------------------------------------------------------------------------------
+volumes:
+  postgres_data:
+    name: danhthangky_postgres_data
+  uploads_data:
+    name: danhthangky_uploads_data
+
+networks:
+  app_net:
+    name: danhthangky_network
+    driver: bridge

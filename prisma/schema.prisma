@@ -1,0 +1,108 @@
+// Prisma Schema for Danh Thang Ky - Ea Sup & Tay Nguyen Heritage Platform
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  TRAVELER
+  EDITOR
+  ADMIN
+}
+
+model User {
+  id           String        @id @default(cuid())
+  name         String
+  email        String        @unique
+  password     String
+  role         Role          @default(TRAVELER)
+  avatar       String?
+  destinations Destination[]
+  reviews      Review[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+}
+
+model Category {
+  id           String        @id @default(cuid())
+  name         String
+  slug         String        @unique
+  icon         String?       // Lucide icon name or svg
+  description  String?
+  destinations Destination[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+}
+
+model Destination {
+  id               String    @id @default(cuid())
+  title            String
+  slug             String    @unique
+  subTitle         String?
+  historicalPeriod String?   // Niên đại / Thời kỳ lịch sử
+  content          String    @db.Text // Bài thuyết minh chuyên sâu
+  audioVoiceUrl    String?   // Link file audio thuyết minh AI
+  thumbnail        String
+  gallery          String[]  // Danh sách ảnh chất lượng cao
+  
+  // Địa chỉ & Tọa độ địa lý
+  address          String    // Thôn/buôn, xã Ea Súp, tỉnh Đắk Lắk
+  latitude         Float     // Tọa độ Vĩ độ GPS
+  longitude        Float     // Tọa độ Kinh độ GPS
+
+  // Sổ tay trải nghiệm & Cẩm nang du khách
+  bestSeason       String?   // Mùa đẹp nhất (Tháng 11 - Tháng 4 mùa hoa dã quỳ, mùa lúa chín...)
+  entryFee         String?   // Giá vé / Miễn phí
+  visitingHours    String?   // Giờ mở cửa / đón khách
+  culturalNotes    String?   @db.Text // Lưu ý phong tục, tập quán, kiêng kỵ của đồng bào bản địa
+
+  // Trạng thái & Thống kê
+  isPublished      Boolean   @default(true)
+  isFeatured       Boolean   @default(false)
+  viewsCount       Int       @default(0)
+
+  // Quan hệ
+  categoryId       String
+  category         Category  @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  createdById      String?
+  createdBy        User?     @relation(fields: [createdById], references: [id], onDelete: SetNull)
+  reviews          Review[]
+
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  @@index([slug])
+  @@index([categoryId])
+  @@index([isPublished, isFeatured])
+}
+
+model Review {
+  id            String      @id @default(cuid())
+  rating        Int         @default(5) // 1 - 5 sao
+  comment       String      @db.Text
+  photos        String[]    @default([])
+  destinationId String
+  destination   Destination @relation(fields: [destinationId], references: [id], onDelete: Cascade)
+  userId        String?
+  user          User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
+  userName      String?     // Cho phép du khách vãng lai để lại tên
+  isApproved    Boolean     @default(true)
+  createdAt     DateTime    @default(now())
+
+  @@index([destinationId])
+}
+
+model ItineraryItem {
+  id             String   @id @default(cuid())
+  title          String
+  durationDays   String   // Ví dụ: "1 ngày", "2 ngày 1 đêm", "3 ngày 2 đêm"
+  targetAudience String   // "Gia đình", "Phượt thủ & Khám phá", "Nghiên cứu văn hóa"
+  routeDetails   Json     // Danh sách các chặng dừng chân, thời gian, mô tả, mẹo ăn uống
+  coverImage     String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
