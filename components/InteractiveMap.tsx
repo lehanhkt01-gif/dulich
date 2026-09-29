@@ -48,11 +48,38 @@ export default function InteractiveMap({
           zoomControl: false,
         });
 
-        // Add custom styled tile layer (CartoDB Positron / OpenStreetMap ấm áp)
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-          attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
+        // 1. OpenStreetMap Chuẩn (100% Miễn phí, chi tiết thôn buôn đường xá Việt Nam, không cần API Key)
+        const osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors',
           maxZoom: 19,
-        }).addTo(map);
+          subdomains: ['a', 'b', 'c'],
+        });
+
+        // 2. Ảnh Vệ Tinh Viễn Thám ESRI (100% Miễn phí, không cần API Key)
+        const satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+          attribution: '&copy; Esri &copy; Maxar, Earthstar Geographics',
+          maxZoom: 18,
+        });
+
+        // 3. Bản đồ Địa hình Rừng Núi (ESRI Topo Map)
+        const topoLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
+          attribution: '&copy; Esri &copy; USGS, NOAA',
+          maxZoom: 18,
+        });
+
+        // Mặc định nạp OpenStreetMap
+        osmLayer.addTo(map);
+
+        // Bộ chuyển đổi lớp bản đồ (Base Layers control) ở góc trên bên phải
+        L.control.layers(
+          {
+            '🗺️ Bản đồ Đường & Thôn Buôn': osmLayer,
+            '🛰️ Ảnh Vệ Tinh Viễn Thám': satelliteLayer,
+            '⛰️ Bản đồ Địa Hình Rừng Khộp': topoLayer,
+          },
+          undefined,
+          { position: 'topright' }
+        ).addTo(map);
 
         // Zoom control đặt ở góc phải dưới
         L.control.zoom({ position: 'bottomright' }).addTo(map);
