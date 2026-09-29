@@ -1,22 +1,7 @@
 import type { Metadata } from 'next';
-import { Noto_Serif, Inter } from 'next/font/google';
 import './globals.css';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-
-const notoSerif = Noto_Serif({
-  subsets: ['vietnamese', 'latin'],
-  weight: ['400', '600', '700', '900'],
-  variable: '--font-serif',
-  display: 'swap',
-});
-
-const inter = Inter({
-  subsets: ['vietnamese', 'latin'],
-  weight: ['300', '400', '500', '600', '700'],
-  variable: '--font-sans',
-  display: 'swap',
-});
 
 export const metadata: Metadata = {
   title: 'DU LỊCH EA SÚP | BẢN SẮC, DẤU ẤN ĐẠI NGÀN TÂY NGUYÊN',
@@ -58,8 +43,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="vi" className={`${notoSerif.variable} ${inter.variable}`}>
+    <html lang="vi">
       <head>
+        {/* Google Fonts loaded asynchronously in browser to avoid Docker build network timeouts */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Serif:wght@400;600;700;900&display=swap"
+          rel="stylesheet"
+        />
         {/* Leaflet CSS */}
         <link
           rel="stylesheet"

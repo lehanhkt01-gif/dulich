@@ -7,6 +7,8 @@
    ========================================================================== */
 
 :root {
+  --font-serif: 'Noto Serif', 'Merriweather', Georgia, Cambria, serif;
+  --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --bg-heritage: #FBF9F5;
   --text-charcoal: #1C1917;
   --color-moss: #0066CC;
@@ -20,14 +22,14 @@
 body {
   background-color: var(--bg-heritage);
   color: var(--text-charcoal);
-  font-family: var(--font-sans), system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  font-family: var(--font-sans);
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 h1, h2, h3, .font-serif-title {
-  font-family: var(--font-serif), 'Merriweather', 'Noto Serif', Georgia, Cambria, serif;
+  font-family: var(--font-serif);
   letter-spacing: -0.015em;
 }
 
