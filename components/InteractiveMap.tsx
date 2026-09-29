@@ -48,17 +48,24 @@ export default function InteractiveMap({
           zoomControl: false,
         });
 
-        // 1. OpenStreetMap Chuẩn (100% Miễn phí, chi tiết thôn buôn đường xá Việt Nam, không cần API Key)
+        // 1. Ảnh Vệ Tinh Viễn Thám Kết Hợp Nhãn Thôn Buôn & Đường Xá (MẶC ĐỊNH)
+        const satelliteImagery = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+          attribution: '&copy; Esri, Maxar, Earthstar Geographics',
+          maxZoom: 19,
+        });
+
+        const satelliteLabels = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', {
+          attribution: '',
+          maxZoom: 19,
+        });
+
+        const satelliteGroup = L.layerGroup([satelliteImagery, satelliteLabels]);
+
+        // 2. OpenStreetMap Chuẩn (Bản đồ Đường & Thôn Buôn)
         const osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
           attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors',
           maxZoom: 19,
           subdomains: ['a', 'b', 'c'],
-        });
-
-        // 2. Ảnh Vệ Tinh Viễn Thám ESRI (100% Miễn phí, không cần API Key)
-        const satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-          attribution: '&copy; Esri &copy; Maxar, Earthstar Geographics',
-          maxZoom: 18,
         });
 
         // 3. Bản đồ Địa hình Rừng Núi (ESRI Topo Map)
@@ -67,15 +74,15 @@ export default function InteractiveMap({
           maxZoom: 18,
         });
 
-        // Mặc định nạp OpenStreetMap
-        osmLayer.addTo(map);
+        // THIẾT LẬP MẶC ĐỊNH LÀ BẢN ĐỒ VỆ TINH
+        satelliteGroup.addTo(map);
 
         // Bộ chuyển đổi lớp bản đồ (Base Layers control) ở góc trên bên phải
         L.control.layers(
           {
-            '🗺️ Bản đồ Đường & Thôn Buôn': osmLayer,
-            '🛰️ Ảnh Vệ Tinh Viễn Thám': satelliteLayer,
-            '⛰️ Bản đồ Địa Hình Rừng Khộp': topoLayer,
+            '🛰️ Bản Đồ Vệ Tinh (Mặc định)': satelliteGroup,
+            '🗺️ Bản Đồ Đường & Thôn Buôn': osmLayer,
+            '⛰️ Bản Đồ Địa Hình Rừng Khộp': topoLayer,
           },
           undefined,
           { position: 'topright' }

@@ -38,11 +38,17 @@ export default function GpsPickerModal({
         zoom: 13,
       });
 
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors',
+      const satelliteImagery = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+        attribution: '&copy; Esri, Maxar',
         maxZoom: 19,
-        subdomains: ['a', 'b', 'c'],
-      }).addTo(map);
+      });
+
+      const satelliteLabels = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', {
+        attribution: '',
+        maxZoom: 19,
+      });
+
+      const satelliteGroup = L.layerGroup([satelliteImagery, satelliteLabels]).addTo(map);
 
       const marker = L.marker([currentLat, currentLng], { draggable: true }).addTo(map);
       markerRef.current = marker;
