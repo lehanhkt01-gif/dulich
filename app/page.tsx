@@ -292,7 +292,7 @@ export default async function HomePage() {
           PHẦN 5: GỢI Ý LỊCH TRÌNH DU LỊCH ĐỊA PHƯƠNG
           ==================================================================== */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 scroll-mt-24" id="lich-trinh">
-        <div className="bg-[#F5F2EB] rounded-3xl border border-[#E7E2D7] p-8 sm:p-12 space-y-8">
+        <div className="bg-[#F5F2EB] rounded-3xl border border-[#E7E2D7] p-5 sm:p-8 lg:p-12 space-y-8">
           <div>
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#A64B2A]/10 text-[#A64B2A] text-xs font-bold uppercase tracking-wider mb-2">
               <Calendar className="w-3.5 h-3.5" />
@@ -306,24 +306,24 @@ export default async function HomePage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
             {itineraries.map((itinerary) => (
               <div
                 key={itinerary.id}
-                className="bg-white rounded-2xl border border-[#E7E2D7] p-6 shadow-sm space-y-6"
+                className="bg-white rounded-2xl border border-[#E7E2D7] p-5 sm:p-6 shadow-sm space-y-6"
               >
-                <div className="flex items-start justify-between border-b border-[#E7E2D7] pb-4">
-                  <div>
-                    <span className="px-3 py-1 rounded-full bg-[#0066CC] text-white text-xs font-bold inline-block mb-2">
+                <div className="border-b border-[#E7E2D7] pb-4 space-y-3">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <span className="px-3 py-1 rounded-full bg-[#0066CC] text-white text-xs font-bold shadow-sm">
                       {itinerary.durationDays}
                     </span>
-                    <h3 className="font-serif text-lg sm:text-xl font-bold text-[#1C1917]">
-                      {itinerary.title}
-                    </h3>
+                    <span className="text-xs text-stone-600 font-medium bg-stone-100 px-3 py-1 rounded-lg">
+                      {itinerary.targetAudience}
+                    </span>
                   </div>
-                  <span className="text-xs text-stone-500 font-medium shrink-0 bg-stone-100 px-3 py-1 rounded-lg">
-                    {itinerary.targetAudience}
-                  </span>
+                  <h3 className="font-serif text-lg sm:text-xl font-bold text-[#1C1917] leading-snug">
+                    {itinerary.title}
+                  </h3>
                 </div>
 
                 {/* Timeline stops */}
@@ -339,9 +339,9 @@ export default async function HomePage() {
                         )}
                       </div>
                       <div className="flex-1 space-y-1">
-                        <div className="flex items-center justify-between">
+                        <div className="flex items-center justify-between gap-2">
                           <h4 className="text-sm font-bold text-[#1C1917]">{stop.title}</h4>
-                          <span className="text-[11px] font-mono text-stone-500 bg-stone-100 px-2 py-0.5 rounded">
+                          <span className="text-[11px] font-mono text-stone-500 bg-stone-100 px-2 py-0.5 rounded shrink-0">
                             {stop.time}
                           </span>
                         </div>
