@@ -37,10 +37,28 @@ export default async function HomePage() {
           - Thanh tra cứu nhanh và định vị bản đồ trong tầm mắt đầu tiên
           ==================================================================== */}
       <section className="relative pt-6 pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <div className="relative rounded-3xl overflow-hidden bg-gradient-to-b from-[#2D5A43]/10 to-[#F5F2EB] border border-[#E7E2D7] p-8 sm:p-12 lg:p-14">
-          <div className="max-w-3xl space-y-6">
+        <div className="relative rounded-3xl overflow-hidden border border-[#E7E2D7] shadow-heritage p-8 sm:p-12 lg:p-14 min-h-[480px] flex items-center">
+          {/* Ảnh nền Hồ Ea Súp Thượng (Đập Thủy Lợi) được hòa trộn mỹ thuật */}
+          <div className="absolute inset-0 z-0">
+            <img
+              src="/hero-easup.jpg"
+              alt="Hồ Ea Súp Thượng - Đập Thủy Lợi Ea Súp"
+              className="w-full h-full object-cover object-[75%_center] filter brightness-[0.98] contrast-[1.04]"
+            />
+            {/* Lớp hòa sắc di sản mềm mại (Harmonious Gradient Scrim) bảo vệ độ tương phản chữ */}
+            <div className="absolute inset-0 bg-gradient-to-r from-[#FBF9F5] via-[#FBF9F5]/90 to-[#FBF9F5]/30 sm:via-[#FBF9F5]/85 sm:to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#FBF9F5]/90 via-transparent to-transparent sm:hidden" />
+          </div>
+
+          {/* Badge góc phải: Chú thích danh thắng Hồ Ea Súp Thượng */}
+          <div className="absolute bottom-4 right-4 z-10 hidden md:flex items-center gap-2 bg-[#1C1917]/70 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-white/20 text-white text-[11px] shadow-sm">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span className="font-medium">Toàn cảnh Hồ Thủy Lợi Ea Súp Thượng</span>
+          </div>
+
+          <div className="relative z-10 max-w-3xl space-y-6">
             {/* Tag hành chính & logo xã Ea Súp */}
-            <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-[#2D5A43] text-amber-100 text-xs font-semibold uppercase tracking-wider shadow-sm">
+            <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-[#2D5A43] text-amber-100 text-xs font-semibold uppercase tracking-wider shadow-sm backdrop-blur-sm">
               <img
                 src="/logo-easup.png"
                 alt="Logo Xã Ea Súp"
@@ -50,7 +68,7 @@ export default async function HomePage() {
             </div>
 
             {/* Tiêu đề chính */}
-            <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#1C1917] tracking-tight leading-[1.15]">
+            <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#1C1917] tracking-tight leading-[1.15] drop-shadow-sm">
               DU LỊCH EA SÚP
               <span className="block text-[#A64B2A] text-2xl sm:text-3xl lg:text-4xl mt-2 font-bold tracking-normal">
                 BẢN SẮC, DẤU ẤN ĐẠI NGÀN TÂY NGUYÊN
@@ -58,7 +76,7 @@ export default async function HomePage() {
             </h1>
 
             {/* Dẫn nhập súc tích (Dưới 20 từ) */}
-            <p className="text-base sm:text-lg text-stone-700 leading-relaxed font-normal">
+            <p className="text-base sm:text-lg text-stone-800 leading-relaxed font-normal max-w-2xl">
               Khám phá ngọn tháp Chàm Yang PRông cổ kính, biển hồ Ea Súp Thượng mênh mông và hồn cồng chiêng buôn làng.
             </p>
 
@@ -67,7 +85,7 @@ export default async function HomePage() {
               <form
                 action="#danh-thang"
                 method="GET"
-                className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 bg-white p-2.5 rounded-2xl border border-[#E7E2D7] shadow-heritage"
+                className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 bg-white/95 backdrop-blur-md p-2.5 rounded-2xl border border-[#E7E2D7] shadow-heritage"
               >
                 <div className="flex-1 flex items-center gap-3 px-3">
                   <Search className="w-5 h-5 text-[#2D5A43]" />
@@ -82,7 +100,7 @@ export default async function HomePage() {
                 <div className="flex items-center gap-2">
                   <a
                     href="#ban-do-du-lich"
-                    className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-[#F5F2EB] hover:bg-stone-200 text-[#1C1917] text-xs font-semibold transition-colors"
+                    className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-[#F5F2EB]/90 hover:bg-stone-200 text-[#1C1917] text-xs font-semibold transition-colors"
                   >
                     <MapPin className="w-4 h-4 text-[#A64B2A]" />
                     <span>Mở Bản Đồ GIS</span>
@@ -99,28 +117,28 @@ export default async function HomePage() {
 
             {/* Danh mục nhanh */}
             <div className="flex flex-wrap items-center gap-2 pt-2">
-              <span className="text-xs font-medium text-stone-500 mr-1">Chủ đề:</span>
+              <span className="text-xs font-bold text-stone-700 mr-1 drop-shadow-sm">Chủ đề:</span>
               <a
                 href="#danh-thang"
-                className="px-3 py-1 rounded-full text-xs font-semibold bg-white border border-[#E7E2D7] text-[#2D5A43] hover:border-[#2D5A43] transition-colors"
+                className="px-3 py-1 rounded-full text-xs font-semibold bg-white/95 backdrop-blur-md border border-[#E7E2D7] text-[#2D5A43] hover:border-[#2D5A43] shadow-sm transition-colors"
               >
                 🏛️ Di tích Lịch sử
               </a>
               <a
                 href="#danh-thang"
-                className="px-3 py-1 rounded-full text-xs font-semibold bg-white border border-[#E7E2D7] text-[#2D5A43] hover:border-[#2D5A43] transition-colors"
+                className="px-3 py-1 rounded-full text-xs font-semibold bg-white/95 backdrop-blur-md border border-[#E7E2D7] text-[#2D5A43] hover:border-[#2D5A43] shadow-sm transition-colors"
               >
                 🌊 Hồ sinh thái Ea Súp Thượng
               </a>
               <a
                 href="#danh-thang"
-                className="px-3 py-1 rounded-full text-xs font-semibold bg-white border border-[#E7E2D7] text-[#2D5A43] hover:border-[#2D5A43] transition-colors"
+                className="px-3 py-1 rounded-full text-xs font-semibold bg-white/95 backdrop-blur-md border border-[#E7E2D7] text-[#2D5A43] hover:border-[#2D5A43] shadow-sm transition-colors"
               >
                 🔥 Cồng chiêng Buôn A2
               </a>
               <a
                 href="#danh-thang"
-                className="px-3 py-1 rounded-full text-xs font-semibold bg-white border border-[#E7E2D7] text-[#2D5A43] hover:border-[#2D5A43] transition-colors"
+                className="px-3 py-1 rounded-full text-xs font-semibold bg-white/95 backdrop-blur-md border border-[#E7E2D7] text-[#2D5A43] hover:border-[#2D5A43] shadow-sm transition-colors"
               >
                 🐘 Voi thân thiện Yok Đôn
               </a>
