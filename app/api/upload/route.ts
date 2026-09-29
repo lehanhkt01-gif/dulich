@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
-import sharp from 'sharp';
 import { getAuthUser, requireRole } from '@/lib/auth';
 
 export async function POST(req: NextRequest) {
@@ -37,37 +36,11 @@ export async function POST(req: NextRequest) {
       .replace(/\.[^/.]+$/, '')
       .replace(/[^a-zA-Z0-9_-]/g, '_')
       .substring(0, 50);
-    const isImage = file.type.startsWith('image/');
 
-    let finalFilename = '';
-    let mimeType = file.type;
-
-    if (isImage) {
-      try {
-        // Nén ảnh sang định dạng WebP chất lượng 82% và kích thước tối đa 1920px
-        finalFilename = `${originalName}-${timestamp}.webp`;
-        const filePath = path.join(uploadDir, finalFilename);
-
-        await sharp(buffer)
-          .resize({ width: 1920, withoutEnlargement: true })
-          .webp({ quality: 82 })
-          .toFile(filePath);
-
-        mimeType = 'image/webp';
-      } catch (sharpError) {
-        console.warn('Sharp optimization error, saving original file:', sharpError);
-        const ext = path.extname(file.name) || '.jpg';
-        finalFilename = `${originalName}-${timestamp}${ext}`;
-        const filePath = path.join(uploadDir, finalFilename);
-        fs.writeFileSync(filePath, buffer);
-      }
-    } else {
-      // Tệp âm thanh hoặc tệp khác giữ nguyên định dạng an toàn
-      const ext = path.extname(file.name) || '.mp3';
-      finalFilename = `${originalName}-${timestamp}${ext}`;
-      const filePath = path.join(uploadDir, finalFilename);
-      fs.writeFileSync(filePath, buffer);
-    }
+    const ext = path.extname(file.name) || (file.type.startsWith('image/') ? '.jpg' : '.mp3');
+    const finalFilename = `${originalName}-${timestamp}${ext}`;
+    const filePath = path.join(uploadDir, finalFilename);
+    fs.writeFileSync(filePath, buffer);
 
     const fileUrl = `/uploads/${finalFilename}`;
 
@@ -76,7 +49,7 @@ export async function POST(req: NextRequest) {
       message: 'Tải tệp và lưu trữ thành công',
       url: fileUrl,
       fileName: finalFilename,
-      type: mimeType,
+      type: file.type,
     });
   } catch (error: any) {
     console.error('Error in upload API:', error);
