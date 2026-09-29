@@ -11,7 +11,7 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 # BuildKit cache mount giúp download npm cực nhanh và không bao giờ bị tải lại
 RUN --mount=type=cache,target=/root/.npm \
-    npm ci --no-audit --prefer-offline
+    npm ci --legacy-peer-deps --no-audit
 
 # Sao chép schema Prisma và sinh Client
 COPY prisma ./prisma/
