@@ -34,17 +34,21 @@ export default function Navbar() {
       }`}
     >
       <div className="max-w-7xl mx-auto h-full px-4 sm:px-6 lg:px-8 flex items-center justify-between">
-        {/* Brand Logo */}
+        {/* Brand Logo Xã Ea Súp */}
         <Link href="/" className="flex items-center gap-3 group">
-          <div className="w-10 h-10 rounded-xl bg-[#2D5A43] flex items-center justify-center text-amber-100 shadow-md group-hover:scale-105 transition-transform">
-            <Compass className="w-6 h-6 stroke-[1.75]" />
+          <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-[#2D5A43] shadow-md group-hover:scale-105 transition-transform shrink-0 bg-white">
+            <img
+              src="/logo-easup.png"
+              alt="Logo Xã Ea Súp"
+              className="w-full h-full object-cover"
+            />
           </div>
           <div>
-            <span className="font-serif font-bold text-xl sm:text-2xl text-[#1C1917] tracking-tight block leading-none">
-              DANH THẮNG KÝ
+            <span className="font-serif font-bold text-lg sm:text-xl lg:text-2xl text-[#1C1917] tracking-tight block leading-none">
+              DU LỊCH EA SÚP
             </span>
-            <span className="text-[11px] uppercase tracking-wider text-[#A64B2A] font-semibold block mt-1">
-              Số hóa Di sản Ea Súp & Tây Nguyên
+            <span className="text-[10px] sm:text-[11px] uppercase tracking-wider text-[#A64B2A] font-bold block mt-1">
+              BẢN SẮC, DẤU ẤN ĐẠI NGÀN TÂY NGUYÊN
             </span>
           </div>
         </Link>

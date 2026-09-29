@@ -39,15 +39,22 @@ export default async function HomePage() {
       <section className="relative pt-6 pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         <div className="relative rounded-3xl overflow-hidden bg-gradient-to-b from-[#2D5A43]/10 to-[#F5F2EB] border border-[#E7E2D7] p-8 sm:p-12 lg:p-14">
           <div className="max-w-3xl space-y-6">
-            {/* Tag hành chính & văn hóa */}
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#2D5A43] text-amber-100 text-xs font-semibold uppercase tracking-wider shadow-sm">
-              <Compass className="w-4 h-4 text-amber-300" />
-              <span>Cổng Thông Tin Số Hóa Di Sản Văn Hóa & Du Lịch Ea Súp</span>
+            {/* Tag hành chính & logo xã Ea Súp */}
+            <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-[#2D5A43] text-amber-100 text-xs font-semibold uppercase tracking-wider shadow-sm">
+              <img
+                src="/logo-easup.png"
+                alt="Logo Xã Ea Súp"
+                className="w-5 h-5 rounded-full object-cover border border-amber-300/60 shrink-0"
+              />
+              <span>ỦY BAN NHÂN DÂN XÃ EA SÚP • TỈNH ĐẮK LẮK</span>
             </div>
 
-            {/* Tiêu đề chính (Tối đa 2 dòng desktop) */}
+            {/* Tiêu đề chính */}
             <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#1C1917] tracking-tight leading-[1.15]">
-              Danh Thắng Ký: Dấu Ấn Đại Ngàn & Trầm Tích Di Sản Ea Súp
+              DU LỊCH EA SÚP
+              <span className="block text-[#A64B2A] text-2xl sm:text-3xl lg:text-4xl mt-2 font-bold tracking-normal">
+                BẢN SẮC, DẤU ẤN ĐẠI NGÀN TÂY NGUYÊN
+              </span>
             </h1>
 
             {/* Dẫn nhập súc tích (Dưới 20 từ) */}
@@ -138,19 +145,27 @@ export default async function HomePage() {
             <div>
               <div className="inline-flex items-center gap-1.5 text-xs font-bold text-[#A64B2A] uppercase tracking-wider mb-2">
                 <MapPin className="w-4 h-4" />
-                <span>Hệ thống Định vị Địa không gian</span>
+                <span>Hệ thống Định vị Địa không gian GIS</span>
               </div>
               <h2 className="font-serif text-2xl sm:text-3xl font-bold text-[#1C1917]">
-                Bản Đồ Không Gian Du Lịch Xã & Huyện Ea Súp
+                Bản Đồ Không Gian Du Lịch Xã Ea Súp, Tỉnh Đắk Lắk
               </h2>
+              <p className="text-xs text-stone-500 font-mono mt-1">
+                Tọa độ trung tâm xã: 13.070029, 107.883355
+              </p>
             </div>
             <p className="text-xs sm:text-sm text-stone-600 max-w-md">
-              Chấm tọa độ chính xác từng di tích, hồ chứa nước và buôn làng. Nhấn vào điểm đánh dấu để xem tóm lược và kích hoạt dẫn đường Google Maps.
+              Chấm tọa độ chính xác từng di tích, hồ chứa nước và buôn làng. Nhấn vào biểu tượng huy hiệu xã để định vị trung tâm hành chính và kích hoạt chỉ đường Google Maps.
             </p>
           </div>
 
           {/* Map Leaflet */}
-          <InteractiveMap destinations={destinations} height="520px" />
+          <InteractiveMap
+            destinations={destinations}
+            initialCenter={[13.070029, 107.883355]}
+            initialZoom={12}
+            height="520px"
+          />
         </div>
       </section>
 

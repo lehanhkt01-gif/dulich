@@ -10,15 +10,19 @@ export default function Footer() {
           {/* Cột 1: Thông tin nền tảng */}
           <div className="md:col-span-2 space-y-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-[#2D5A43] flex items-center justify-center text-amber-200">
-                <Compass className="w-6 h-6" />
+              <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-amber-300/40 shrink-0 bg-white">
+                <img
+                  src="/logo-easup.png"
+                  alt="Logo Xã Ea Súp"
+                  className="w-full h-full object-cover"
+                />
               </div>
               <div>
-                <span className="font-serif font-bold text-2xl text-white tracking-wide">
-                  DANH THẮNG KÝ
+                <span className="font-serif font-bold text-2xl text-white tracking-wide block leading-none">
+                  DU LỊCH EA SÚP
                 </span>
-                <p className="text-xs text-[#A64B2A] font-semibold tracking-wider uppercase">
-                  Nền tảng số hóa di tích & văn hóa Ea Súp
+                <p className="text-[11px] text-[#A64B2A] font-bold tracking-wider uppercase mt-1">
+                  BẢN SẮC, DẤU ẤN ĐẠI NGÀN TÂY NGUYÊN
                 </p>
               </div>
             </div>

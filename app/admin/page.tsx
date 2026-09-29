@@ -40,9 +40,9 @@ export default function AdminPage() {
     content: '',
     audioVoiceUrl: '',
     thumbnail: '',
-    address: 'Xã Ea Súp, Huyện Ea Súp, Tỉnh Đắk Lắk',
-    latitude: 13.2086,
-    longitude: 107.8925,
+    address: 'Xã Ea Súp, Tỉnh Đắk Lắk',
+    latitude: 13.070029,
+    longitude: 107.883355,
     bestSeason: 'Tháng 11 đến Tháng 4 mùa khô rực rỡ',
     entryFee: 'Miễn phí tham quan',
     visitingHours: '07:00 - 17:30',
@@ -268,13 +268,22 @@ export default function AdminPage() {
       {/* Top Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#E7E2D7] pb-6">
         <div>
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#2D5A43]/10 text-[#2D5A43] text-xs font-semibold mb-2">
-            <ShieldCheck className="w-4 h-4" />
-            <span>Phân Hệ Ban Biên Tập & Quản Trị Hệ Thống</span>
+          <div className="flex items-center gap-2.5 mb-2">
+            <img
+              src="/logo-easup.png"
+              alt="Logo Xã Ea Súp"
+              className="w-7 h-7 rounded-full border border-[#2D5A43] shrink-0"
+            />
+            <span className="text-xs font-bold text-[#2D5A43] uppercase tracking-wider">
+              ỦY BAN NHÂN DÂN XÃ EA SÚP • TỈNH ĐẮK LẮK
+            </span>
           </div>
           <h1 className="font-serif text-2xl sm:text-3xl font-bold text-[#1C1917]">
-            Bảng Quản Trị Di Sản & Danh Thắng Ea Súp
+            Quản Trị Hệ Thống: DU LỊCH EA SÚP
           </h1>
+          <p className="text-xs text-[#A64B2A] font-bold uppercase tracking-wider mt-1">
+            BẢN SẮC, DẤU ẤN ĐẠI NGÀN TÂY NGUYÊN
+          </p>
         </div>
 
         <div className="flex items-center gap-3">

@@ -19,12 +19,12 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: 'DANH THẮNG KÝ | Nền Tảng Số Hóa Di Tích & Danh Lam Ea Súp, Tây Nguyên',
+  title: 'DU LỊCH EA SÚP | BẢN SẮC, DẤU ẤN ĐẠI NGÀN TÂY NGUYÊN',
   description:
-    'Hệ thống số hóa di tích lịch sử, danh lam thắng cảnh, văn hóa cồng chiêng buôn làng và du lịch sinh thái nông nghiệp huyện Ea Súp, tỉnh Đắk Lắk. Bản đồ GIS du lịch, thuyết minh âm thanh đa phương tiện.',
+    'Cổng thông tin du lịch và số hóa di tích lịch sử, danh lam thắng cảnh, văn hóa cồng chiêng buôn làng xã Ea Súp, tỉnh Đắk Lắk. Bản đồ GIS du lịch tương tác tọa độ 13.070029, 107.883355.',
   keywords: [
-    'Danh thắng ký',
-    'Ea Súp',
+    'Du lịch Ea Súp',
+    'Bản sắc dấu ấn đại ngàn Tây Nguyên',
     'Tháp Chàm Yang PRông',
     'Hồ Ea Súp Thượng',
     'Du lịch Đắk Lắk',
@@ -32,12 +32,17 @@ export const metadata: Metadata = {
     'Du lịch sinh thái Yok Đôn',
     'Bản đồ du lịch Ea Súp',
   ],
-  authors: [{ name: 'Ban Biên Tập Di Sản Ea Súp' }],
+  icons: {
+    icon: '/logo-easup.png',
+    apple: '/logo-easup.png',
+  },
+  authors: [{ name: 'UBND Xã Ea Súp - Ban Biên Tập Văn Hóa & Du Lịch' }],
   openGraph: {
-    title: 'DANH THẮNG KÝ | Số hóa Di tích & Danh lam Ea Súp, Tây Nguyên',
-    description: 'Bản đồ GIS du lịch, thuyết minh âm thanh đa phương tiện và di sản Tây Nguyên',
+    title: 'DU LỊCH EA SÚP | BẢN SẮC, DẤU ẤN ĐẠI NGÀN TÂY NGUYÊN',
+    description: 'Bản đồ GIS du lịch, thuyết minh âm thanh đa phương tiện và di sản xã Ea Súp, tỉnh Đắk Lắk',
     type: 'website',
     locale: 'vi_VN',
+    images: [{ url: '/logo-easup.png' }],
   },
 };
 

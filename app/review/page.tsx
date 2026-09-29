@@ -168,15 +168,15 @@ docker compose up -d --build && docker compose exec web npx prisma db push && do
       <div className="bg-[#FFFFFF] rounded-3xl border border-[#E7E2D7] p-8 shadow-heritage space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-2xl bg-[#2D5A43] text-amber-100 flex items-center justify-center shadow-md">
-              <ShieldCheck className="w-7 h-7" />
+            <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-[#2D5A43] shadow-md shrink-0 bg-white">
+              <img src="/logo-easup.png" alt="Logo Xã Ea Súp" className="w-full h-full object-cover" />
             </div>
             <div>
               <span className="text-[11px] font-bold uppercase tracking-wider text-[#A64B2A] block">
-                Bảng Kiểm Tra Hệ Thống Trước Khi Deploy VPS
+                ỦY BAN NHÂN DÂN XÃ EA SÚP • TỈNH ĐẮK LẮK (13.070029, 107.883355)
               </span>
               <h1 className="font-serif text-2xl sm:text-3xl font-extrabold text-[#1C1917]">
-                Trang Kiểm Tra & Nghiệm Thu (Pre-Flight Review)
+                DU LỊCH EA SÚP: BẢN SẮC, DẤU ẤN ĐẠI NGÀN
               </h1>
             </div>
           </div>

@@ -16,8 +16,8 @@ interface InteractiveMapProps {
 export default function InteractiveMap({
   destinations,
   selectedCategory = 'all',
-  initialCenter = [13.2086, 107.8925], // Trung tâm huyện Ea Súp
-  initialZoom = 11,
+  initialCenter = [13.070029, 107.883355], // Vị trí xã Ea Súp, tỉnh Đắk Lắk (13.070029, 107.883355)
+  initialZoom = 12,
   height = '540px',
 }: InteractiveMapProps) {
   const mapContainerRef = useRef<HTMLDivElement>(null);
@@ -175,6 +175,64 @@ export default function InteractiveMap({
         markersRef.current.push(marker);
       });
 
+      // Marker đặc biệt: Vị trí trung tâm Xã Ea Súp, Tỉnh Đắk Lắk (13.070029, 107.883355)
+      const centerEaSupIcon = L.divIcon({
+        html: `
+          <div style="
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: #2D5A43;
+            border: 3px solid #C6923C;
+            box-shadow: 0 4px 18px rgba(0,0,0,0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            cursor: pointer;
+          ">
+            <img src="/logo-easup.png" style="width: 100%; height: 100%; object-fit: cover;" alt="Logo Xã Ea Súp" />
+          </div>
+        `,
+        className: 'center-easup-pin',
+        iconSize: [48, 48],
+        iconAnchor: [24, 24],
+        popupAnchor: [0, -24],
+      });
+
+      const centerMarker = L.marker([13.070029, 107.883355], {
+        icon: centerEaSupIcon,
+        zIndexOffset: 1000,
+      }).addTo(map);
+
+      centerMarker.bindPopup(`
+        <div style="width: 260px; font-family: inherit; padding: 12px 14px; text-align: center;">
+          <div style="width: 58px; height: 58px; border-radius: 50%; overflow: hidden; margin: 0 auto 8px auto; border: 2px solid #2D5A43; box-shadow: 0 2px 8px rgba(0,0,0,0.15);">
+            <img src="/logo-easup.png" style="width: 100%; height: 100%; object-fit: cover;" alt="Logo Xã Ea Súp" />
+          </div>
+          <span style="font-size: 10px; font-weight: 700; color: #A64B2A; text-transform: uppercase; letter-spacing: 0.5px;">TRUNG TÂM VĂN HÓA & DU LỊCH</span>
+          <h4 style="font-size: 15px; font-weight: 800; color: #1C1917; margin: 3px 0 2px 0;">XÃ EA SÚP</h4>
+          <p style="font-size: 11px; color: #57534E; margin: 0 0 10px 0;">Tỉnh Đắk Lắk • Tọa độ: <strong>13.070029, 107.883355</strong></p>
+          <a href="https://www.google.com/maps/dir/?api=1&destination=13.070029,107.883355" target="_blank" rel="noopener noreferrer" style="
+            display: inline-block;
+            width: 100%;
+            background: #2D5A43;
+            color: white;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 8px 0;
+            border-radius: 8px;
+            text-decoration: none;
+            box-shadow: 0 2px 6px rgba(45,90,67,0.3);
+          ">🧭 Dẫn Đường Về Xã Ea Súp</a>
+        </div>
+      `, {
+        className: 'custom-heritage-popup',
+        maxWidth: 300,
+      });
+
+      markersRef.current.push(centerMarker);
+
       // Fit bounds nếu có điểm
       if (filtered.length > 0) {
         const group = L.featureGroup(markersRef.current);
@@ -194,18 +252,29 @@ export default function InteractiveMap({
   return (
     <div className="relative w-full rounded-2xl overflow-hidden border border-[#E7E2D7] shadow-heritage bg-[#F5F2EB]">
       {/* Top Map Bar */}
-      <div className="absolute top-4 left-4 z-20 flex items-center gap-2 bg-[#FFFFFF]/90 backdrop-blur-md px-3.5 py-2 rounded-xl border border-[#E7E2D7] shadow-sm">
-        <Compass className="w-4 h-4 text-[#2D5A43] animate-pulse" />
-        <span className="text-xs font-semibold text-[#1C1917]">
-          Bản Đồ Không Gian Du Lịch GIS Ea Súp
-        </span>
-        <span className="text-[11px] px-2 py-0.5 rounded-full bg-[#2D5A43]/10 text-[#2D5A43] font-bold">
+      <div className="absolute top-4 left-4 z-20 flex items-center gap-2.5 bg-[#FFFFFF]/95 backdrop-blur-md px-3.5 py-2 rounded-xl border border-[#E7E2D7] shadow-sm">
+        <div className="w-5 h-5 rounded-full overflow-hidden border border-[#2D5A43]">
+          <img src="/logo-easup.png" alt="Logo" className="w-full h-full object-cover" />
+        </div>
+        <div>
+          <span className="text-xs font-bold text-[#1C1917] block leading-none">
+            Bản Đồ Du Lịch Xã Ea Súp, Tỉnh Đắk Lắk
+          </span>
+          <span className="text-[10px] text-stone-500 font-mono">
+            Tọa độ tâm: 13.070029, 107.883355
+          </span>
+        </div>
+        <span className="text-[11px] px-2 py-0.5 rounded-full bg-[#2D5A43]/10 text-[#2D5A43] font-bold ml-1">
           {destinations.length} Điểm
         </span>
       </div>
 
       {/* Map Legend */}
       <div className="absolute bottom-4 left-4 z-20 hidden sm:flex items-center gap-3 bg-[#FFFFFF]/90 backdrop-blur-md px-3 py-1.5 rounded-xl border border-[#E7E2D7] text-[11px] shadow-sm">
+        <div className="flex items-center gap-1.5">
+          <span className="w-3.5 h-3.5 rounded-full border border-amber-600 bg-amber-400"></span>
+          <span className="font-semibold text-stone-800">Tâm Xã Ea Súp</span>
+        </div>
         <div className="flex items-center gap-1.5">
           <span className="w-3 h-3 rounded-full bg-[#A64B2A]"></span>
           <span className="font-medium text-stone-700">Điểm Tiêu Biểu</span>

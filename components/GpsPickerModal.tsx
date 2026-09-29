@@ -17,8 +17,8 @@ export default function GpsPickerModal({
   onClose,
 }: GpsPickerModalProps) {
   const mapContainerRef = useRef<HTMLDivElement>(null);
-  const [currentLat, setCurrentLat] = useState(initialLat || 13.2086);
-  const [currentLng, setCurrentLng] = useState(initialLng || 107.8925);
+  const [currentLat, setCurrentLat] = useState(initialLat || 13.070029);
+  const [currentLng, setCurrentLng] = useState(initialLng || 107.883355);
   const markerRef = useRef<any>(null);
   const mapRef = useRef<any>(null);
 
