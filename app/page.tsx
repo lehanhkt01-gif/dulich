@@ -98,17 +98,10 @@ export default async function HomePage() {
                   />
                 </div>
 
-                <div className="flex items-center gap-2">
-                  <a
-                    href="#ban-do-du-lich"
-                    className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-[#F5F2EB]/90 hover:bg-stone-200 text-[#1C1917] text-xs font-semibold transition-colors"
-                  >
-                    <MapPin className="w-4 h-4 text-[#A64B2A]" />
-                    <span>Mở Bản Đồ GIS</span>
-                  </a>
+                <div className="flex items-center">
                   <button
                     type="submit"
-                    className="flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-[#0066CC] hover:bg-[#0052A3] text-white text-xs font-bold transition-all shadow-md hover:scale-[1.02]"
+                    className="flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-[#0066CC] hover:bg-[#0052A3] text-white text-xs font-bold transition-all shadow-md hover:scale-[1.02] w-full sm:w-auto"
                   >
                     <span>Tra Cứu</span>
                   </button>
