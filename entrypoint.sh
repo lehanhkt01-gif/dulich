@@ -13,7 +13,9 @@ if [ -n "$DATABASE_URL" ]; then
 fi
 
 echo "=> Khoi dong ung dung Next.js..."
-if command -v su-exec >/dev/null 2>&1; then
+if command -v gosu >/dev/null 2>&1; then
+  exec gosu nextjs "$@"
+elif command -v su-exec >/dev/null 2>&1; then
   exec su-exec nextjs "$@"
 else
   exec "$@"
