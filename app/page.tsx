@@ -329,19 +329,19 @@ export default async function HomePage() {
                 {/* Timeline stops */}
                 <div className="space-y-4">
                   {itinerary.routeDetails.map((stop, sIdx) => (
-                    <div key={sIdx} className="flex gap-4 items-start group">
-                      <div className="flex flex-col items-center">
-                        <div className="w-6 h-6 rounded-full bg-[#0066CC]/15 text-[#0066CC] flex items-center justify-center text-xs font-bold shrink-0">
+                    <div key={sIdx} className="flex gap-3 sm:gap-4 items-start group">
+                      <div className="flex flex-col items-center self-stretch">
+                        <div className="w-6 h-6 rounded-full bg-[#0066CC]/15 text-[#0066CC] flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">
                           {sIdx + 1}
                         </div>
                         {sIdx !== itinerary.routeDetails.length - 1 && (
-                          <div className="w-0.5 h-12 bg-[#E7E2D7] mt-1" />
+                          <div className="w-0.5 flex-1 min-h-[36px] bg-[#E7E2D7] my-1" />
                         )}
                       </div>
-                      <div className="flex-1 space-y-1">
-                        <div className="flex items-center justify-between gap-2">
-                          <h4 className="text-sm font-bold text-[#1C1917]">{stop.title}</h4>
-                          <span className="text-[11px] font-mono text-stone-500 bg-stone-100 px-2 py-0.5 rounded shrink-0">
+                      <div className="flex-1 space-y-1.5 pb-2">
+                        <h4 className="text-sm font-bold text-[#1C1917] leading-snug">{stop.title}</h4>
+                        <div>
+                          <span className="inline-flex items-center text-[11px] font-mono text-stone-600 bg-stone-100 px-2 py-0.5 rounded border border-stone-200">
                             {stop.time}
                           </span>
                         </div>
