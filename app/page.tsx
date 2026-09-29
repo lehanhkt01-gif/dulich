@@ -58,11 +58,11 @@ export default async function HomePage() {
 
           <div className="relative z-10 max-w-3xl space-y-6">
             {/* Tag hành chính & logo xã Ea Súp */}
-            <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-[#2D5A43] text-amber-100 text-xs font-semibold uppercase tracking-wider shadow-sm backdrop-blur-sm">
+            <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-[#0066CC] text-white text-xs font-bold uppercase tracking-wider shadow-md backdrop-blur-sm">
               <img
                 src="/logo-easup.png"
                 alt="Logo Xã Ea Súp"
-                className="w-5 h-5 rounded-full object-cover border border-amber-300/60 shrink-0"
+                className="w-5 h-5 rounded-full object-cover border border-white/80 shrink-0 shadow-sm"
               />
               <span>ĐOÀN THANH NIÊN EA SÚP - ĐĂK LĂK</span>
             </div>
@@ -88,7 +88,7 @@ export default async function HomePage() {
                 className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 bg-white/95 backdrop-blur-md p-2.5 rounded-2xl border border-[#E7E2D7] shadow-heritage"
               >
                 <div className="flex-1 flex items-center gap-3 px-3">
-                  <Search className="w-5 h-5 text-[#2D5A43]" />
+                  <Search className="w-5 h-5 text-[#0066CC]" />
                   <input
                     type="text"
                     name="q"
@@ -107,7 +107,7 @@ export default async function HomePage() {
                   </a>
                   <button
                     type="submit"
-                    className="flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-[#2D5A43] hover:bg-[#234634] text-white text-xs font-bold transition-all shadow-md hover:scale-[1.02]"
+                    className="flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-[#0066CC] hover:bg-[#0052A3] text-white text-xs font-bold transition-all shadow-md hover:scale-[1.02]"
                   >
                     <span>Tra Cứu</span>
                   </button>
@@ -120,25 +120,25 @@ export default async function HomePage() {
               <span className="text-xs font-bold text-stone-700 mr-1 drop-shadow-sm">Chủ đề:</span>
               <a
                 href="#danh-thang"
-                className="px-3 py-1 rounded-full text-xs font-semibold bg-white/95 backdrop-blur-md border border-[#E7E2D7] text-[#2D5A43] hover:border-[#2D5A43] shadow-sm transition-colors"
+                className="px-3 py-1 rounded-full text-xs font-semibold bg-white/95 backdrop-blur-md border border-[#E7E2D7] text-[#0066CC] hover:border-[#0066CC] shadow-sm transition-colors"
               >
                 🏛️ Di tích Lịch sử
               </a>
               <a
                 href="#danh-thang"
-                className="px-3 py-1 rounded-full text-xs font-semibold bg-white/95 backdrop-blur-md border border-[#E7E2D7] text-[#2D5A43] hover:border-[#2D5A43] shadow-sm transition-colors"
+                className="px-3 py-1 rounded-full text-xs font-semibold bg-white/95 backdrop-blur-md border border-[#E7E2D7] text-[#0066CC] hover:border-[#0066CC] shadow-sm transition-colors"
               >
                 🌊 Hồ sinh thái Ea Súp Thượng
               </a>
               <a
                 href="#danh-thang"
-                className="px-3 py-1 rounded-full text-xs font-semibold bg-white/95 backdrop-blur-md border border-[#E7E2D7] text-[#2D5A43] hover:border-[#2D5A43] shadow-sm transition-colors"
+                className="px-3 py-1 rounded-full text-xs font-semibold bg-white/95 backdrop-blur-md border border-[#E7E2D7] text-[#0066CC] hover:border-[#0066CC] shadow-sm transition-colors"
               >
                 🔥 Cồng chiêng Buôn A2
               </a>
               <a
                 href="#danh-thang"
-                className="px-3 py-1 rounded-full text-xs font-semibold bg-white/95 backdrop-blur-md border border-[#E7E2D7] text-[#2D5A43] hover:border-[#2D5A43] shadow-sm transition-colors"
+                className="px-3 py-1 rounded-full text-xs font-semibold bg-white/95 backdrop-blur-md border border-[#E7E2D7] text-[#0066CC] hover:border-[#0066CC] shadow-sm transition-colors"
               >
                 🐘 Voi thân thiện Yok Đôn
               </a>
@@ -194,7 +194,7 @@ export default async function HomePage() {
         <div className="space-y-8">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
             <div>
-              <span className="text-xs font-bold text-[#2D5A43] uppercase tracking-wider block mb-1">
+              <span className="text-xs font-bold text-[#0066CC] uppercase tracking-wider block mb-1">
                 Khám phá chuyên sâu
               </span>
               <h2 className="font-serif text-2xl sm:text-3xl font-bold text-[#1C1917]">
@@ -211,7 +211,7 @@ export default async function HomePage() {
             {destinations.map((dest, idx) => (
               <div
                 key={dest.id}
-                className="group bg-white rounded-2xl border border-[#E7E2D7] overflow-hidden shadow-heritage hover:border-[#2D5A43] transition-all flex flex-col"
+                className="group bg-white rounded-2xl border border-[#E7E2D7] overflow-hidden shadow-heritage hover:border-[#0066CC] transition-all flex flex-col"
               >
                 <div className="relative h-64 sm:h-72 w-full overflow-hidden">
                   <img
@@ -223,7 +223,7 @@ export default async function HomePage() {
 
                   {/* Badges */}
                   <div className="absolute top-4 left-4 flex gap-2">
-                    <span className="px-3 py-1 rounded-full bg-[#2D5A43] text-white text-xs font-bold shadow">
+                    <span className="px-3 py-1 rounded-full bg-[#0066CC] text-white text-xs font-bold shadow">
                       {dest.category?.name || 'Di sản'}
                     </span>
                     {dest.isFeatured && (
@@ -251,7 +251,7 @@ export default async function HomePage() {
 
                   <div className="space-y-3 pt-3 border-t border-[#E7E2D7]">
                     <div className="flex items-center justify-between text-xs text-stone-500">
-                      <span className="flex items-center gap-1 text-[#2D5A43] font-medium">
+                      <span className="flex items-center gap-1 text-[#0066CC] font-medium">
                         <Headphones className="w-3.5 h-3.5" />
                         Có thuyết minh AI
                       </span>
@@ -274,7 +274,7 @@ export default async function HomePage() {
 
                       <Link
                         href={`/destinations/${dest.slug}`}
-                        className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#2D5A43] hover:bg-[#234634] text-white text-xs font-semibold transition-all shadow-sm group-hover:translate-x-0.5"
+                        className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#0066CC] hover:bg-[#0052A3] text-white text-xs font-semibold transition-all shadow-sm group-hover:translate-x-0.5"
                       >
                         <span>Chi tiết khảo cứu</span>
                         <ChevronRight className="w-3.5 h-3.5" />
@@ -314,7 +314,7 @@ export default async function HomePage() {
               >
                 <div className="flex items-start justify-between border-b border-[#E7E2D7] pb-4">
                   <div>
-                    <span className="px-3 py-1 rounded-full bg-[#2D5A43] text-white text-xs font-bold inline-block mb-2">
+                    <span className="px-3 py-1 rounded-full bg-[#0066CC] text-white text-xs font-bold inline-block mb-2">
                       {itinerary.durationDays}
                     </span>
                     <h3 className="font-serif text-lg sm:text-xl font-bold text-[#1C1917]">
@@ -331,7 +331,7 @@ export default async function HomePage() {
                   {itinerary.routeDetails.map((stop, sIdx) => (
                     <div key={sIdx} className="flex gap-4 items-start group">
                       <div className="flex flex-col items-center">
-                        <div className="w-6 h-6 rounded-full bg-[#2D5A43]/15 text-[#2D5A43] flex items-center justify-center text-xs font-bold shrink-0">
+                        <div className="w-6 h-6 rounded-full bg-[#0066CC]/15 text-[#0066CC] flex items-center justify-center text-xs font-bold shrink-0">
                           {sIdx + 1}
                         </div>
                         {sIdx !== itinerary.routeDetails.length - 1 && (

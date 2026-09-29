@@ -272,9 +272,9 @@ export default function AdminPage() {
             <img
               src="/logo-easup.png"
               alt="Logo Xã Ea Súp"
-              className="w-7 h-7 rounded-full border border-[#2D5A43] shrink-0"
+              className="w-7 h-7 rounded-full border border-[#0066CC] shrink-0"
             />
-            <span className="text-xs font-bold text-[#2D5A43] uppercase tracking-wider">
+            <span className="text-xs font-bold text-[#0066CC] uppercase tracking-wider">
               ĐOÀN THANH NIÊN EA SÚP - ĐĂK LĂK (XÃ EA SÚP)
             </span>
           </div>
@@ -299,7 +299,7 @@ export default function AdminPage() {
               setEditingDest(null);
               setActiveTab(activeTab === 'create' ? 'list' : 'create');
             }}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#2D5A43] hover:bg-[#234634] text-white text-xs font-bold shadow transition-all"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#0066CC] hover:bg-[#0052A3] text-white text-xs font-bold shadow transition-all"
           >
             {activeTab === 'create' ? <FileText className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
             <span>{activeTab === 'create' ? 'Xem Danh Sách' : 'Thêm Mới Danh Thắng'}</span>
@@ -311,7 +311,7 @@ export default function AdminPage() {
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         <div className="bg-white p-4 rounded-xl border border-[#E7E2D7] shadow-sm">
           <p className="text-xs text-stone-500 font-medium">Tổng danh lam & di tích</p>
-          <p className="text-2xl font-serif font-bold text-[#2D5A43] mt-1">{destinations.length}</p>
+          <p className="text-2xl font-serif font-bold text-[#0066CC] mt-1">{destinations.length}</p>
         </div>
         <div className="bg-white p-4 rounded-xl border border-[#E7E2D7] shadow-sm">
           <p className="text-xs text-stone-500 font-medium">Ghim tiêu biểu trang chủ</p>
@@ -327,7 +327,7 @@ export default function AdminPage() {
         </div>
         <div className="bg-white p-4 rounded-xl border border-[#E7E2D7] shadow-sm">
           <p className="text-xs text-stone-500 font-medium">Tổng lượt quan tâm</p>
-          <p className="text-2xl font-serif font-bold text-[#2D5A43] mt-1">
+          <p className="text-2xl font-serif font-bold text-[#0066CC] mt-1">
             {destinations.reduce((acc, d) => acc + (d.viewsCount || 0), 0).toLocaleString()}
           </p>
         </div>
@@ -367,7 +367,7 @@ export default function AdminPage() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Tìm theo tên di tích, thôn buôn, địa chỉ..."
-                className="w-full text-xs pl-9 pr-4 py-2.5 rounded-xl border border-[#E7E2D7] focus:outline-none focus:border-[#2D5A43]"
+                className="w-full text-xs pl-9 pr-4 py-2.5 rounded-xl border border-[#E7E2D7] focus:outline-none focus:border-[#0066CC]"
               />
             </div>
           </div>
@@ -434,7 +434,7 @@ export default function AdminPage() {
                         <Link
                           href={`/destinations/${dest.slug}`}
                           target="_blank"
-                          className="p-1.5 text-stone-500 hover:text-[#2D5A43]"
+                          className="p-1.5 text-stone-500 hover:text-[#0066CC]"
                           title="Xem trên web"
                         >
                           <Eye className="w-4 h-4" />
@@ -471,7 +471,7 @@ export default function AdminPage() {
         >
           <div className="flex items-center justify-between border-b border-[#E7E2D7] pb-4">
             <h2 className="font-serif text-xl font-bold text-[#1C1917] flex items-center gap-2">
-              <Sparkles className="w-5 h-5 text-[#2D5A43]" />
+              <Sparkles className="w-5 h-5 text-[#0066CC]" />
               <span>{editingDest ? 'Chỉnh Sửa Hồ Sơ Di Tích' : 'Tạo Mới Hồ Sơ Di Tích & Danh Thắng'}</span>
             </h2>
             <button
@@ -493,7 +493,7 @@ export default function AdminPage() {
                 value={formData.title}
                 onChange={(e) => handleTitleChange(e.target.value)}
                 placeholder="VD: Tháp Chàm Yang PRông, Hồ Ea Súp Thượng..."
-                className="w-full text-xs p-3 rounded-xl border border-[#E7E2D7] focus:outline-none focus:border-[#2D5A43]"
+                className="w-full text-xs p-3 rounded-xl border border-[#E7E2D7] focus:outline-none focus:border-[#0066CC]"
               />
             </div>
 
@@ -506,7 +506,7 @@ export default function AdminPage() {
                 value={formData.slug}
                 onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
                 placeholder="thap-cham-yang-prong"
-                className="w-full text-xs p-3 rounded-xl border border-[#E7E2D7] font-mono focus:outline-none focus:border-[#2D5A43]"
+                className="w-full text-xs p-3 rounded-xl border border-[#E7E2D7] font-mono focus:outline-none focus:border-[#0066CC]"
               />
             </div>
 
@@ -516,7 +516,7 @@ export default function AdminPage() {
               <select
                 value={formData.categoryId}
                 onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}
-                className="w-full text-xs p-3 rounded-xl border border-[#E7E2D7] focus:outline-none focus:border-[#2D5A43] bg-white"
+                className="w-full text-xs p-3 rounded-xl border border-[#E7E2D7] focus:outline-none focus:border-[#0066CC] bg-white"
               >
                 <option value="cat-di-tich">Di tích Lịch sử & Kiến trúc</option>
                 <option value="cat-thac-ho">Thác nước & Hồ cảnh quan</option>
@@ -533,7 +533,7 @@ export default function AdminPage() {
                 value={formData.historicalPeriod}
                 onChange={(e) => setFormData({ ...formData, historicalPeriod: e.target.value })}
                 placeholder="VD: Cuối thế kỷ XIII, Thời vua Chế Mân..."
-                className="w-full text-xs p-3 rounded-xl border border-[#E7E2D7] focus:outline-none focus:border-[#2D5A43]"
+                className="w-full text-xs p-3 rounded-xl border border-[#E7E2D7] focus:outline-none focus:border-[#0066CC]"
               />
             </div>
           </div>
@@ -546,7 +546,7 @@ export default function AdminPage() {
               value={formData.subTitle}
               onChange={(e) => setFormData({ ...formData, subTitle: e.target.value })}
               placeholder="Một câu trích dẫn đặc sắc về di tích..."
-              className="w-full text-xs p-3 rounded-xl border border-[#E7E2D7] focus:outline-none focus:border-[#2D5A43]"
+              className="w-full text-xs p-3 rounded-xl border border-[#E7E2D7] focus:outline-none focus:border-[#0066CC]"
             />
           </div>
 
@@ -560,7 +560,7 @@ export default function AdminPage() {
               <button
                 type="button"
                 onClick={() => setGpsModalOpen(true)}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#2D5A43] text-white text-xs font-semibold hover:bg-[#234634] shadow-sm"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#0066CC] text-white text-xs font-semibold hover:bg-[#0052A3] shadow-sm"
               >
                 <Compass className="w-3.5 h-3.5" />
                 <span>Chấm Tọa Độ Trên Bản Đồ</span>
@@ -609,9 +609,9 @@ export default function AdminPage() {
             <div className="space-y-2">
               <label className="text-xs font-bold text-stone-700 flex items-center justify-between">
                 <span>Ảnh Tiêu Biểu (Tự động nén WebP)</span>
-                {uploadingImage && <span className="text-[11px] text-[#2D5A43]">Đang nén WebP...</span>}
+                {uploadingImage && <span className="text-[11px] text-[#0066CC]">Đang nén WebP...</span>}
               </label>
-              <div className="border-2 border-dashed border-[#E7E2D7] hover:border-[#2D5A43] rounded-xl p-4 text-center bg-[#FBF9F5] transition-colors relative">
+              <div className="border-2 border-dashed border-[#E7E2D7] hover:border-[#0066CC] rounded-xl p-4 text-center bg-[#FBF9F5] transition-colors relative">
                 <input
                   type="file"
                   accept="image/*"
@@ -632,16 +632,16 @@ export default function AdminPage() {
             <div className="space-y-2">
               <label className="text-xs font-bold text-stone-700 flex items-center justify-between">
                 <span>File Âm Thanh Thuyết Minh AI (.mp3, .ogg)</span>
-                {uploadingAudio && <span className="text-[11px] text-[#2D5A43]">Đang tải lên...</span>}
+                {uploadingAudio && <span className="text-[11px] text-[#0066CC]">Đang tải lên...</span>}
               </label>
-              <div className="border-2 border-dashed border-[#E7E2D7] hover:border-[#2D5A43] rounded-xl p-4 text-center bg-[#FBF9F5] transition-colors relative">
+              <div className="border-2 border-dashed border-[#E7E2D7] hover:border-[#0066CC] rounded-xl p-4 text-center bg-[#FBF9F5] transition-colors relative">
                 <input
                   type="file"
                   accept="audio/*"
                   onChange={handleAudioUpload}
                   className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
                 />
-                <Headphones className="w-6 h-6 text-[#2D5A43] mx-auto mb-1" />
+                <Headphones className="w-6 h-6 text-[#0066CC] mx-auto mb-1" />
                 <p className="text-xs text-stone-600 font-medium">
                   Kéo thả file thuyết minh ghi âm
                 </p>
@@ -663,7 +663,7 @@ export default function AdminPage() {
               value={formData.content}
               onChange={(e) => setFormData({ ...formData, content: e.target.value })}
               placeholder="Soạn thảo nội dung lịch sử, kiến trúc, sự tích, tín ngưỡng..."
-              className="w-full text-xs p-3 rounded-xl border border-[#E7E2D7] leading-relaxed focus:outline-none focus:border-[#2D5A43]"
+              className="w-full text-xs p-3 rounded-xl border border-[#E7E2D7] leading-relaxed focus:outline-none focus:border-[#0066CC]"
             />
           </div>
 
@@ -718,7 +718,7 @@ export default function AdminPage() {
               id="isFeatured"
               checked={formData.isFeatured}
               onChange={(e) => setFormData({ ...formData, isFeatured: e.target.checked })}
-              className="w-4 h-4 rounded text-[#2D5A43] focus:ring-0"
+              className="w-4 h-4 rounded text-[#0066CC] focus:ring-0"
             />
             <label htmlFor="isFeatured" className="text-xs font-bold text-stone-700 cursor-pointer">
               Ghim danh thắng này làm Di Sản Tiêu Biểu trên Bento Grid trang chủ
@@ -736,7 +736,7 @@ export default function AdminPage() {
             </button>
             <button
               type="submit"
-              className="px-6 py-2.5 rounded-xl bg-[#2D5A43] hover:bg-[#234634] text-white text-xs font-bold shadow-md transition-all"
+              className="px-6 py-2.5 rounded-xl bg-[#0066CC] hover:bg-[#0052A3] text-white text-xs font-bold shadow-md transition-all"
             >
               {editingDest ? 'Lưu Thay Đổi Di Tích' : 'Đăng Tải Danh Thắng Mới'}
             </button>

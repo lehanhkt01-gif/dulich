@@ -82,7 +82,7 @@ export default function GpsPickerModal({
         {/* Header */}
         <div className="px-6 py-4 border-b border-[#E7E2D7] flex items-center justify-between bg-[#FBF9F5]">
           <div className="flex items-center gap-2">
-            <Compass className="w-5 h-5 text-[#2D5A43]" />
+            <Compass className="w-5 h-5 text-[#0066CC]" />
             <h3 className="font-serif text-lg font-bold text-[#1C1917]">
               Chấm Tọa Độ GPS Di Tích Trên Bản Đồ
             </h3>
@@ -106,8 +106,8 @@ export default function GpsPickerModal({
         {/* Footer */}
         <div className="px-6 py-4 bg-[#FBF9F5] border-t border-[#E7E2D7] flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="text-xs font-mono text-stone-700 bg-white px-3 py-2 rounded-lg border border-[#E7E2D7]">
-            Vĩ độ (Lat): <strong className="text-[#2D5A43]">{currentLat.toFixed(6)}</strong> | Kinh độ (Lng):{' '}
-            <strong className="text-[#2D5A43]">{currentLng.toFixed(6)}</strong>
+            Vĩ độ (Lat): <strong className="text-[#0066CC]">{currentLat.toFixed(6)}</strong> | Kinh độ (Lng):{' '}
+            <strong className="text-[#0066CC]">{currentLng.toFixed(6)}</strong>
           </div>
           <div className="flex gap-2">
             <button
@@ -121,7 +121,7 @@ export default function GpsPickerModal({
                 onSelect(currentLat, currentLng);
                 onClose();
               }}
-              className="inline-flex items-center gap-1.5 px-5 py-2 rounded-xl bg-[#2D5A43] hover:bg-[#234634] text-white text-xs font-bold shadow transition-all"
+              className="inline-flex items-center gap-1.5 px-5 py-2 rounded-xl bg-[#0066CC] hover:bg-[#0052A3] text-white text-xs font-bold shadow transition-all"
             >
               <Check className="w-4 h-4" />
               <span>Xác Nhận Tọa Độ Này</span>

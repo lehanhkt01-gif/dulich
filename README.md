@@ -19,7 +19,7 @@ Xây dựng trên nền tảng **Next.js 15 (App Router, TypeScript, Tailwind CS
 ## 🎨 TRIẾT LÝ THIẾT KẾ HERITAGE ANTI-SLOP
 
 - **Bộ 3 Khóa bất biến (The 3 Locks)**:
-  - *Color Consistency Lock*: Nền kem di sản `#FBF9F5`, chữ than chì `#1C1917`, điểm nhấn màu xanh rêu đại ngàn `#2D5A43` và sắc đất đỏ bazan `#A64B2A`. Không dùng gradient tím AI sến sẩm.
+  - *Color Consistency Lock*: Nền kem di sản `#FBF9F5`, chữ than chì `#1C1917`, điểm nhấn màu xanh da trời Đoàn thanh niên tươi sáng `#0066CC` và sắc đất đỏ bazan `#A64B2A`. Không dùng gradient tím AI sến sẩm.
   - *Shape Consistency Lock*: Đồng bộ hệ bo góc mềm mại `rounded-xl` / `rounded-2xl`.
   - *Page Theme Lock*: Độ tương phản chuẩn WCAG AA.
 - **Hero Discipline**:
@@ -36,7 +36,7 @@ Xây dựng trên nền tảng **Next.js 15 (App Router, TypeScript, Tailwind CS
 ## 🛠️ CÔNG NGHỆ & KIẾN TRÚC HỆ THỐNG
 
 - **Framework**: Next.js 15.1 (App Router, Server & Client Components)
-- **Styling**: Tailwind CSS với custom tokens `#FBF9F5`, `#2D5A43`, `#A64B2A`
+- **Styling**: Tailwind CSS với custom tokens `#FBF9F5`, `#0066CC`, `#A64B2A`
 - **Bản đồ GIS**: Leaflet.js với Custom SVG Heritage Pin & Popups dẫn đường Google Maps
 - **Âm thanh số**: Trình phát Audio Bar tùy chỉnh tốc độ 1x/1.25x/1.5x, tua thời gian và mô phỏng quét mã QR tại bia di tích
 - **Cơ sở dữ liệu**: PostgreSQL 16 + Prisma ORM

@@ -106,15 +106,15 @@ export default function AudioPlayerBar({ title, audioUrl, slug }: AudioPlayerBar
       {/* Header Player */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-[#2D5A43] text-white flex items-center justify-center shadow-sm">
+          <div className="w-10 h-10 rounded-xl bg-[#0066CC] text-white flex items-center justify-center shadow-sm">
             <Volume2 className="w-5 h-5 animate-pulse" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-xs font-bold text-[#2D5A43] uppercase tracking-wider">
+              <span className="text-xs font-bold text-[#0066CC] uppercase tracking-wider">
                 Thuyết Minh Số Tự Động
               </span>
-              <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-semibold">
+              <span className="text-[10px] px-2 py-0.5 rounded-full bg-sky-100 text-sky-800 font-semibold">
                 AI Voice Di Sản
               </span>
             </div>
@@ -136,8 +136,8 @@ export default function AudioPlayerBar({ title, audioUrl, slug }: AudioPlayerBar
       </div>
 
       {qrSimulationActive && (
-        <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-3 flex items-center gap-2 text-xs text-emerald-800 animate-fadeIn">
-          <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+        <div className="bg-sky-50 border border-sky-200 rounded-xl p-3 flex items-center gap-2 text-xs text-sky-800 animate-fadeIn">
+          <CheckCircle2 className="w-4 h-4 text-sky-600 shrink-0" />
           <span>Đã nhận diện tọa độ di tích qua mã QR thực địa! Hệ thống đang phát bài thuyết minh tự động...</span>
         </div>
       )}
@@ -150,7 +150,7 @@ export default function AudioPlayerBar({ title, audioUrl, slug }: AudioPlayerBar
           max={duration || 100}
           value={currentTime}
           onChange={handleSeek}
-          className="w-full h-2 bg-stone-200 rounded-lg appearance-none cursor-pointer accent-[#2D5A43]"
+          className="w-full h-2 bg-stone-200 rounded-lg appearance-none cursor-pointer accent-[#0066CC]"
         />
         <div className="flex justify-between text-xs text-stone-500 font-mono">
           <span>{formatTime(currentTime)}</span>
@@ -171,7 +171,7 @@ export default function AudioPlayerBar({ title, audioUrl, slug }: AudioPlayerBar
 
           <button
             onClick={togglePlay}
-            className="w-12 h-12 rounded-full bg-[#2D5A43] hover:bg-[#234634] text-white flex items-center justify-center shadow-md transition-transform hover:scale-105"
+            className="w-12 h-12 rounded-full bg-[#0066CC] hover:bg-[#0052A3] text-white flex items-center justify-center shadow-md transition-transform hover:scale-105"
             aria-label={isPlaying ? 'Tạm dừng' : 'Phát thuyết minh'}
           >
             {isPlaying ? <Pause className="w-6 h-6" /> : <Play className="w-6 h-6 ml-0.5" />}

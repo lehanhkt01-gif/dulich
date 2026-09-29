@@ -53,7 +53,7 @@ export default function BentoGrid({ destinations }: BentoGridProps) {
       {/* Header của Bento */}
       <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
         <div>
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#2D5A43]/10 text-[#2D5A43] text-xs font-semibold uppercase tracking-wider mb-2">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#0066CC]/10 text-[#0066CC] text-xs font-semibold uppercase tracking-wider mb-2">
             <Sparkles className="w-3.5 h-3.5" />
             <span>Không gian Di sản Nổi bật</span>
           </div>
@@ -87,7 +87,7 @@ export default function BentoGrid({ destinations }: BentoGridProps) {
                 </span>
                 {featured.historicalPeriod && (
                   <span className="px-3 py-1 rounded-full bg-white/90 backdrop-blur-md text-[#1C1917] text-xs font-medium shadow flex items-center gap-1.5">
-                    <Clock className="w-3 h-3 text-[#2D5A43]" />
+                    <Clock className="w-3 h-3 text-[#0066CC]" />
                     {featured.historicalPeriod}
                   </span>
                 )}
@@ -115,7 +115,7 @@ export default function BentoGrid({ destinations }: BentoGridProps) {
               <div className="bg-[#FBF9F5] rounded-xl p-4 border border-[#E7E2D7] space-y-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-full bg-[#2D5A43] text-white flex items-center justify-center">
+                    <div className="w-8 h-8 rounded-full bg-[#0066CC] text-white flex items-center justify-center">
                       <Volume2 className="w-4 h-4" />
                     </div>
                     <div>
@@ -131,7 +131,7 @@ export default function BentoGrid({ destinations }: BentoGridProps) {
                   {/* Play/Pause Button */}
                   <button
                     onClick={togglePlayAudio}
-                    className="w-10 h-10 rounded-full bg-[#2D5A43] hover:bg-[#234634] text-white flex items-center justify-center shadow-md transition-transform hover:scale-105"
+                    className="w-10 h-10 rounded-full bg-[#0066CC] hover:bg-[#0052A3] text-white flex items-center justify-center shadow-md transition-transform hover:scale-105"
                     aria-label="Phát thuyết minh"
                   >
                     {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5 ml-0.5" />}
@@ -142,7 +142,7 @@ export default function BentoGrid({ destinations }: BentoGridProps) {
                 <div className="space-y-1">
                   <div className="w-full bg-[#E7E2D7] h-1.5 rounded-full overflow-hidden">
                     <div
-                      className="bg-[#2D5A43] h-full transition-all duration-300"
+                      className="bg-[#0066CC] h-full transition-all duration-300"
                       style={{ width: `${progress}%` }}
                     />
                   </div>
@@ -160,7 +160,7 @@ export default function BentoGrid({ destinations }: BentoGridProps) {
                 </div>
                 <Link
                   href={`/destinations/${featured.slug}`}
-                  className="inline-flex items-center gap-2 text-sm font-semibold text-[#2D5A43] hover:text-[#A64B2A] transition-colors"
+                  className="inline-flex items-center gap-2 text-sm font-semibold text-[#0066CC] hover:text-[#A64B2A] transition-colors"
                 >
                   <span>Khám phá khảo cứu chi tiết</span>
                   <ArrowRight className="w-4 h-4" />
@@ -176,7 +176,7 @@ export default function BentoGrid({ destinations }: BentoGridProps) {
           {secondary[0] && (
             <Link
               href={`/destinations/${secondary[0].slug}`}
-              className="group relative bg-[#FFFFFF] rounded-2xl border border-[#E7E2D7] overflow-hidden shadow-heritage p-5 flex gap-4 hover:border-[#2D5A43]/50 transition-all"
+              className="group relative bg-[#FFFFFF] rounded-2xl border border-[#E7E2D7] overflow-hidden shadow-heritage p-5 flex gap-4 hover:border-[#0066CC]/50 transition-all"
             >
               <div className="w-28 h-28 shrink-0 rounded-xl overflow-hidden relative">
                 <img
@@ -190,16 +190,16 @@ export default function BentoGrid({ destinations }: BentoGridProps) {
               </div>
               <div className="flex-1 flex flex-col justify-between">
                 <div>
-                  <span className="text-[11px] font-semibold text-[#2D5A43] uppercase tracking-wider block mb-1">
+                  <span className="text-[11px] font-semibold text-[#0066CC] uppercase tracking-wider block mb-1">
                     Hồ Sinh Thái
                   </span>
-                  <h4 className="font-serif text-base font-bold text-[#1C1917] group-hover:text-[#2D5A43] transition-colors line-clamp-2">
+                  <h4 className="font-serif text-base font-bold text-[#1C1917] group-hover:text-[#0066CC] transition-colors line-clamp-2">
                     {secondary[0].title}
                   </h4>
                 </div>
                 <div className="flex items-center justify-between text-xs text-stone-500 pt-2 border-t border-stone-100">
                   <span>Hoàng hôn & dạo thuyền</span>
-                  <ArrowRight className="w-3.5 h-3.5 text-[#2D5A43] group-hover:translate-x-1 transition-transform" />
+                  <ArrowRight className="w-3.5 h-3.5 text-[#0066CC] group-hover:translate-x-1 transition-transform" />
                 </div>
               </div>
             </Link>
@@ -209,7 +209,7 @@ export default function BentoGrid({ destinations }: BentoGridProps) {
           {secondary[1] && (
             <Link
               href={`/destinations/${secondary[1].slug}`}
-              className="group relative bg-[#FFFFFF] rounded-2xl border border-[#E7E2D7] overflow-hidden shadow-heritage p-5 flex gap-4 hover:border-[#2D5A43]/50 transition-all"
+              className="group relative bg-[#FFFFFF] rounded-2xl border border-[#E7E2D7] overflow-hidden shadow-heritage p-5 flex gap-4 hover:border-[#0066CC]/50 transition-all"
             >
               <div className="w-28 h-28 shrink-0 rounded-xl overflow-hidden relative">
                 <img
@@ -239,7 +239,7 @@ export default function BentoGrid({ destinations }: BentoGridProps) {
           )}
 
           {/* Vệ tinh 3: Thẻ Nông sản OCOP Xoài Cát Ea Súp & Liên kết vùng */}
-          <div className="bg-[#2D5A43] text-white rounded-2xl p-5 shadow-heritage flex flex-col justify-between relative overflow-hidden">
+          <div className="bg-[#0066CC] text-white rounded-2xl p-5 shadow-heritage flex flex-col justify-between relative overflow-hidden">
             <div className="absolute -right-6 -bottom-6 w-32 h-32 rounded-full bg-white/5 pointer-events-none" />
             <div>
               <div className="flex items-center justify-between mb-3">
@@ -257,7 +257,7 @@ export default function BentoGrid({ destinations }: BentoGridProps) {
             </div>
             <Link
               href="/destinations/vung-xoai-cat-ea-sup-ocop"
-              className="inline-flex items-center justify-between px-4 py-2.5 rounded-xl bg-white text-[#2D5A43] text-xs font-bold hover:bg-amber-100 transition-colors shadow"
+              className="inline-flex items-center justify-between px-4 py-2.5 rounded-xl bg-white text-[#0066CC] text-xs font-bold hover:bg-amber-100 transition-colors shadow"
             >
               <span>Xem nông trang trải nghiệm</span>
               <ArrowRight className="w-3.5 h-3.5" />

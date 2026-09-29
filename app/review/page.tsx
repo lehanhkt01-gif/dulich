@@ -76,7 +76,7 @@ export default function PreDeploymentReviewPage() {
       items: [
         {
           name: 'Bộ 3 Khóa Bất Biến (The 3 Locks)',
-          desc: 'Màu be kem #FBF9F5, chữ than chì #1C1917, xanh rêu #2D5A43 & bazan #A64B2A. Không neon/AI gradients.',
+          desc: 'Màu be kem #FBF9F5, chữ than chì #1C1917, xanh rêu #0066CC & bazan #A64B2A. Không neon/AI gradients.',
           status: 'ready',
         },
         {
@@ -168,7 +168,7 @@ docker compose up -d --build && docker compose exec web npx prisma db push && do
       <div className="bg-[#FFFFFF] rounded-3xl border border-[#E7E2D7] p-8 shadow-heritage space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-[#2D5A43] shadow-md shrink-0 bg-white">
+            <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-[#0066CC] shadow-md shrink-0 bg-white">
               <img src="/logo-easup.png" alt="Logo Xã Ea Súp" className="w-full h-full object-cover" />
             </div>
             <div>
@@ -197,7 +197,7 @@ docker compose up -d --build && docker compose exec web npx prisma db push && do
       {/* QUICK PREVIEW TIÊU ĐIỂM (CÁC LIÊN KẾT NHANH ĐẾN TỪNG PHÂN HỆ) */}
       <div className="space-y-4">
         <h2 className="font-serif text-xl font-bold text-[#1C1917] flex items-center gap-2">
-          <Layers className="w-5 h-5 text-[#2D5A43]" />
+          <Layers className="w-5 h-5 text-[#0066CC]" />
           <span>Kiểm Tra Trực Quan Các Trang Chức Năng</span>
         </h2>
 
@@ -205,20 +205,20 @@ docker compose up -d --build && docker compose exec web npx prisma db push && do
           <Link
             href="/"
             target="_blank"
-            className="group bg-white p-5 rounded-2xl border border-[#E7E2D7] shadow-sm hover:border-[#2D5A43] hover:shadow-heritage transition-all flex flex-col justify-between"
+            className="group bg-white p-5 rounded-2xl border border-[#E7E2D7] shadow-sm hover:border-[#0066CC] hover:shadow-heritage transition-all flex flex-col justify-between"
           >
             <div>
-              <div className="w-9 h-9 rounded-xl bg-[#2D5A43]/10 text-[#2D5A43] flex items-center justify-center mb-3">
+              <div className="w-9 h-9 rounded-xl bg-[#0066CC]/10 text-[#0066CC] flex items-center justify-center mb-3">
                 <Globe className="w-5 h-5" />
               </div>
-              <h3 className="font-serif text-sm font-bold text-[#1C1917] group-hover:text-[#2D5A43]">
+              <h3 className="font-serif text-sm font-bold text-[#1C1917] group-hover:text-[#0066CC]">
                 Trang Chủ Công Cộng
               </h3>
               <p className="text-xs text-stone-500 mt-1 line-clamp-2">
                 Hero di sản, Bento Grid bất đối xứng, Mini Audio Player & Bản đồ GIS Leaflet.
               </p>
             </div>
-            <div className="mt-4 pt-3 border-t border-stone-100 flex items-center justify-between text-xs text-[#2D5A43] font-semibold">
+            <div className="mt-4 pt-3 border-t border-stone-100 flex items-center justify-between text-xs text-[#0066CC] font-semibold">
               <span>Mở tab mới</span>
               <ExternalLink className="w-3.5 h-3.5" />
             </div>
@@ -227,7 +227,7 @@ docker compose up -d --build && docker compose exec web npx prisma db push && do
           <Link
             href="/destinations/thap-cham-yang-prong"
             target="_blank"
-            className="group bg-white p-5 rounded-2xl border border-[#E7E2D7] shadow-sm hover:border-[#2D5A43] hover:shadow-heritage transition-all flex flex-col justify-between"
+            className="group bg-white p-5 rounded-2xl border border-[#E7E2D7] shadow-sm hover:border-[#0066CC] hover:shadow-heritage transition-all flex flex-col justify-between"
           >
             <div>
               <div className="w-9 h-9 rounded-xl bg-[#A64B2A]/10 text-[#A64B2A] flex items-center justify-center mb-3">
@@ -249,7 +249,7 @@ docker compose up -d --build && docker compose exec web npx prisma db push && do
           <Link
             href="/destinations/ho-ea-sup-thuong"
             target="_blank"
-            className="group bg-white p-5 rounded-2xl border border-[#E7E2D7] shadow-sm hover:border-[#2D5A43] hover:shadow-heritage transition-all flex flex-col justify-between"
+            className="group bg-white p-5 rounded-2xl border border-[#E7E2D7] shadow-sm hover:border-[#0066CC] hover:shadow-heritage transition-all flex flex-col justify-between"
           >
             <div>
               <div className="w-9 h-9 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center mb-3">
@@ -271,20 +271,20 @@ docker compose up -d --build && docker compose exec web npx prisma db push && do
           <Link
             href="/admin"
             target="_blank"
-            className="group bg-white p-5 rounded-2xl border border-[#E7E2D7] shadow-sm hover:border-[#2D5A43] hover:shadow-heritage transition-all flex flex-col justify-between"
+            className="group bg-white p-5 rounded-2xl border border-[#E7E2D7] shadow-sm hover:border-[#0066CC] hover:shadow-heritage transition-all flex flex-col justify-between"
           >
             <div>
               <div className="w-9 h-9 rounded-xl bg-stone-100 text-stone-800 flex items-center justify-center mb-3">
                 <Lock className="w-5 h-5" />
               </div>
-              <h3 className="font-serif text-sm font-bold text-[#1C1917] group-hover:text-[#2D5A43]">
+              <h3 className="font-serif text-sm font-bold text-[#1C1917] group-hover:text-[#0066CC]">
                 Ban Quản Trị CMS
               </h3>
               <p className="text-xs text-stone-500 mt-1 line-clamp-2">
                 Quản lý danh sách, ghim trang chủ, bản đồ chấm GPS trực quan, kéo-thả nén ảnh WebP.
               </p>
             </div>
-            <div className="mt-4 pt-3 border-t border-stone-100 flex items-center justify-between text-xs text-[#2D5A43] font-semibold">
+            <div className="mt-4 pt-3 border-t border-stone-100 flex items-center justify-between text-xs text-[#0066CC] font-semibold">
               <span>Mở tab mới</span>
               <ExternalLink className="w-3.5 h-3.5" />
             </div>
@@ -297,7 +297,7 @@ docker compose up -d --build && docker compose exec web npx prisma db push && do
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#E7E2D7] pb-4">
           <div>
             <h2 className="font-serif text-xl font-bold text-[#1C1917] flex items-center gap-2">
-              <Code2 className="w-5 h-5 text-[#2D5A43]" />
+              <Code2 className="w-5 h-5 text-[#0066CC]" />
               <span>Chạy Thử Nghiệm API Handlers Trực Tiếp (Live API Tester)</span>
             </h2>
             <p className="text-xs text-stone-500 mt-1">
@@ -313,33 +313,33 @@ docker compose up -d --build && docker compose exec web npx prisma db push && do
         <div className="flex flex-wrap gap-2">
           <button
             onClick={() => testApi('/api/destinations')}
-            className="px-3.5 py-2 rounded-xl text-xs font-bold bg-[#F5F2EB] hover:bg-[#2D5A43] hover:text-white text-[#1C1917] border border-[#E7E2D7] transition-all flex items-center gap-1.5"
+            className="px-3.5 py-2 rounded-xl text-xs font-bold bg-[#F5F2EB] hover:bg-[#0066CC] hover:text-white text-[#1C1917] border border-[#E7E2D7] transition-all flex items-center gap-1.5"
           >
-            <Play className="w-3 h-3 text-[#2D5A43]" />
+            <Play className="w-3 h-3 text-[#0066CC]" />
             <span>GET /api/destinations</span>
           </button>
 
           <button
             onClick={() => testApi('/api/destinations/thap-cham-yang-prong')}
-            className="px-3.5 py-2 rounded-xl text-xs font-bold bg-[#F5F2EB] hover:bg-[#2D5A43] hover:text-white text-[#1C1917] border border-[#E7E2D7] transition-all flex items-center gap-1.5"
+            className="px-3.5 py-2 rounded-xl text-xs font-bold bg-[#F5F2EB] hover:bg-[#0066CC] hover:text-white text-[#1C1917] border border-[#E7E2D7] transition-all flex items-center gap-1.5"
           >
-            <Play className="w-3 h-3 text-[#2D5A43]" />
+            <Play className="w-3 h-3 text-[#0066CC]" />
             <span>GET /api/destinations/thap-cham-yang-prong</span>
           </button>
 
           <button
             onClick={() => testApi('/api/itineraries')}
-            className="px-3.5 py-2 rounded-xl text-xs font-bold bg-[#F5F2EB] hover:bg-[#2D5A43] hover:text-white text-[#1C1917] border border-[#E7E2D7] transition-all flex items-center gap-1.5"
+            className="px-3.5 py-2 rounded-xl text-xs font-bold bg-[#F5F2EB] hover:bg-[#0066CC] hover:text-white text-[#1C1917] border border-[#E7E2D7] transition-all flex items-center gap-1.5"
           >
-            <Play className="w-3 h-3 text-[#2D5A43]" />
+            <Play className="w-3 h-3 text-[#0066CC]" />
             <span>GET /api/itineraries</span>
           </button>
 
           <button
             onClick={() => testApi('/api/auth/me')}
-            className="px-3.5 py-2 rounded-xl text-xs font-bold bg-[#F5F2EB] hover:bg-[#2D5A43] hover:text-white text-[#1C1917] border border-[#E7E2D7] transition-all flex items-center gap-1.5"
+            className="px-3.5 py-2 rounded-xl text-xs font-bold bg-[#F5F2EB] hover:bg-[#0066CC] hover:text-white text-[#1C1917] border border-[#E7E2D7] transition-all flex items-center gap-1.5"
           >
-            <Play className="w-3 h-3 text-[#2D5A43]" />
+            <Play className="w-3 h-3 text-[#0066CC]" />
             <span>GET /api/auth/me</span>
           </button>
         </div>
@@ -357,14 +357,14 @@ docker compose up -d --build && docker compose exec web npx prisma db push && do
       {/* DETAILED CHECKLIST ITEMS */}
       <div className="space-y-6">
         <h2 className="font-serif text-xl font-bold text-[#1C1917] flex items-center gap-2">
-          <CheckCircle2 className="w-5 h-5 text-[#2D5A43]" />
+          <CheckCircle2 className="w-5 h-5 text-[#0066CC]" />
           <span>Danh Mục Nghiệm Thu Kỹ Thuật (Pre-flight Checklist)</span>
         </h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {checklistItems.map((group, gIdx) => (
             <div key={gIdx} className="bg-white rounded-2xl border border-[#E7E2D7] p-6 shadow-sm space-y-4">
-              <h3 className="font-serif text-sm font-bold text-[#2D5A43] uppercase tracking-wide border-b border-[#E7E2D7] pb-3">
+              <h3 className="font-serif text-sm font-bold text-[#0066CC] uppercase tracking-wide border-b border-[#E7E2D7] pb-3">
                 {group.category}
               </h3>
               <div className="space-y-3">
@@ -396,7 +396,7 @@ docker compose up -d --build && docker compose exec web npx prisma db push && do
           </div>
           <button
             onClick={() => copyToClipboard(deploymentScript, 'deploy-script')}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#2D5A43] hover:bg-[#234634] text-white text-xs font-bold transition-all shadow"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#0066CC] hover:bg-[#0052A3] text-white text-xs font-bold transition-all shadow"
           >
             {copiedId === 'deploy-script' ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
             <span>{copiedId === 'deploy-script' ? 'Đã sao chép' : 'Sao chép toàn bộ lệnh'}</span>

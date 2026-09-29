@@ -55,14 +55,14 @@ export default function ReviewSection({ destinationId, initialReviews = [] }: Re
       <div className="flex items-center justify-between border-b border-[#E7E2D7] pb-4">
         <div>
           <h3 className="font-serif text-xl sm:text-2xl font-bold text-[#1C1917] flex items-center gap-2">
-            <MessageSquare className="w-5 h-5 text-[#2D5A43]" />
+            <MessageSquare className="w-5 h-5 text-[#0066CC]" />
             <span>Cảm Nhận Du Khách & Đánh Giá</span>
           </h3>
           <p className="text-xs text-stone-500 mt-1">
             Ghi lại những khoảnh khắc xúc cảm sau khi ghé thăm di tích
           </p>
         </div>
-        <span className="text-sm font-semibold text-[#2D5A43] bg-[#2D5A43]/10 px-3 py-1 rounded-full">
+        <span className="text-sm font-semibold text-[#0066CC] bg-[#0066CC]/10 px-3 py-1 rounded-full">
           {reviews.length} Phản hồi
         </span>
       </div>
@@ -104,7 +104,7 @@ export default function ReviewSection({ destinationId, initialReviews = [] }: Re
             value={userName}
             onChange={(e) => setUserName(e.target.value)}
             placeholder="Họ và tên của bạn (hoặc để trống để làm Du khách phương xa)"
-            className="w-full text-xs p-3 rounded-lg border border-[#E7E2D7] bg-white text-[#1C1917] focus:outline-none focus:border-[#2D5A43]"
+            className="w-full text-xs p-3 rounded-lg border border-[#E7E2D7] bg-white text-[#1C1917] focus:outline-none focus:border-[#0066CC]"
           />
         </div>
 
@@ -116,7 +116,7 @@ export default function ReviewSection({ destinationId, initialReviews = [] }: Re
             value={comment}
             onChange={(e) => setComment(e.target.value)}
             placeholder="Chia sẻ trải nghiệm của bạn về cảnh sắc, âm thanh cồng chiêng, món ăn bản địa hoặc cảm giác khi đến đây..."
-            className="w-full text-xs p-3 rounded-lg border border-[#E7E2D7] bg-white text-[#1C1917] focus:outline-none focus:border-[#2D5A43]"
+            className="w-full text-xs p-3 rounded-lg border border-[#E7E2D7] bg-white text-[#1C1917] focus:outline-none focus:border-[#0066CC]"
           />
         </div>
 
@@ -131,7 +131,7 @@ export default function ReviewSection({ destinationId, initialReviews = [] }: Re
           <button
             type="submit"
             disabled={submitting}
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#2D5A43] hover:bg-[#234634] text-white text-xs font-bold transition-all shadow-md disabled:opacity-50"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#0066CC] hover:bg-[#0052A3] text-white text-xs font-bold transition-all shadow-md disabled:opacity-50"
           >
             <Send className="w-3.5 h-3.5" />
             <span>{submitting ? 'Đang gửi...' : 'Gửi Đánh Giá Di Sản'}</span>
@@ -153,7 +153,7 @@ export default function ReviewSection({ destinationId, initialReviews = [] }: Re
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <div className="w-7 h-7 rounded-full bg-[#2D5A43]/15 text-[#2D5A43] flex items-center justify-center font-bold text-xs">
+                  <div className="w-7 h-7 rounded-full bg-[#0066CC]/15 text-[#0066CC] flex items-center justify-center font-bold text-xs">
                     {rev.userName ? rev.userName[0].toUpperCase() : 'D'}
                   </div>
                   <div>

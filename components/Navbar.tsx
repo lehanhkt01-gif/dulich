@@ -36,7 +36,7 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto h-full px-4 sm:px-6 lg:px-8 flex items-center justify-between">
         {/* Brand Logo Xã Ea Súp */}
         <Link href="/" className="flex items-center gap-3 group">
-          <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-[#2D5A43] shadow-md group-hover:scale-105 transition-transform shrink-0 bg-white">
+          <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-[#0066CC] shadow-md group-hover:scale-105 transition-transform shrink-0 bg-white">
             <img
               src="/logo-easup.png"
               alt="Logo Xã Ea Súp"
@@ -64,11 +64,11 @@ export default function Navbar() {
                 href={link.href}
                 className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                   isActive
-                    ? 'text-[#2D5A43] bg-[#2D5A43]/10 font-semibold'
-                    : 'text-[#1C1917]/80 hover:text-[#2D5A43] hover:bg-[#2D5A43]/5'
+                    ? 'text-[#0066CC] bg-[#0066CC]/10 font-semibold'
+                    : 'text-[#1C1917]/80 hover:text-[#0066CC] hover:bg-[#0066CC]/5'
                 }`}
               >
-                <Icon className="w-4 h-4 text-[#2D5A43]/80" />
+                <Icon className="w-4 h-4 text-[#0066CC]/80" />
                 <span>{link.name}</span>
               </Link>
             );
@@ -88,7 +88,7 @@ export default function Navbar() {
 
           <Link
             href="/admin"
-            className="flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold text-[#2D5A43] border border-[#2D5A43]/30 hover:border-[#2D5A43] hover:bg-[#2D5A43] hover:text-white transition-all shadow-sm"
+            className="flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold text-[#0066CC] border border-[#0066CC]/30 hover:border-[#0066CC] hover:bg-[#0066CC] hover:text-white transition-all shadow-sm"
           >
             <span>Ban Quản Trị</span>
           </Link>
@@ -114,9 +114,9 @@ export default function Navbar() {
                 key={link.name}
                 href={link.href}
                 onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-base font-medium text-[#1C1917] hover:bg-[#2D5A43]/10 hover:text-[#2D5A43]"
+                className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-base font-medium text-[#1C1917] hover:bg-[#0066CC]/10 hover:text-[#0066CC]"
               >
-                <Icon className="w-5 h-5 text-[#2D5A43]" />
+                <Icon className="w-5 h-5 text-[#0066CC]" />
                 <span>{link.name}</span>
               </Link>
             );
@@ -125,7 +125,7 @@ export default function Navbar() {
             <Link
               href="/admin"
               onClick={() => setMobileMenuOpen(false)}
-              className="flex items-center justify-center gap-2 w-full px-4 py-3 rounded-xl bg-[#2D5A43] text-white font-medium text-sm shadow-md"
+              className="flex items-center justify-center gap-2 w-full px-4 py-3 rounded-xl bg-[#0066CC] text-white font-medium text-sm shadow-md"
             >
               <ShieldCheck className="w-4 h-4" />
               <span>Đăng nhập Ban Quản Trị CMS</span>

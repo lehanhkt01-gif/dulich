@@ -102,7 +102,7 @@ export default function InteractiveMap({
 
       // Custom Heritage SVG Pin Icon
       const createCustomIcon = (isFeatured: boolean) => {
-        const color = isFeatured ? '#A64B2A' : '#2D5A43';
+        const color = isFeatured ? '#A64B2A' : '#0066CC';
         const svgIcon = `
           <div style="
             background: ${color};
@@ -157,7 +157,7 @@ export default function InteractiveMap({
               }
             </div>
             <div style="padding: 12px 14px;">
-              <p style="font-size: 11px; color: #2D5A43; font-weight: 600; text-transform: uppercase; margin: 0 0 4px 0;">
+              <p style="font-size: 11px; color: #0066CC; font-weight: 600; text-transform: uppercase; margin: 0 0 4px 0;">
                 ${dest.category?.name || 'Di tích & Danh thắng'}
               </p>
               <h4 style="font-size: 14px; font-weight: 700; color: #1C1917; margin: 0 0 6px 0; line-height: 1.3;">
@@ -170,7 +170,7 @@ export default function InteractiveMap({
                 <a href="/destinations/${dest.slug}" style="
                   flex: 1;
                   display: inline-block;
-                  background: #2D5A43;
+                  background: #0066CC;
                   color: white;
                   font-size: 12px;
                   font-weight: 600;
@@ -216,7 +216,7 @@ export default function InteractiveMap({
             width: 48px;
             height: 48px;
             border-radius: 50%;
-            background: #2D5A43;
+            background: #0066CC;
             border: 3px solid #C6923C;
             box-shadow: 0 4px 18px rgba(0,0,0,0.4);
             display: flex;
@@ -241,7 +241,7 @@ export default function InteractiveMap({
 
       centerMarker.bindPopup(`
         <div style="width: 260px; font-family: inherit; padding: 12px 14px; text-align: center;">
-          <div style="width: 58px; height: 58px; border-radius: 50%; overflow: hidden; margin: 0 auto 8px auto; border: 2px solid #2D5A43; box-shadow: 0 2px 8px rgba(0,0,0,0.15);">
+          <div style="width: 58px; height: 58px; border-radius: 50%; overflow: hidden; margin: 0 auto 8px auto; border: 2px solid #0066CC; box-shadow: 0 2px 8px rgba(0,0,0,0.15);">
             <img src="/logo-easup.png" style="width: 100%; height: 100%; object-fit: cover;" alt="Logo Xã Ea Súp" />
           </div>
           <span style="font-size: 10px; font-weight: 700; color: #A64B2A; text-transform: uppercase; letter-spacing: 0.5px;">TRUNG TÂM VĂN HÓA & DU LỊCH</span>
@@ -250,14 +250,14 @@ export default function InteractiveMap({
           <a href="https://www.google.com/maps/dir/?api=1&destination=13.070029,107.883355" target="_blank" rel="noopener noreferrer" style="
             display: inline-block;
             width: 100%;
-            background: #2D5A43;
+            background: #0066CC;
             color: white;
             font-size: 12px;
             font-weight: 700;
             padding: 8px 0;
             border-radius: 8px;
             text-decoration: none;
-            box-shadow: 0 2px 6px rgba(45,90,67,0.3);
+            box-shadow: 0 2px 6px rgba(0,102,204,0.3);
           ">🧭 Dẫn Đường Về Xã Ea Súp</a>
         </div>
       `, {
@@ -287,7 +287,7 @@ export default function InteractiveMap({
     <div className="relative w-full rounded-2xl overflow-hidden border border-[#E7E2D7] shadow-heritage bg-[#F5F2EB]">
       {/* Top Map Bar */}
       <div className="absolute top-4 left-4 z-20 flex items-center gap-2.5 bg-[#FFFFFF]/95 backdrop-blur-md px-3.5 py-2 rounded-xl border border-[#E7E2D7] shadow-sm">
-        <div className="w-5 h-5 rounded-full overflow-hidden border border-[#2D5A43]">
+        <div className="w-5 h-5 rounded-full overflow-hidden border border-[#0066CC]">
           <img src="/logo-easup.png" alt="Logo" className="w-full h-full object-cover" />
         </div>
         <div>
@@ -298,7 +298,7 @@ export default function InteractiveMap({
             Tọa độ tâm: 13.070029, 107.883355
           </span>
         </div>
-        <span className="text-[11px] px-2 py-0.5 rounded-full bg-[#2D5A43]/10 text-[#2D5A43] font-bold ml-1">
+        <span className="text-[11px] px-2 py-0.5 rounded-full bg-[#0066CC]/10 text-[#0066CC] font-bold ml-1">
           {destinations.length} Điểm
         </span>
       </div>
@@ -314,7 +314,7 @@ export default function InteractiveMap({
           <span className="font-medium text-stone-700">Điểm Tiêu Biểu</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <span className="w-3 h-3 rounded-full bg-[#2D5A43]"></span>
+          <span className="w-3 h-3 rounded-full bg-[#0066CC]"></span>
           <span className="font-medium text-stone-700">Di tích & Thắng cảnh</span>
         </div>
       </div>

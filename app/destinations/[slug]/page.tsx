@@ -75,7 +75,7 @@ export default async function DestinationDetailPage({ params }: PageProps) {
       <div className="flex items-center justify-between text-xs text-stone-500">
         <Link
           href="/#danh-thang"
-          className="inline-flex items-center gap-1.5 hover:text-[#2D5A43] font-medium transition-colors"
+          className="inline-flex items-center gap-1.5 hover:text-[#0066CC] font-medium transition-colors"
         >
           <ChevronLeft className="w-4 h-4" />
           <span>Quay lại Bản đồ & Danh sách</span>
@@ -88,7 +88,7 @@ export default async function DestinationDetailPage({ params }: PageProps) {
           ==================================================================== */}
       <header className="space-y-4 border-b border-[#E7E2D7] pb-8">
         <div className="flex flex-wrap items-center gap-2">
-          <span className="px-3 py-1 rounded-full bg-[#2D5A43] text-white text-xs font-bold uppercase tracking-wider">
+          <span className="px-3 py-1 rounded-full bg-[#0066CC] text-white text-xs font-bold uppercase tracking-wider">
             {destination.category?.name || 'Di tích & Thắng cảnh'}
           </span>
           {destination.historicalPeriod && (
@@ -120,7 +120,7 @@ export default async function DestinationDetailPage({ params }: PageProps) {
               href={`https://www.google.com/maps/dir/?api=1&destination=${destination.latitude},${destination.longitude}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#2D5A43] text-white font-semibold hover:bg-[#234634] transition-colors"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#0066CC] text-white font-semibold hover:bg-[#0052A3] transition-colors"
             >
               <Navigation className="w-3.5 h-3.5" />
               <span>Dẫn đường Google Maps</span>
@@ -158,7 +158,7 @@ export default async function DestinationDetailPage({ params }: PageProps) {
 
           {/* Nội dung bài viết khảo cứu */}
           <article className="prose prose-stone max-w-none space-y-6 text-[#1C1917] leading-relaxed text-base">
-            <div className="bg-[#F5F2EB] p-4 rounded-xl border-l-4 border-[#2D5A43] text-sm text-stone-700 italic">
+            <div className="bg-[#F5F2EB] p-4 rounded-xl border-l-4 border-[#0066CC] text-sm text-stone-700 italic">
               Bài viết được số hóa và biên soạn bởi Đoàn Thanh Niên Ea Súp - Đắk Lắk dựa trên tư liệu lịch sử di tích xã Ea Súp kết hợp khảo sát thực địa địa bàn biên giới.
             </div>
 
@@ -173,7 +173,7 @@ export default async function DestinationDetailPage({ params }: PageProps) {
           {destination.gallery && destination.gallery.length > 0 && (
             <div className="space-y-4 pt-4 border-t border-[#E7E2D7]">
               <h3 className="font-serif text-xl font-bold text-[#1C1917] flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-[#2D5A43]" />
+                <Sparkles className="w-5 h-5 text-[#0066CC]" />
                 <span>Thư Viện Ảnh Khảo Cứu Thực Địa</span>
               </h3>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
@@ -205,7 +205,7 @@ export default async function DestinationDetailPage({ params }: PageProps) {
           {/* Khối Sổ tay cẩm nang du khách */}
           <div className="bg-white rounded-2xl border border-[#E7E2D7] p-6 shadow-heritage space-y-6">
             <div className="flex items-center gap-2 border-b border-[#E7E2D7] pb-3">
-              <Compass className="w-5 h-5 text-[#2D5A43]" />
+              <Compass className="w-5 h-5 text-[#0066CC]" />
               <h3 className="font-serif text-lg font-bold text-[#1C1917]">
                 Sổ Tay Trải Nghiệm
               </h3>
@@ -225,7 +225,7 @@ export default async function DestinationDetailPage({ params }: PageProps) {
               {destination.visitingHours && (
                 <div className="space-y-1">
                   <span className="font-bold text-stone-800 flex items-center gap-1.5">
-                    <Clock className="w-4 h-4 text-[#2D5A43]" />
+                    <Clock className="w-4 h-4 text-[#0066CC]" />
                     Khung giờ đón khách:
                   </span>
                   <p className="text-stone-600 pl-5 leading-relaxed">{destination.visitingHours}</p>
@@ -235,7 +235,7 @@ export default async function DestinationDetailPage({ params }: PageProps) {
               {destination.entryFee && (
                 <div className="space-y-1">
                   <span className="font-bold text-stone-800 flex items-center gap-1.5">
-                    <Ticket className="w-4 h-4 text-[#2D5A43]" />
+                    <Ticket className="w-4 h-4 text-[#0066CC]" />
                     Vé tham quan:
                   </span>
                   <p className="text-stone-600 pl-5 font-semibold text-emerald-800">
@@ -259,7 +259,7 @@ export default async function DestinationDetailPage({ params }: PageProps) {
           </div>
 
           {/* Khối Đặc sản OCOP & Ẩm thực kết nối */}
-          <div className="bg-[#2D5A43] text-white rounded-2xl p-6 shadow-heritage space-y-4">
+          <div className="bg-[#0066CC] text-white rounded-2xl p-6 shadow-heritage space-y-4">
             <div className="flex items-center gap-2">
               <ShoppingBag className="w-5 h-5 text-amber-300" />
               <h4 className="font-serif text-base font-bold">Món Ngon & Sản Phẩm OCOP</h4>
@@ -303,7 +303,7 @@ export default async function DestinationDetailPage({ params }: PageProps) {
                       className="w-14 h-14 rounded-lg object-cover shrink-0"
                     />
                     <div className="flex-1 min-w-0">
-                      <h5 className="text-xs font-bold text-[#1C1917] group-hover:text-[#2D5A43] truncate">
+                      <h5 className="text-xs font-bold text-[#1C1917] group-hover:text-[#0066CC] truncate">
                         {item.title}
                       </h5>
                       <span className="text-[11px] text-[#A64B2A] font-mono">
