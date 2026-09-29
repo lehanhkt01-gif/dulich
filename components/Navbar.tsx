@@ -75,21 +75,13 @@ export default function Navbar() {
           })}
         </nav>
 
-        {/* Action Buttons: Pre-flight Review & Admin CMS */}
+        {/* Action Button: Admin CMS */}
         <div className="hidden md:flex items-center gap-2">
           <Link
-            href="/review"
-            className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold text-[#A64B2A] bg-[#A64B2A]/10 hover:bg-[#A64B2A] hover:text-white transition-all shadow-sm"
-            title="Kiểm tra hệ thống trước khi deploy VPS"
-          >
-            <ShieldCheck className="w-3.5 h-3.5" />
-            <span>Nghiệm Thu Deploy</span>
-          </Link>
-
-          <Link
             href="/admin"
-            className="flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold text-[#0066CC] border border-[#0066CC]/30 hover:border-[#0066CC] hover:bg-[#0066CC] hover:text-white transition-all shadow-sm"
+            className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold text-[#0066CC] border border-[#0066CC]/30 hover:border-[#0066CC] hover:bg-[#0066CC] hover:text-white transition-all shadow-sm"
           >
+            <ShieldCheck className="w-4 h-4" />
             <span>Ban Quản Trị</span>
           </Link>
         </div>
