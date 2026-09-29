@@ -7,11 +7,19 @@ FROM node:20-alpine AS deps
 RUN apk add --no-cache libc6-compat openssl
 WORKDIR /app
 
-# Sao chép package manifests và schema Prisma để cache layer
-COPY package.json package-lock.json* ./
-COPY prisma ./prisma/
+# Tối ưu cấu hình mạng npm tránh nghẽn socket và timeout
+RUN npm config set fetch-retry-mintimeout 20000 && \
+    npm config set fetch-retry-maxtimeout 120000 && \
+    npm config set fetch-retries 5 && \
+    npm config set progress false
 
-RUN npm ci
+# Sao chép CHỈ package manifests trước để tầng node_modules được cache vĩnh viễn
+COPY package.json package-lock.json* ./
+
+RUN npm install --no-audit --prefer-offline
+
+# Sao chép schema Prisma và sinh Client sau khi dependencies đã cài xong
+COPY prisma ./prisma/
 RUN npx prisma generate
 
 # --- Stage 2: Xây dựng ứng dụng (Builder) ---
