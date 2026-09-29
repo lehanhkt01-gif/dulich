@@ -33,10 +33,16 @@ export const metadata: Metadata = {
     'Bản đồ du lịch Ea Súp',
   ],
   icons: {
-    icon: '/logo-easup.png',
-    apple: '/logo-easup.png',
+    icon: [
+      { url: '/logo-easup.png' },
+      { url: '/favicon.ico' },
+    ],
+    shortcut: ['/logo-easup.png'],
+    apple: [
+      { url: '/logo-easup.png' },
+    ],
   },
-  authors: [{ name: 'UBND Xã Ea Súp - Ban Biên Tập Văn Hóa & Du Lịch' }],
+  authors: [{ name: 'Đoàn Thanh Niên Ea Súp - Đắk Lắk' }],
   openGraph: {
     title: 'DU LỊCH EA SÚP | BẢN SẮC, DẤU ẤN ĐẠI NGÀN TÂY NGUYÊN',
     description: 'Bản đồ GIS du lịch, thuyết minh âm thanh đa phương tiện và di sản xã Ea Súp, tỉnh Đắk Lắk',
