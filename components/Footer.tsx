@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import { Compass, Mail, MapPin, Phone, ExternalLink } from 'lucide-react';
+import { Compass, Mail, MapPin, Phone } from 'lucide-react';
 
 export default function Footer() {
   return (
@@ -84,15 +84,6 @@ export default function Footer() {
               <div className="flex items-center gap-2">
                 <Mail className="w-4 h-4 text-[#0066CC] shrink-0" />
                 <span>doanthanhnien@easup.daklak.gov.vn</span>
-              </div>
-              <div className="pt-2">
-                <Link
-                  href="/admin"
-                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-amber-200/80 hover:text-amber-200 underline underline-offset-4"
-                >
-                  <span>Cổng quản trị viên</span>
-                  <ExternalLink className="w-3 h-3" />
-                </Link>
               </div>
             </div>
           </div>

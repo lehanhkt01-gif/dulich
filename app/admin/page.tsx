@@ -40,7 +40,7 @@ export default function AdminPage() {
   // Authentication State
   const [currentUser, setCurrentUser] = useState<{ id: string; name: string; email: string; role: string } | null>(null);
   const [authChecking, setAuthChecking] = useState(true);
-  const [loginEmail, setLoginEmail] = useState('admin@easup.daklak.gov.vn');
+  const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
   const [loginLoading, setLoginLoading] = useState(false);
   const [loginError, setLoginError] = useState('');
@@ -485,15 +485,8 @@ export default function AdminPage() {
             </button>
           </form>
 
-          <div className="pt-4 border-t border-[#E7E2D7] text-center space-y-2">
-            <p className="text-[11px] text-stone-500">
-              Tài khoản quản trị mặc định:
-            </p>
-            <div className="p-2.5 bg-stone-50 rounded-xl border border-stone-200 text-left font-mono text-[11px] text-stone-700 space-y-1">
-              <div>Email: <strong className="text-[#0066CC]">admin@easup.daklak.gov.vn</strong></div>
-              <div>Mật khẩu: <strong className="text-emerald-700">AdminEaSup@2025!</strong></div>
-            </div>
-            <Link href="/" className="inline-flex items-center gap-1 text-xs text-stone-500 hover:text-[#0066CC] pt-2">
+          <div className="pt-4 border-t border-[#E7E2D7] text-center">
+            <Link href="/" className="inline-flex items-center gap-1 text-xs text-stone-500 hover:text-[#0066CC]">
               <ArrowLeft className="w-3.5 h-3.5" />
               <span>Quay về trang chủ</span>
             </Link>
