@@ -37,33 +37,44 @@ export default function Footer() {
             </blockquote>
           </div>
 
-          {/* Cột 2: Tra cứu nhanh */}
+          {/* Cột 2: Điểm nhấn trải nghiệm */}
           <div className="space-y-3">
-            <h4 className="font-serif text-base font-semibold text-white">Tra cứu di sản</h4>
-            <ul className="space-y-2 text-sm text-stone-400">
+            <h4 className="font-serif text-base font-semibold text-white">Điểm nhấn trải nghiệm</h4>
+            <ul className="space-y-2.5 text-xs text-stone-400">
               <li>
-                <Link href="/#danh-thang" className="hover:text-[#A64B2A] transition-colors">
-                  Tháp Cổ Yang PRông
+                <Link
+                  href="/destinations/thap-cham-yang-prong"
+                  className="flex items-center gap-2 hover:text-amber-200 transition-colors"
+                >
+                  <span>🏛️</span>
+                  <span>Di tích quốc gia Tháp Yang Prông</span>
                 </Link>
               </li>
               <li>
-                <Link href="/#danh-thang" className="hover:text-[#A64B2A] transition-colors">
-                  Hồ Sinh Thái Ea Súp Thượng
+                <Link
+                  href="/destinations/ho-ea-sup-thuong"
+                  className="flex items-center gap-2 hover:text-amber-200 transition-colors"
+                >
+                  <span>🌊</span>
+                  <span>Sinh thái Hồ Ea Súp Thượng</span>
                 </Link>
               </li>
               <li>
-                <Link href="/#danh-thang" className="hover:text-[#A64B2A] transition-colors">
-                  Không gian Cồng chiêng Buôn A2
+                <Link
+                  href="/destinations/vuon-quoc-gia-yok-don"
+                  className="flex items-center gap-2 hover:text-amber-200 transition-colors"
+                >
+                  <span>🌿</span>
+                  <span>Rừng khộp Yok Đôn nguyên sinh</span>
                 </Link>
               </li>
               <li>
-                <Link href="/#danh-thang" className="hover:text-[#A64B2A] transition-colors">
-                  Du lịch Voi Vườn QG Yok Đôn
-                </Link>
-              </li>
-              <li>
-                <Link href="/#danh-thang" className="hover:text-[#A64B2A] transition-colors">
-                  Đặc sản Xoài Cát OCOP 4 sao
+                <Link
+                  href="/destinations/buon-a2-ea-sup"
+                  className="flex items-center gap-2 hover:text-amber-200 transition-colors"
+                >
+                  <span>🍲</span>
+                  <span>Ẩm thực & Hương sắc buôn làng</span>
                 </Link>
               </li>
             </ul>
