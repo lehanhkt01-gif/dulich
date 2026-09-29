@@ -173,7 +173,7 @@ docker compose up -d --build && docker compose exec web npx prisma db push && do
             </div>
             <div>
               <span className="text-[11px] font-bold uppercase tracking-wider text-[#A64B2A] block">
-                ỦY BAN NHÂN DÂN XÃ EA SÚP • TỈNH ĐẮK LẮK (13.070029, 107.883355)
+                ĐOÀN THANH NIÊN EA SÚP - ĐĂK LĂK (13.070029, 107.883355)
               </span>
               <h1 className="font-serif text-2xl sm:text-3xl font-extrabold text-[#1C1917]">
                 DU LỊCH EA SÚP: BẢN SẮC, DẤU ẤN ĐẠI NGÀN

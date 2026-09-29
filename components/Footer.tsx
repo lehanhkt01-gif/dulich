@@ -28,7 +28,7 @@ export default function Footer() {
             </div>
 
             <p className="text-sm text-stone-400 max-w-lg leading-relaxed">
-              Dự án chuyển đổi số công tác bảo tồn, phát huy giá trị di sản văn hóa, danh lam thắng cảnh và du lịch sinh thái cộng đồng tại huyện biên giới Ea Súp, tỉnh Đắk Lắk. Kết nối văn hóa ngàn đời cùng công nghệ hiện đại.
+              Dự án số hóa và phát huy giá trị di sản văn hóa, danh lam thắng cảnh và du lịch sinh thái nông nghiệp tại xã Ea Súp, tỉnh Đắk Lắk. Kết nối văn hóa ngàn đời cùng sức trẻ đại ngàn.
             </p>
 
             <blockquote className="border-l-2 border-[#A64B2A] pl-3 text-xs italic text-stone-400">
@@ -71,19 +71,19 @@ export default function Footer() {
 
           {/* Cột 3: Đơn vị chủ quản */}
           <div className="space-y-3">
-            <h4 className="font-serif text-base font-semibold text-white">Cơ quan phụ trách</h4>
+            <h4 className="font-serif text-base font-semibold text-white">Đơn vị chủ quản</h4>
             <div className="space-y-2.5 text-xs text-stone-400 leading-relaxed">
               <div className="flex items-start gap-2">
                 <MapPin className="w-4 h-4 text-[#2D5A43] shrink-0 mt-0.5" />
-                <span>Trung tâm Văn hóa - Thể thao & Truyền thông Huyện Ea Súp, Tỉnh Đắk Lắk</span>
+                <span className="font-bold text-amber-200">ĐOÀN THANH NIÊN EA SÚP - ĐĂK LĂK (Xã Ea Súp, Tỉnh Đắk Lắk)</span>
               </div>
               <div className="flex items-center gap-2">
                 <Phone className="w-4 h-4 text-[#2D5A43] shrink-0" />
-                <span>Hotline Du lịch: (0262) 3688.xxx</span>
+                <span>Hotline Thanh Niên Du Lịch: (0262) 3688.xxx</span>
               </div>
               <div className="flex items-center gap-2">
                 <Mail className="w-4 h-4 text-[#2D5A43] shrink-0" />
-                <span>danhthangky@easup.daklak.gov.vn</span>
+                <span>doanthanhnien@easup.daklak.gov.vn</span>
               </div>
               <div className="pt-2">
                 <Link
@@ -100,7 +100,7 @@ export default function Footer() {
 
         {/* Bản quyền */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between text-xs text-stone-500 gap-4">
-          <p>© 2025 - 2026 DANH THẮNG KÝ. Bản quyền thuộc UBND Huyện Ea Súp, Tỉnh Đắk Lắk.</p>
+          <p>© 2025 - 2026 DU LỊCH EA SÚP. Bản quyền thuộc ĐOÀN THANH NIÊN EA SÚP - ĐĂK LĂK (Xã Ea Súp, Tỉnh Đắk Lắk).</p>
           <p className="flex items-center gap-2">
             <span>Thiết kế theo chuẩn Taste Skill di sản</span>
             <span className="w-1.5 h-1.5 rounded-full bg-[#2D5A43]"></span>

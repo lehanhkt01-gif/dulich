@@ -64,7 +64,7 @@ export default async function HomePage() {
                 alt="Logo Xã Ea Súp"
                 className="w-5 h-5 rounded-full object-cover border border-amber-300/60 shrink-0"
               />
-              <span>ỦY BAN NHÂN DÂN XÃ EA SÚP • TỈNH ĐẮK LẮK</span>
+              <span>ĐOÀN THANH NIÊN EA SÚP - ĐĂK LĂK</span>
             </div>
 
             {/* Tiêu đề chính */}

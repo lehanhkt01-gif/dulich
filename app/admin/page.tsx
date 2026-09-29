@@ -275,7 +275,7 @@ export default function AdminPage() {
               className="w-7 h-7 rounded-full border border-[#2D5A43] shrink-0"
             />
             <span className="text-xs font-bold text-[#2D5A43] uppercase tracking-wider">
-              ỦY BAN NHÂN DÂN XÃ EA SÚP • TỈNH ĐẮK LẮK
+              ĐOÀN THANH NIÊN EA SÚP - ĐĂK LĂK (XÃ EA SÚP)
             </span>
           </div>
           <h1 className="font-serif text-2xl sm:text-3xl font-bold text-[#1C1917]">

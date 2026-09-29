@@ -1,6 +1,6 @@
 # DANH THẮNG KÝ (NỀN TẢNG SỐ HÓA DI TÍCH & DU LỊCH VĂN HÓA EA SÚP)
 
-Dự án công nghệ số hóa di tích lịch sử, danh lam thắng cảnh, văn hóa cồng chiêng buôn làng và du lịch sinh thái nông nghiệp tại huyện biên giới Ea Súp, tỉnh Đắk Lắk.
+Dự án công nghệ số hóa di tích lịch sử, danh lam thắng cảnh, văn hóa cồng chiêng buôn làng và du lịch sinh thái nông nghiệp tại xã Ea Súp, Đắk Lắk.
 
 Xây dựng trên nền tảng **Next.js 15 (App Router, TypeScript, Tailwind CSS, Prisma ORM, PostgreSQL 16)** và tuân thủ chuẩn mực **Taste-Skill Anti-Slop (Heritage Design System)**.
 

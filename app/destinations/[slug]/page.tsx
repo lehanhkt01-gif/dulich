@@ -159,7 +159,7 @@ export default async function DestinationDetailPage({ params }: PageProps) {
           {/* Nội dung bài viết khảo cứu */}
           <article className="prose prose-stone max-w-none space-y-6 text-[#1C1917] leading-relaxed text-base">
             <div className="bg-[#F5F2EB] p-4 rounded-xl border-l-4 border-[#2D5A43] text-sm text-stone-700 italic">
-              Bài viết được số hóa và biên soạn dựa trên tư liệu lịch sử di tích huyện Ea Súp kết hợp khảo sát thực địa địa bàn biên giới.
+              Bài viết được số hóa và biên soạn bởi Đoàn Thanh Niên Ea Súp - Đắk Lắk dựa trên tư liệu lịch sử di tích xã Ea Súp kết hợp khảo sát thực địa địa bàn biên giới.
             </div>
 
             {destination.content.split('\n\n').map((paragraph, idx) => (
