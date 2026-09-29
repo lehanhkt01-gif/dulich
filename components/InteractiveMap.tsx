@@ -18,7 +18,7 @@ export default function InteractiveMap({
   selectedCategory = 'all',
   initialCenter = [13.070029, 107.883355], // Vị trí xã Ea Súp, tỉnh Đắk Lắk (13.070029, 107.883355)
   initialZoom = 12,
-  height = '540px',
+  height = '350px',
 }: InteractiveMapProps) {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<any>(null);

@@ -160,7 +160,7 @@ export default async function HomePage() {
           PHẦN 3: BẢN ĐỒ DU LỊCH TƯƠNG TÁC GIS LEAFLET.JS
           ==================================================================== */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 scroll-mt-24" id="ban-do-du-lich">
-        <div className="bg-white rounded-3xl border border-[#E7E2D7] p-6 sm:p-8 shadow-heritage space-y-6">
+        <div className="bg-white rounded-3xl border border-[#E7E2D7] p-5 sm:p-7 shadow-heritage space-y-5">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
             <div>
               <div className="inline-flex items-center gap-1.5 text-xs font-bold text-[#A64B2A] uppercase tracking-wider mb-2">
@@ -179,12 +179,12 @@ export default async function HomePage() {
             </p>
           </div>
 
-          {/* Map Leaflet */}
+          {/* Map Leaflet - Chiều cao thu gọn 2/3 (350px) */}
           <InteractiveMap
             destinations={destinations}
             initialCenter={[13.070029, 107.883355]}
             initialZoom={12}
-            height="520px"
+            height="350px"
           />
         </div>
       </section>
