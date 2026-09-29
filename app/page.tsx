@@ -170,9 +170,6 @@ export default async function HomePage() {
               <h2 className="font-serif text-2xl sm:text-3xl font-bold text-[#1C1917]">
                 Bản Đồ Không Gian Du Lịch Xã Ea Súp, Tỉnh Đắk Lắk
               </h2>
-              <p className="text-xs text-stone-500 font-mono mt-1">
-                Tọa độ trung tâm xã: 13.070029, 107.883355
-              </p>
             </div>
             <p className="text-xs sm:text-sm text-stone-600 max-w-md">
               Chấm tọa độ chính xác từng di tích, hồ chứa nước và buôn làng. Nhấn vào biểu tượng huy hiệu xã để định vị trung tâm hành chính và kích hoạt chỉ đường Google Maps.

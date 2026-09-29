@@ -326,7 +326,7 @@ export default function InteractiveMap({
           </div>
           <span style="font-size: 10px; font-weight: 700; color: #A64B2A; text-transform: uppercase; letter-spacing: 0.5px;">TRUNG TÂM VĂN HÓA & DU LỊCH</span>
           <h4 style="font-size: 15px; font-weight: 800; color: #1C1917; margin: 3px 0 2px 0;">XÃ EA SÚP</h4>
-          <p style="font-size: 11px; color: #57534E; margin: 0 0 10px 0;">Tỉnh Đắk Lắk • Tọa độ: <strong>13.070029, 107.883355</strong></p>
+          <p style="font-size: 11px; color: #57534E; margin: 0 0 10px 0;">Tỉnh Đắk Lắk</p>
           <a href="https://www.google.com/maps/dir/?api=1&destination=13.070029,107.883355" target="_blank" rel="noopener noreferrer" style="
             display: inline-block;
             width: 100%;
@@ -370,30 +370,13 @@ export default function InteractiveMap({
 
   return (
     <div className="relative w-full rounded-2xl overflow-hidden border border-[#E7E2D7] shadow-heritage bg-[#F5F2EB]">
-      {/* Top Map Bar & Google My Maps Action */}
-      <div className="absolute top-4 left-4 z-20 flex flex-wrap items-center gap-2 max-w-[calc(100%-80px)]">
-        <div className="flex items-center gap-2.5 bg-[#FFFFFF]/95 backdrop-blur-md px-3.5 py-2 rounded-xl border border-[#E7E2D7] shadow-sm">
-          <div className="w-5 h-5 rounded-full overflow-hidden border border-[#0066CC]">
-            <img src="/logo-easup-official.png" alt="Logo" className="w-full h-full object-cover" />
-          </div>
-          <div>
-            <span className="text-xs font-bold text-[#1C1917] block leading-none">
-              Bản Đồ Du Lịch Xã Ea Súp, Tỉnh Đắk Lắk
-            </span>
-            <span className="text-[10px] text-stone-500 font-mono">
-              Tọa độ tâm: 13.070029, 107.883355
-            </span>
-          </div>
-          <span className="text-[11px] px-2 py-0.5 rounded-full bg-[#0066CC]/10 text-[#0066CC] font-bold ml-1">
-            {destinations.length} Điểm
-          </span>
-        </div>
-
+      {/* Google My Maps Action */}
+      <div className="absolute top-3 left-14 z-20">
         <a
           href="https://www.google.com/maps/d/viewer?mid=1TpQUCEXOZcK88BsqXkT3gPzaDzsctP8"
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white/95 backdrop-blur-md border border-[#E7E2D7] text-xs font-bold text-stone-800 hover:text-[#0066CC] hover:border-[#0066CC] shadow-sm transition-all hover:scale-105"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/95 backdrop-blur-md border border-[#E7E2D7] text-xs font-bold text-stone-800 hover:text-[#0066CC] hover:border-[#0066CC] shadow-sm transition-all hover:scale-105"
           title="Mở toàn màn hình trên Google My Maps"
         >
           <ExternalLink className="w-3.5 h-3.5 text-[#0066CC]" />

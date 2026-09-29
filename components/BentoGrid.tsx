@@ -83,7 +83,7 @@ export default function BentoGrid({ destinations }: BentoGridProps) {
               {/* Tag góc */}
               <div className="absolute top-4 left-4 flex flex-wrap gap-2">
                 <span className="px-3 py-1 rounded-full bg-[#A64B2A] text-white text-xs font-bold tracking-wide uppercase shadow">
-                  Di sản Quốc gia
+                  Danh Lam
                 </span>
                 {featured.historicalPeriod && (
                   <span className="px-3 py-1 rounded-full bg-white/90 backdrop-blur-md text-[#1C1917] text-xs font-medium shadow flex items-center gap-1.5">

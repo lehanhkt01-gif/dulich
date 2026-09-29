@@ -3,11 +3,10 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Compass, MapPin, Landmark, Calendar, ShieldCheck, Menu, X, Headphones } from 'lucide-react';
+import { MapPin, Landmark, Calendar, ShieldCheck, Headphones } from 'lucide-react';
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const pathname = usePathname();
 
   useEffect(() => {
@@ -53,8 +52,8 @@ export default function Navbar() {
           </div>
         </Link>
 
-        {/* Desktop Navigation Links */}
-        <nav className="hidden md:flex items-center gap-1 lg:gap-2">
+        {/* Navigation Links: Trên điện thoại chỉ hiện mỗi biểu tượng, trên desktop hiện icon + chữ */}
+        <nav className="flex items-center gap-1 sm:gap-1.5 lg:gap-2">
           {navLinks.map((link) => {
             const Icon = link.icon;
             const isActive = pathname === link.href;
@@ -62,69 +61,34 @@ export default function Navbar() {
               <Link
                 key={link.name}
                 href={link.href}
-                className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                title={link.name}
+                aria-label={link.name}
+                className={`flex items-center justify-center gap-1.5 p-2 sm:px-2.5 sm:py-2 md:px-3 rounded-xl text-sm font-medium transition-all ${
                   isActive
-                    ? 'text-[#0066CC] bg-[#0066CC]/10 font-semibold'
+                    ? 'text-[#0066CC] bg-[#0066CC]/10 font-semibold shadow-xs'
                     : 'text-[#1C1917]/80 hover:text-[#0066CC] hover:bg-[#0066CC]/5'
                 }`}
               >
-                <Icon className="w-4 h-4 text-[#0066CC]/80" />
-                <span>{link.name}</span>
+                <Icon className="w-5 h-5 sm:w-4 sm:h-4 text-[#0066CC]/80 shrink-0" />
+                <span className="hidden md:inline whitespace-nowrap">{link.name}</span>
               </Link>
             );
           })}
         </nav>
 
         {/* Action Button: Admin CMS */}
-        <div className="hidden md:flex items-center gap-2">
+        <div className="flex items-center gap-2 shrink-0">
           <Link
             href="/admin"
-            className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold text-[#0066CC] border border-[#0066CC]/30 hover:border-[#0066CC] hover:bg-[#0066CC] hover:text-white transition-all shadow-sm"
+            title="Ban Quản Trị"
+            aria-label="Ban Quản Trị"
+            className="flex items-center gap-1.5 p-2 sm:px-3 sm:py-2 md:px-4 rounded-xl text-xs font-semibold text-[#0066CC] border border-[#0066CC]/30 hover:border-[#0066CC] hover:bg-[#0066CC] hover:text-white transition-all shadow-sm"
           >
-            <ShieldCheck className="w-4 h-4" />
-            <span>Ban Quản Trị</span>
+            <ShieldCheck className="w-4 h-4 shrink-0" />
+            <span className="hidden lg:inline">Ban Quản Trị</span>
           </Link>
         </div>
-
-        {/* Mobile Menu Button */}
-        <button
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="md:hidden p-2 rounded-lg text-[#1C1917] hover:bg-stone-200/50"
-          aria-label="Toggle Navigation"
-        >
-          {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-        </button>
       </div>
-
-      {/* Mobile Drawer */}
-      {mobileMenuOpen && (
-        <div className="md:hidden bg-[#FBF9F5] border-b border-[#E7E2D7] px-4 pt-3 pb-6 space-y-2 shadow-xl">
-          {navLinks.map((link) => {
-            const Icon = link.icon;
-            return (
-              <Link
-                key={link.name}
-                href={link.href}
-                onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-base font-medium text-[#1C1917] hover:bg-[#0066CC]/10 hover:text-[#0066CC]"
-              >
-                <Icon className="w-5 h-5 text-[#0066CC]" />
-                <span>{link.name}</span>
-              </Link>
-            );
-          })}
-          <div className="pt-2 border-t border-stone-200">
-            <Link
-              href="/admin"
-              onClick={() => setMobileMenuOpen(false)}
-              className="flex items-center justify-center gap-2 w-full px-4 py-3 rounded-xl bg-[#0066CC] text-white font-medium text-sm shadow-md"
-            >
-              <ShieldCheck className="w-4 h-4" />
-              <span>Đăng nhập Ban Quản Trị CMS</span>
-            </Link>
-          </div>
-        </div>
-      )}
     </header>
   );
 }
