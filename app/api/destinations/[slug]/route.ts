@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { calculateDistanceKm, deleteMemoryDestination, getDbDestinationBySlug, getDbDestinations, prisma, updateMemoryDestination } from '@/lib/prisma';
+import { revalidatePath } from 'next/cache';
+import { calculateDistanceKm, getDbDestinationBySlug, getDbDestinations, prisma } from '@/lib/prisma';
+import { upsertStoredDestination, deleteStoredDestination, getStoredDestinationBySlug } from '@/lib/storage';
 import { getAuthUser, requireRole } from '@/lib/auth';
 
 interface Context {
@@ -65,34 +67,60 @@ export async function PUT(req: NextRequest, { params }: Context) {
     const { slug } = await params;
     const body = await req.json();
 
+    // Loại bỏ các trường quan hệ có thể gây lỗi Prisma update
+    const { category, reviews, createdBy, id, ...cleanData } = body;
+
+    let updatedData: any = null;
+
     try {
       const updated = await prisma.destination.update({
         where: { slug },
-        data: body,
+        data: cleanData,
         include: { category: true },
       });
-
-      return NextResponse.json({
-        success: true,
-        message: 'Cập nhật điểm đến thành công',
-        data: updated,
-      });
-    } catch {
-      // Memory fallback
-      const existing = await getDbDestinationBySlug(slug);
+      updatedData = {
+        ...updated,
+        createdAt: updated.createdAt.toISOString(),
+        updatedAt: updated.updatedAt.toISOString(),
+      };
+      // Đồng bộ vào persistent JSON storage
+      upsertStoredDestination({ ...updatedData, slug });
+    } catch (dbErr) {
+      // Lưu vào persistent JSON storage
+      const existing = getStoredDestinationBySlug(slug);
       if (existing) {
-        updateMemoryDestination(existing.id, body);
-        return NextResponse.json({
-          success: true,
-          message: 'Cập nhật thành công (in-memory)',
-          data: { ...existing, ...body },
+        updatedData = upsertStoredDestination({
+          ...existing,
+          ...cleanData,
+          slug,
         });
       }
-      return NextResponse.json(
-        { success: false, message: 'Không tìm thấy điểm đến để cập nhật' },
-        { status: 404 }
-      );
     }
+
+    if (!updatedData) {
+      // Thử cập nhật theo slug trong storage kể cả khi không tìm thấy trước đó
+      updatedData = upsertStoredDestination({
+        ...cleanData,
+        slug,
+        title: cleanData.title || slug,
+      });
+    }
+
+    // Làm mới cache ngay lập tức
+    try {
+      revalidatePath('/');
+      revalidatePath('/admin');
+      revalidatePath(`/destinations/${slug}`);
+      revalidatePath(`/di-tich/${slug}`);
+    } catch (e) {
+      console.warn('Revalidate error:', e);
+    }
+
+    return NextResponse.json({
+      success: true,
+      message: 'Cập nhật điểm đến thành công và đã lưu bền vững',
+      data: updatedData,
+    });
   } catch (error) {
     console.error('Error updating destination:', error);
     return NextResponse.json(
@@ -121,10 +149,18 @@ export async function DELETE(req: NextRequest, { params }: Context) {
         where: { slug },
       });
     } catch {
-      const existing = await getDbDestinationBySlug(slug);
-      if (existing) {
-        deleteMemoryDestination(existing.id);
-      }
+      // Bỏ qua lỗi DB nếu chưa kết nối
+    }
+
+    // Xóa trong persistent JSON storage
+    deleteStoredDestination(slug);
+
+    // Làm mới cache
+    try {
+      revalidatePath('/');
+      revalidatePath('/admin');
+    } catch (e) {
+      console.warn('Revalidate error:', e);
     }
 
     return NextResponse.json({

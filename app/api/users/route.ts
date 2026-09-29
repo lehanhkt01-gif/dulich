@@ -1,11 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
 import { prisma } from '@/lib/prisma';
-import { INITIAL_USERS } from '@/lib/data/seed-data';
-import { User } from '@/lib/types';
-
-// In-memory fallback
-let memoryUsers: User[] = [...INITIAL_USERS];
+import { getStoredUsers, upsertStoredUser, deleteStoredUser } from '@/lib/storage';
 
 export async function GET() {
   try {
@@ -23,7 +19,15 @@ export async function GET() {
       });
       return NextResponse.json({ success: true, data: users });
     } catch {
-      return NextResponse.json({ success: true, data: memoryUsers });
+      const users = getStoredUsers().map((u) => ({
+        id: u.id,
+        name: u.name,
+        email: u.email,
+        role: u.role,
+        avatar: u.avatar,
+        createdAt: u.createdAt,
+      }));
+      return NextResponse.json({ success: true, data: users });
     }
   } catch (error: any) {
     return NextResponse.json(
@@ -47,9 +51,12 @@ export async function POST(req: NextRequest) {
 
     const hashedPassword = await bcrypt.hash(password, 10);
     const assignedRole = role === 'ADMIN' ? 'ADMIN' : 'EDITOR';
+    const avatarUrl = `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(name)}`;
+
+    let savedUser: any = null;
 
     try {
-      // Check existing email
+      // Check existing email in DB
       const existing = await prisma.user.findUnique({ where: { email } });
       if (existing) {
         return NextResponse.json(
@@ -58,13 +65,13 @@ export async function POST(req: NextRequest) {
         );
       }
 
-      const newUser = await prisma.user.create({
+      savedUser = await prisma.user.create({
         data: {
           name,
           email,
           password: hashedPassword,
           role: assignedRole,
-          avatar: `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(name)}`,
+          avatar: avatarUrl,
         },
         select: {
           id: true,
@@ -76,36 +83,42 @@ export async function POST(req: NextRequest) {
         },
       });
 
-      return NextResponse.json({
-        success: true,
-        message: 'Cấp quyền tài khoản mới thành công!',
-        data: newUser,
+      // Đồng bộ vào persistent JSON storage
+      upsertStoredUser({
+        ...savedUser,
+        password: hashedPassword,
       });
     } catch {
-      // Fallback
-      if (memoryUsers.some((u) => u.email === email)) {
+      // Fallback persistent storage
+      const existingUsers = getStoredUsers();
+      if (existingUsers.some((u) => u.email === email)) {
         return NextResponse.json(
           { success: false, message: 'Email này đã tồn tại trong hệ thống' },
           { status: 400 }
         );
       }
 
-      const mockUser: User = {
-        id: `user-${Date.now()}`,
+      savedUser = upsertStoredUser({
         name,
         email,
+        password: hashedPassword,
         role: assignedRole,
-        avatar: `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(name)}`,
-        createdAt: new Date().toISOString(),
-      };
-      memoryUsers.push(mockUser);
-
-      return NextResponse.json({
-        success: true,
-        message: 'Cấp quyền tài khoản mới thành công (chế độ dự phòng)!',
-        data: mockUser,
+        avatar: avatarUrl,
       });
     }
+
+    return NextResponse.json({
+      success: true,
+      message: 'Cấp quyền tài khoản mới thành công và đã lưu bền vững!',
+      data: {
+        id: savedUser.id,
+        name: savedUser.name,
+        email: savedUser.email,
+        role: savedUser.role,
+        avatar: savedUser.avatar,
+        createdAt: savedUser.createdAt,
+      },
+    });
   } catch (error: any) {
     return NextResponse.json(
       { success: false, message: 'Lỗi khi tạo tài khoản: ' + error.message },
@@ -127,7 +140,7 @@ export async function DELETE(req: NextRequest) {
     }
 
     try {
-      // Đếm số lượng ADMIN còn lại
+      // Đếm số lượng ADMIN còn lại trong DB
       const adminCount = await prisma.user.count({ where: { role: 'ADMIN' } });
       const targetUser = await prisma.user.findUnique({ where: { id } });
 
@@ -139,11 +152,14 @@ export async function DELETE(req: NextRequest) {
       }
 
       await prisma.user.delete({ where: { id } });
-      return NextResponse.json({ success: true, message: 'Đã xóa tài khoản thành công' });
     } catch {
-      memoryUsers = memoryUsers.filter((u) => u.id !== id);
-      return NextResponse.json({ success: true, message: 'Đã xóa tài khoản thành công' });
+      // Bỏ qua lỗi DB nếu chưa kết nối
     }
+
+    // Xóa trong persistent storage
+    deleteStoredUser(id);
+
+    return NextResponse.json({ success: true, message: 'Đã xóa tài khoản thành công' });
   } catch (error: any) {
     return NextResponse.json(
       { success: false, message: 'Lỗi khi xóa tài khoản: ' + error.message },

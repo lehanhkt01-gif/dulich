@@ -27,26 +27,40 @@ export async function POST(req: NextRequest) {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    const uploadDir = path.join(process.cwd(), 'public', 'uploads');
+    const uploadDir = process.env.UPLOAD_DIR || path.join(process.cwd(), 'public', 'uploads');
     if (!fs.existsSync(uploadDir)) {
       fs.mkdirSync(uploadDir, { recursive: true });
     }
 
     const timestamp = Date.now();
-    const originalName = file.name.replace(/\.[^/.]+$/, '').replace(/[^a-zA-Z0-9_-]/g, '_');
+    const originalName = file.name
+      .replace(/\.[^/.]+$/, '')
+      .replace(/[^a-zA-Z0-9_-]/g, '_')
+      .substring(0, 50);
     const isImage = file.type.startsWith('image/');
 
     let finalFilename = '';
+    let mimeType = file.type;
 
     if (isImage) {
-      // Nén ảnh sang định dạng WebP chất lượng 82% và kích thước tối đa 1920px
-      finalFilename = `${originalName}-${timestamp}.webp`;
-      const filePath = path.join(uploadDir, finalFilename);
+      try {
+        // Nén ảnh sang định dạng WebP chất lượng 82% và kích thước tối đa 1920px
+        finalFilename = `${originalName}-${timestamp}.webp`;
+        const filePath = path.join(uploadDir, finalFilename);
 
-      await sharp(buffer)
-        .resize({ width: 1920, withoutEnlargement: true })
-        .webp({ quality: 82 })
-        .toFile(filePath);
+        await sharp(buffer)
+          .resize({ width: 1920, withoutEnlargement: true })
+          .webp({ quality: 82 })
+          .toFile(filePath);
+
+        mimeType = 'image/webp';
+      } catch (sharpError) {
+        console.warn('Sharp optimization error, saving original file:', sharpError);
+        const ext = path.extname(file.name) || '.jpg';
+        finalFilename = `${originalName}-${timestamp}${ext}`;
+        const filePath = path.join(uploadDir, finalFilename);
+        fs.writeFileSync(filePath, buffer);
+      }
     } else {
       // Tệp âm thanh hoặc tệp khác giữ nguyên định dạng an toàn
       const ext = path.extname(file.name) || '.mp3';
@@ -59,15 +73,15 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: 'Tải tệp và tối ưu hóa thành công',
+      message: 'Tải tệp và lưu trữ thành công',
       url: fileUrl,
       fileName: finalFilename,
-      type: isImage ? 'image/webp' : file.type,
+      type: mimeType,
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error in upload API:', error);
     return NextResponse.json(
-      { success: false, message: 'Lỗi khi xử lý tệp tải lên' },
+      { success: false, message: 'Lỗi khi xử lý tệp tải lên: ' + (error?.message || error) },
       { status: 500 }
     );
   }

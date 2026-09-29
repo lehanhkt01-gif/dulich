@@ -19,7 +19,8 @@ import {
   Flame,
 } from 'lucide-react';
 
-export const revalidate = 60; // ISR cache revalidation
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 export default async function HomePage() {
   const [destinations, categories, itineraries] = await Promise.all([

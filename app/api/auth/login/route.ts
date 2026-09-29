@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
 import { prisma } from '@/lib/prisma';
 import { signJwtToken } from '@/lib/auth';
-import { INITIAL_USERS } from '@/lib/data/seed-data';
+import { getStoredUsers } from '@/lib/storage';
 
 export async function POST(req: NextRequest) {
   try {
@@ -19,13 +19,11 @@ export async function POST(req: NextRequest) {
     try {
       user = await prisma.user.findUnique({ where: { email } });
     } catch {
-      // In-memory fallback
-      const found = INITIAL_USERS.find((u) => u.email === email);
+      // Persistent storage fallback
+      const storedUsers = getStoredUsers();
+      const found = storedUsers.find((u) => u.email === email);
       if (found) {
-        user = {
-          ...found,
-          password: 'mock_password', // bypass check for mock demo admin
-        };
+        user = found;
       }
     }
 

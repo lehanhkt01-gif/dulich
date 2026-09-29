@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { addMemoryDestination, getDbDestinations, prisma } from '@/lib/prisma';
+import { revalidatePath } from 'next/cache';
+import { getDbDestinations, prisma } from '@/lib/prisma';
+import { upsertStoredDestination } from '@/lib/storage';
 import { getAuthUser, requireRole } from '@/lib/auth';
 import { Destination } from '@/lib/types';
 
@@ -44,7 +46,6 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const user = getAuthUser(req);
-    // Cho phép nếu có token role EDITOR/ADMIN, hoặc dev fallback
     if (user && !requireRole(user, ['EDITOR', 'ADMIN'])) {
       return NextResponse.json(
         { success: false, message: 'Quyền truy cập bị từ chối' },
@@ -112,11 +113,11 @@ export async function POST(req: NextRequest) {
         createdAt: created.createdAt.toISOString(),
         updatedAt: created.updatedAt.toISOString(),
       };
+      // Đồng bộ vào persistent JSON storage
+      upsertStoredDestination(createdDestination);
     } catch {
-      // Fallback in-memory
-      const newId = 'dest-' + Date.now();
-      createdDestination = {
-        id: newId,
+      // Lưu vào persistent JSON storage khi DB chưa kết nối
+      createdDestination = upsertStoredDestination({
         title,
         slug,
         subTitle,
@@ -135,17 +136,23 @@ export async function POST(req: NextRequest) {
         categoryId,
         isPublished: true,
         isFeatured: Boolean(isFeatured),
-        viewsCount: 0,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      };
-      addMemoryDestination(createdDestination);
+      });
+    }
+
+    // Làm mới cache toàn bộ các trang liên quan ngay lập tức
+    try {
+      revalidatePath('/');
+      revalidatePath('/admin');
+      revalidatePath(`/destinations/${slug}`);
+      revalidatePath(`/di-tich/${slug}`);
+    } catch (e) {
+      console.warn('Revalidate error:', e);
     }
 
     return NextResponse.json(
       {
         success: true,
-        message: 'Thêm mới danh lam thắng cảnh thành công',
+        message: 'Thêm mới danh lam thắng cảnh thành công và đã lưu bền vững',
         data: createdDestination,
       },
       { status: 201 }

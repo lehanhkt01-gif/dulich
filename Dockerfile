@@ -31,18 +31,20 @@ RUN npm run build
 FROM node:20-alpine AS runner
 WORKDIR /app
 
+RUN apk add --no-cache su-exec
+
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
-# Thiết lập người dùng bảo mật không dùng root
+# Thiết lập người dùng bảo mật
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
-# Tạo thư mục public và uploads với quyền chính xác
-RUN mkdir -p public/uploads
-RUN chown -R nextjs:nodejs public/uploads
+# Tạo thư mục public, uploads và data với quyền chính xác
+RUN mkdir -p public/uploads data
+RUN chown -R nextjs:nodejs public/uploads data
 
 # Tận dụng output standalone tối ưu từ Next.js
 COPY --from=builder /app/public ./public
@@ -50,9 +52,10 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
 
-# Chuyển sang người dùng bảo mật
-USER nextjs
+COPY entrypoint.sh /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
 
 EXPOSE 3000
 
+ENTRYPOINT ["/app/entrypoint.sh"]
 CMD ["node", "server.js"]

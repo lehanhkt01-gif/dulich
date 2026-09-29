@@ -1,6 +1,13 @@
 import { PrismaClient } from '@prisma/client';
-import { INITIAL_CATEGORIES, INITIAL_DESTINATIONS, INITIAL_ITINERARIES, INITIAL_USERS } from './data/seed-data';
 import { Destination, RouteStop, ItineraryItem } from './types';
+import {
+  getStoredDestinations,
+  getStoredDestinationBySlug,
+  upsertStoredDestination,
+  deleteStoredDestination,
+  getStoredCategories,
+  getStoredItineraries,
+} from './storage';
 
 // Global variable để tránh khởi tạo nhiều Prisma client instance khi Next.js hot-reload
 const globalForPrisma = globalThis as unknown as {
@@ -34,11 +41,6 @@ export function calculateDistanceKm(
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   return Math.round(R * c * 10) / 10;
 }
-
-// In-memory data store for fallback khi chưa kết nối PostgreSQL hoặc môi trường test
-let memoryDestinations = [...INITIAL_DESTINATIONS];
-const memoryCategories = [...INITIAL_CATEGORIES];
-const memoryItineraries = [...INITIAL_ITINERARIES];
 
 export async function getDbDestinations(options?: {
   query?: string;
@@ -97,14 +99,13 @@ export async function getDbDestinations(options?: {
 
     return results;
   } catch (error) {
-    // Fallback thông minh sang bộ dữ liệu mẫu (Seed Data) nếu DB chưa kết nối
-    console.warn('Prisma DB not reachable, falling back to rich seed data:', error instanceof Error ? error.message : error);
-
-    let list = [...memoryDestinations];
+    // Fallback thông minh sang bộ dữ liệu JSON lưu trữ bền vững (Persistent JSON Storage)
+    let list = getStoredDestinations();
+    const categories = getStoredCategories();
 
     if (options?.categorySlug && options.categorySlug !== 'all') {
       list = list.filter((d) => {
-        const cat = memoryCategories.find((c) => c.id === d.categoryId);
+        const cat = categories.find((c) => c.id === d.categoryId);
         return cat?.slug === options.categorySlug;
       });
     }
@@ -133,7 +134,7 @@ export async function getDbDestinations(options?: {
     }
 
     return list.map((d) => {
-      const cat = memoryCategories.find((c) => c.id === d.categoryId);
+      const cat = categories.find((c) => c.id === d.categoryId);
       return { ...d, category: cat };
     });
   }
@@ -167,10 +168,11 @@ export async function getDbDestinationBySlug(slug: string) {
       })),
     };
   } catch {
-    const item = memoryDestinations.find((d) => d.slug === slug);
+    const item = getStoredDestinationBySlug(slug);
     if (!item) return null;
-    const cat = memoryCategories.find((c) => c.id === item.categoryId);
-    return { ...item, category: cat, viewsCount: item.viewsCount + 1 };
+    const categories = getStoredCategories();
+    const cat = categories.find((c) => c.id === item.categoryId);
+    return { ...item, category: cat, viewsCount: (item.viewsCount || 0) + 1 };
   }
 }
 
@@ -178,7 +180,7 @@ export async function getDbCategories() {
   try {
     return await prisma.category.findMany({ orderBy: { name: 'asc' } });
   } catch {
-    return memoryCategories;
+    return getStoredCategories();
   }
 }
 
@@ -191,18 +193,26 @@ export async function getDbItineraries(): Promise<ItineraryItem[]> {
       createdAt: i.createdAt.toISOString(),
     }));
   } catch {
-    return memoryItineraries;
+    return getStoredItineraries();
   }
 }
 
 export function addMemoryDestination(newDest: Destination) {
-  memoryDestinations = [newDest, ...memoryDestinations];
+  upsertStoredDestination(newDest);
 }
 
 export function updateMemoryDestination(id: string, updated: Partial<Destination>) {
-  memoryDestinations = memoryDestinations.map((d) => (d.id === id ? { ...d, ...updated } : d));
+  const all = getStoredDestinations();
+  const existing = all.find((d) => d.id === id);
+  if (existing) {
+    upsertStoredDestination({ ...existing, ...updated });
+  }
 }
 
 export function deleteMemoryDestination(id: string) {
-  memoryDestinations = memoryDestinations.filter((d) => d.id !== id);
+  const all = getStoredDestinations();
+  const existing = all.find((d) => d.id === id);
+  if (existing) {
+    deleteStoredDestination(existing.slug);
+  }
 }

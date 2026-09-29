@@ -1,0 +1,30 @@
+[
+  {
+    "id": "cat-di-tich",
+    "name": "Di tích Lịch sử & Kiến trúc",
+    "slug": "di-tich-lich-su",
+    "icon": "Landmark",
+    "description": "Các công trình kiến trúc cổ kính, di tích kháng chiến hào hùng trên dải đất biên cương Ea Súp."
+  },
+  {
+    "id": "cat-thac-ho",
+    "name": "Thác nước & Hồ cảnh quan",
+    "slug": "thac-nuoc-ho-canh-quan",
+    "icon": "Waves",
+    "description": "Mặt nước hồ thủy lợi mênh mông, thác ghềnh giữa lòng rừng khộp đại ngàn hoang sơ."
+  },
+  {
+    "id": "cat-buon-lang",
+    "name": "Không gian Văn hóa Buôn làng",
+    "slug": "khong-gian-van-hoa-buon-lang",
+    "icon": "Campfire",
+    "description": "Bản sắc nhà dài, cồng chiêng, nghề dệt thổ cẩm và men rượu cần nồng ấm của người Êđê, Gia Rai."
+  },
+  {
+    "id": "cat-sinh-thai",
+    "name": "Du lịch Sinh thái & Nông nghiệp",
+    "slug": "du-lich-sinh-thai-nong-nghiep",
+    "icon": "Trees",
+    "description": "Trải nghiệm vườn xoài cát Ea Súp OCOP 4 sao, ngắm hệ sinh thái rừng khộp và du lịch voi thân thiện."
+  }
+]

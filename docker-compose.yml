@@ -16,7 +16,6 @@ services:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - app_net
-    # Không dùng "ports: - '5432:5432'" để ngăn chặn tấn công brute-force từ Internet
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-danhthangky_user} -d ${DB_NAME:-danhthangky_db}"]
       interval: 10s
@@ -40,10 +39,12 @@ services:
       AUTH_SECRET: ${AUTH_SECRET}
       NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:-http://localhost}
       UPLOAD_DIR: /app/public/uploads
+      DATA_DIR: /app/data
       NODE_ENV: production
       PORT: 3000
     volumes:
       - uploads_data:/app/public/uploads
+      - app_data:/app/data
     networks:
       - app_net
     expose:
@@ -68,7 +69,6 @@ services:
     networks:
       - app_net
 
-
 # ------------------------------------------------------------------------------
 # VOLUMES & MẠNG NỘI BỘ (PERSISTENT DATA & ISOLATION)
 # ------------------------------------------------------------------------------
@@ -77,6 +77,8 @@ volumes:
     name: danhthangky_postgres_data
   uploads_data:
     name: danhthangky_uploads_data
+  app_data:
+    name: danhthangky_app_data
 
 networks:
   app_net:

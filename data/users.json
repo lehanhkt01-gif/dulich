@@ -1,0 +1,18 @@
+[
+  {
+    "id": "user-admin-1",
+    "name": "Cán Bộ Văn Hóa Ea Súp",
+    "email": "admin@easup.daklak.gov.vn",
+    "role": "ADMIN",
+    "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80",
+    "createdAt": "2025-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "user-editor-1",
+    "name": "Ban Biên Tập Di Sản",
+    "email": "editor@easup.daklak.gov.vn",
+    "role": "EDITOR",
+    "avatar": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&q=80",
+    "createdAt": "2025-01-01T00:00:00.000Z"
+  }
+]
