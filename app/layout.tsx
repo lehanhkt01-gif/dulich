@@ -34,12 +34,12 @@ export const metadata: Metadata = {
   ],
   icons: {
     icon: [
-      { url: '/logo-easup.png' },
+      { url: '/logo-easup-official.png' },
       { url: '/favicon.ico' },
     ],
-    shortcut: ['/logo-easup.png'],
+    shortcut: ['/logo-easup-official.png'],
     apple: [
-      { url: '/logo-easup.png' },
+      { url: '/logo-easup-official.png' },
     ],
   },
   authors: [{ name: 'Đoàn Thanh Niên Ea Súp - Đắk Lắk' }],
@@ -48,7 +48,7 @@ export const metadata: Metadata = {
     description: 'Bản đồ GIS du lịch, thuyết minh âm thanh đa phương tiện và di sản xã Ea Súp, tỉnh Đắk Lắk',
     type: 'website',
     locale: 'vi_VN',
-    images: [{ url: '/logo-easup.png' }],
+    images: [{ url: '/logo-easup-official.png' }],
   },
 };
 

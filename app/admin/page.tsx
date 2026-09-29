@@ -270,7 +270,7 @@ export default function AdminPage() {
         <div>
           <div className="flex items-center gap-2.5 mb-2">
             <img
-              src="/logo-easup.png"
+              src="/logo-easup-official.png"
               alt="Logo Xã Ea Súp"
               className="w-7 h-7 rounded-full border border-[#0066CC] shrink-0"
             />

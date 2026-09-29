@@ -60,7 +60,7 @@ export default async function HomePage() {
             {/* Tag hành chính & logo xã Ea Súp */}
             <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-[#0066CC] text-white text-xs font-bold uppercase tracking-wider shadow-md backdrop-blur-sm">
               <img
-                src="/logo-easup.png"
+                src="/logo-easup-official.png"
                 alt="Logo Xã Ea Súp"
                 className="w-5 h-5 rounded-full object-cover border border-white/80 shrink-0 shadow-sm"
               />

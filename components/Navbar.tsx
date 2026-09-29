@@ -38,7 +38,7 @@ export default function Navbar() {
         <Link href="/" className="flex items-center gap-3 group">
           <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-[#0066CC] shadow-md group-hover:scale-105 transition-transform shrink-0 bg-white">
             <img
-              src="/logo-easup.png"
+              src="/logo-easup-official.png"
               alt="Logo Xã Ea Súp"
               className="w-full h-full object-cover"
             />

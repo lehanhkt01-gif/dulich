@@ -225,7 +225,7 @@ export default function InteractiveMap({
             overflow: hidden;
             cursor: pointer;
           ">
-            <img src="/logo-easup.png" style="width: 100%; height: 100%; object-fit: cover;" alt="Logo Xã Ea Súp" />
+            <img src="/logo-easup-official.png" style="width: 100%; height: 100%; object-fit: cover;" alt="Logo Xã Ea Súp" />
           </div>
         `,
         className: 'center-easup-pin',
@@ -242,7 +242,7 @@ export default function InteractiveMap({
       centerMarker.bindPopup(`
         <div style="width: 260px; font-family: inherit; padding: 12px 14px; text-align: center;">
           <div style="width: 58px; height: 58px; border-radius: 50%; overflow: hidden; margin: 0 auto 8px auto; border: 2px solid #0066CC; box-shadow: 0 2px 8px rgba(0,0,0,0.15);">
-            <img src="/logo-easup.png" style="width: 100%; height: 100%; object-fit: cover;" alt="Logo Xã Ea Súp" />
+            <img src="/logo-easup-official.png" style="width: 100%; height: 100%; object-fit: cover;" alt="Logo Xã Ea Súp" />
           </div>
           <span style="font-size: 10px; font-weight: 700; color: #A64B2A; text-transform: uppercase; letter-spacing: 0.5px;">TRUNG TÂM VĂN HÓA & DU LỊCH</span>
           <h4 style="font-size: 15px; font-weight: 800; color: #1C1917; margin: 3px 0 2px 0;">XÃ EA SÚP</h4>
@@ -288,7 +288,7 @@ export default function InteractiveMap({
       {/* Top Map Bar */}
       <div className="absolute top-4 left-4 z-20 flex items-center gap-2.5 bg-[#FFFFFF]/95 backdrop-blur-md px-3.5 py-2 rounded-xl border border-[#E7E2D7] shadow-sm">
         <div className="w-5 h-5 rounded-full overflow-hidden border border-[#0066CC]">
-          <img src="/logo-easup.png" alt="Logo" className="w-full h-full object-cover" />
+          <img src="/logo-easup-official.png" alt="Logo" className="w-full h-full object-cover" />
         </div>
         <div>
           <span className="text-xs font-bold text-[#1C1917] block leading-none">

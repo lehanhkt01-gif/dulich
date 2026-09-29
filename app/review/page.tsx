@@ -169,7 +169,7 @@ docker compose up -d --build && docker compose exec web npx prisma db push && do
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-[#0066CC] shadow-md shrink-0 bg-white">
-              <img src="/logo-easup.png" alt="Logo Xã Ea Súp" className="w-full h-full object-cover" />
+              <img src="/logo-easup-official.png" alt="Logo Xã Ea Súp" className="w-full h-full object-cover" />
             </div>
             <div>
               <span className="text-[11px] font-bold uppercase tracking-wider text-[#A64B2A] block">
