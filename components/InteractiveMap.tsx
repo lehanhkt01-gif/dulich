@@ -23,6 +23,7 @@ export default function InteractiveMap({
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<any>(null);
   const markersRef = useRef<any[]>([]);
+  const boundaryBoundsRef = useRef<any>(null);
   const [activeDestination, setActiveDestination] = useState<Destination | null>(null);
 
   useEffect(() => {
@@ -90,15 +91,15 @@ export default function InteractiveMap({
 
             const boundaryLayer = L.geoJSON(geoData as any, {
               style: (feature: any) => {
-                const isPolygon = feature?.geometry?.type === 'Polygon';
+                const geomType = feature?.geometry?.type;
+                const isPolygon = geomType === 'Polygon' || geomType === 'MultiPolygon';
                 const color = feature?.properties?.color || (isPolygon ? '#2563EB' : '#DC2626');
                 return {
                   color: color,
                   weight: isPolygon ? 2.5 : 3,
-                  opacity: 0.9,
+                  opacity: 0.95,
                   fillColor: color,
-                  fillOpacity: isPolygon ? 0.14 : 0,
-                  dashArray: isPolygon ? undefined : '6, 6',
+                  fillOpacity: isPolygon ? 0.16 : 0,
                 };
               },
               onEachFeature: (feature: any, layer: any) => {
@@ -117,8 +118,8 @@ export default function InteractiveMap({
                   mouseover: (e: any) => {
                     const target = e.target;
                     target.setStyle({
-                      weight: 4,
-                      fillOpacity: 0.28,
+                      weight: 4.5,
+                      fillOpacity: 0.3,
                     });
                     if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
                       target.bringToFront();
@@ -131,8 +132,19 @@ export default function InteractiveMap({
               },
             });
 
-            // Mặc định hiển thị lớp ranh giới lên bản đồ
+            // Mặc định hiển thị toàn bộ các lớp ranh giới lên bản đồ
             boundaryLayer.addTo(map);
+
+            boundaryBoundsRef.current = boundaryLayer.getBounds();
+            // Tự động bao quát toàn cảnh ranh giới 20 thôn buôn của xã Ea Súp
+            if (boundaryLayer.getBounds().isValid()) {
+              const group = markersRef.current.length > 0 ? L.featureGroup(markersRef.current) : null;
+              if (group && group.getBounds().isValid()) {
+                map.fitBounds(boundaryLayer.getBounds().extend(group.getBounds()).pad(0.06));
+              } else {
+                map.fitBounds(boundaryLayer.getBounds().pad(0.06));
+              }
+            }
 
             // Bổ sung lớp phủ vào Bộ chuyển đổi lớp (Layer control)
             L.control.layers(
@@ -338,7 +350,12 @@ export default function InteractiveMap({
       // Fit bounds nếu có điểm
       if (filtered.length > 0) {
         const group = L.featureGroup(markersRef.current);
-        map.fitBounds(group.getBounds().pad(0.15));
+        const markersBounds = group.getBounds();
+        if (boundaryBoundsRef.current && boundaryBoundsRef.current.isValid() && selectedCategory === 'all') {
+          map.fitBounds(markersBounds.extend(boundaryBoundsRef.current).pad(0.06));
+        } else {
+          map.fitBounds(markersBounds.pad(0.15));
+        }
       }
     });
 
