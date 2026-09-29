@@ -77,21 +77,89 @@ export default function InteractiveMap({
         // THIẾT LẬP MẶC ĐỊNH LÀ BẢN ĐỒ VỆ TINH
         satelliteGroup.addTo(map);
 
-        // Bộ chuyển đổi lớp bản đồ (Base Layers control) ở góc trên bên phải
-        L.control.layers(
-          {
-            '🛰️ Bản Đồ Vệ Tinh (Mặc định)': satelliteGroup,
-            '🗺️ Bản Đồ Đường & Thôn Buôn': osmLayer,
-            '⛰️ Bản Đồ Địa Hình Rừng Khộp': topoLayer,
-          },
-          undefined,
-          { position: 'topright' }
-        ).addTo(map);
-
         // Zoom control đặt ở góc phải dưới
         L.control.zoom({ position: 'bottomright' }).addTo(map);
 
         mapInstanceRef.current = map;
+
+        // Tải và tích hợp lớp Ranh giới 20 thôn buôn Ea Súp từ file GeoJSON (chuyển đổi từ Google My Maps)
+        fetch('/data/easup-boundary.geojson')
+          .then((res) => res.json())
+          .then((geoData) => {
+            if (!mapInstanceRef.current) return;
+
+            const boundaryLayer = L.geoJSON(geoData as any, {
+              style: (feature: any) => {
+                const isPolygon = feature?.geometry?.type === 'Polygon';
+                const color = feature?.properties?.color || (isPolygon ? '#2563EB' : '#DC2626');
+                return {
+                  color: color,
+                  weight: isPolygon ? 2.5 : 3,
+                  opacity: 0.9,
+                  fillColor: color,
+                  fillOpacity: isPolygon ? 0.14 : 0,
+                  dashArray: isPolygon ? undefined : '6, 6',
+                };
+              },
+              onEachFeature: (feature: any, layer: any) => {
+                const name = feature?.properties?.name || 'Ranh giới thôn buôn Ea Súp';
+                const desc = feature?.properties?.description || 'Địa phận thôn buôn sau sáp nhập';
+                
+                layer.bindTooltip(
+                  `<div style="font-family: inherit; padding: 2px 4px;">
+                    <div style="font-weight: 700; color: #1C1917; font-size: 12px;">${name}</div>
+                    <div style="font-size: 11px; color: #57534E;">${desc}</div>
+                  </div>`,
+                  { sticky: true, className: 'custom-heritage-popup' }
+                );
+
+                layer.on({
+                  mouseover: (e: any) => {
+                    const target = e.target;
+                    target.setStyle({
+                      weight: 4,
+                      fillOpacity: 0.28,
+                    });
+                    if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
+                      target.bringToFront();
+                    }
+                  },
+                  mouseout: (e: any) => {
+                    boundaryLayer.resetStyle(e.target);
+                  },
+                });
+              },
+            });
+
+            // Mặc định hiển thị lớp ranh giới lên bản đồ
+            boundaryLayer.addTo(map);
+
+            // Bổ sung lớp phủ vào Bộ chuyển đổi lớp (Layer control)
+            L.control.layers(
+              {
+                '🛰️ Bản Đồ Vệ Tinh (Mặc định)': satelliteGroup,
+                '🗺️ Bản Đồ Đường & Thôn Buôn': osmLayer,
+                '⛰️ Bản Đồ Địa Hình Rừng Khộp': topoLayer,
+              },
+              {
+                '📍 Ranh giới 20 thôn buôn (Google My Maps)': boundaryLayer,
+              },
+              { position: 'topright' }
+            ).addTo(map);
+          })
+          .catch((err) => {
+            console.error('Không thể tải ranh giới Ea Súp GeoJSON:', err);
+            // Fallback nếu không tải được geojson
+            L.control.layers(
+              {
+                '🛰️ Bản Đồ Vệ Tinh (Mặc định)': satelliteGroup,
+                '🗺️ Bản Đồ Đường & Thôn Buôn': osmLayer,
+                '⛰️ Bản Đồ Địa Hình Rừng Khộp': topoLayer,
+              },
+              undefined,
+              { position: 'topright' }
+            ).addTo(map);
+          });
       }
 
       const map = mapInstanceRef.current;
@@ -285,22 +353,35 @@ export default function InteractiveMap({
 
   return (
     <div className="relative w-full rounded-2xl overflow-hidden border border-[#E7E2D7] shadow-heritage bg-[#F5F2EB]">
-      {/* Top Map Bar */}
-      <div className="absolute top-4 left-4 z-20 flex items-center gap-2.5 bg-[#FFFFFF]/95 backdrop-blur-md px-3.5 py-2 rounded-xl border border-[#E7E2D7] shadow-sm">
-        <div className="w-5 h-5 rounded-full overflow-hidden border border-[#0066CC]">
-          <img src="/logo-easup-official.png" alt="Logo" className="w-full h-full object-cover" />
-        </div>
-        <div>
-          <span className="text-xs font-bold text-[#1C1917] block leading-none">
-            Bản Đồ Du Lịch Xã Ea Súp, Tỉnh Đắk Lắk
+      {/* Top Map Bar & Google My Maps Action */}
+      <div className="absolute top-4 left-4 z-20 flex flex-wrap items-center gap-2 max-w-[calc(100%-80px)]">
+        <div className="flex items-center gap-2.5 bg-[#FFFFFF]/95 backdrop-blur-md px-3.5 py-2 rounded-xl border border-[#E7E2D7] shadow-sm">
+          <div className="w-5 h-5 rounded-full overflow-hidden border border-[#0066CC]">
+            <img src="/logo-easup-official.png" alt="Logo" className="w-full h-full object-cover" />
+          </div>
+          <div>
+            <span className="text-xs font-bold text-[#1C1917] block leading-none">
+              Bản Đồ Du Lịch Xã Ea Súp, Tỉnh Đắk Lắk
+            </span>
+            <span className="text-[10px] text-stone-500 font-mono">
+              Tọa độ tâm: 13.070029, 107.883355
+            </span>
+          </div>
+          <span className="text-[11px] px-2 py-0.5 rounded-full bg-[#0066CC]/10 text-[#0066CC] font-bold ml-1">
+            {destinations.length} Điểm
           </span>
-          <span className="text-[10px] text-stone-500 font-mono">
-            Tọa độ tâm: 13.070029, 107.883355
-          </span>
         </div>
-        <span className="text-[11px] px-2 py-0.5 rounded-full bg-[#0066CC]/10 text-[#0066CC] font-bold ml-1">
-          {destinations.length} Điểm
-        </span>
+
+        <a
+          href="https://www.google.com/maps/d/viewer?mid=1TpQUCEXOZcK88BsqXkT3gPzaDzsctP8"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white/95 backdrop-blur-md border border-[#E7E2D7] text-xs font-bold text-stone-800 hover:text-[#0066CC] hover:border-[#0066CC] shadow-sm transition-all hover:scale-105"
+          title="Mở toàn màn hình trên Google My Maps"
+        >
+          <ExternalLink className="w-3.5 h-3.5 text-[#0066CC]" />
+          <span>Mở Google My Maps</span>
+        </a>
       </div>
 
       {/* Map Legend */}
@@ -316,6 +397,10 @@ export default function InteractiveMap({
         <div className="flex items-center gap-1.5">
           <span className="w-3 h-3 rounded-full bg-[#0066CC]"></span>
           <span className="font-medium text-stone-700">Di tích & Thắng cảnh</span>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <span className="w-3.5 h-2 rounded-sm border border-red-500 bg-red-400/20"></span>
+          <span className="font-medium text-stone-700">Ranh giới 20 thôn buôn</span>
         </div>
       </div>
 
