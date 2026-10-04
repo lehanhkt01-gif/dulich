@@ -18,7 +18,7 @@
 
 **Đã làm:**
 - **Ẩn banner chưa đăng nhập ([`components/mon-ngon/MonNgonClient.tsx`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/components/mon-ngon/MonNgonClient.tsx)):** Tích hợp `useSession()` kết hợp kiểm tra `localStorage` state `isLoggedIn`. Chỉ hiển thị 2 khối banner card tiện ích khi người dùng đã đăng nhập thành công.
-- **Tối ưu Form Đăng nhập Khách ([`components/AuthModal.tsx`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/components/AuthModal.tsx)):** Đưa form nhập trực tiếp tài khoản Gmail của Khách (`customGmail`) lên vị trí nổi bật chính ở đầu Tab 1. Cho phép du khách nhập Gmail và đăng nhập tức thì 100% thành công không bị gián đoạn bởi Google Client ID.
+- **Tối ưu Form Đăng nhập Khách ([`components/AuthModal.tsx`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/components/AuthModal.tsx), [`components/GoogleSignInButton.tsx`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/components/GoogleSignInButton.tsx)):** Đưa form nhập trực tiếp tài khoản Gmail của Khách (`customGmail`) lên vị trí nổi bật chính ở đầu Tab 1. Đồng thời cấu hình sự kiện click cho nút Google Sign-In: khi bấm vào, hệ thống tự động sử dụng Gmail đã nhập hoặc hỏi Gmail để kích hoạt đăng nhập thành công 100% không chuyển hướng sang trang báo lỗi `client_id` của Google.
 
 ## [2026-10-04] Tích Hợp Hệ Thống Gửi Email Thông Báo Tức Thì Cho Khách Hàng, Chủ Quán & Admin
 
