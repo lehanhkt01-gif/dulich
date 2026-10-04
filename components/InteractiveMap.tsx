@@ -181,8 +181,16 @@ export default function InteractiveMap({
       markersRef.current = [];
 
       // Custom Heritage SVG Pin Icon
-      const createCustomIcon = (isFeatured: boolean) => {
-        const color = isFeatured ? '#A64B2A' : '#0066CC';
+      const createCustomIcon = (isFeatured: boolean, isFood: boolean = false) => {
+        const color = isFood ? '#D9452B' : isFeatured ? '#A64B2A' : '#0066CC';
+        const innerSvg = isFood
+          ? `<svg style="transform: rotate(45deg); width: 17px; height: 17px; fill: white;" viewBox="0 0 24 24">
+              <path d="M11 9H9V2H7v7H5V2H3v7c0 2.12 1.66 3.84 3.75 3.97V22h2.5v-9.03C11.34 12.84 13 11.12 13 9V2h-2v7zm5-3v8h2.5v8H21V2c-2.76 0-5 2.24-5 4z"/>
+            </svg>`
+          : `<svg style="transform: rotate(45deg); width: 18px; height: 18px; fill: white;" viewBox="0 0 24 24">
+              <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+            </svg>`;
+
         const svgIcon = `
           <div style="
             background: ${color};
@@ -198,9 +206,7 @@ export default function InteractiveMap({
             cursor: pointer;
             transition: transform 0.2s ease;
           ">
-            <svg style="transform: rotate(45deg); width: 18px; height: 18px; fill: white;" viewBox="0 0 24 24">
-              <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
-            </svg>
+            ${innerSvg}
           </div>
         `;
 
@@ -221,8 +227,9 @@ export default function InteractiveMap({
 
       // Tạo marker cho từng điểm đến
       filtered.forEach((dest) => {
+        const isFood = dest.categoryId === 'cat-am-thuc' || dest.category?.slug === 'am-thuc-quan-ngon';
         const marker = L.marker([dest.latitude, dest.longitude], {
-          icon: createCustomIcon(dest.isFeatured),
+          icon: createCustomIcon(dest.isFeatured, isFood),
         }).addTo(map);
 
         // Tạo Popup HTML tùy chỉnh phong cách tạp chí di sản
@@ -232,13 +239,13 @@ export default function InteractiveMap({
               <img src="${dest.thumbnail}" alt="${dest.title}" style="width: 100%; height: 100%; object-fit: cover;" />
               ${
                 dest.isFeatured
-                  ? '<span style="position: absolute; top: 8px; left: 8px; background: #A64B2A; color: white; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 9999px;">TIÊU BIỂU</span>'
+                  ? `<span style="position: absolute; top: 8px; left: 8px; background: ${isFood ? '#D9452B' : '#A64B2A'}; color: white; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 9999px;">${isFood ? 'QUÁN NGON' : 'TIÊU BIỂU'}</span>`
                   : ''
               }
             </div>
             <div style="padding: 12px 14px;">
-              <p style="font-size: 11px; color: #0066CC; font-weight: 600; text-transform: uppercase; margin: 0 0 4px 0;">
-                ${dest.category?.name || 'Di tích & Danh thắng'}
+              <p style="font-size: 11px; color: ${isFood ? '#D9452B' : '#0066CC'}; font-weight: 600; text-transform: uppercase; margin: 0 0 4px 0;">
+                ${dest.category?.name || (isFood ? 'Ẩm thực & Quán ngon' : 'Di tích & Danh thắng')}
               </p>
               <h4 style="font-size: 14px; font-weight: 700; color: #1C1917; margin: 0 0 6px 0; line-height: 1.3;">
                 ${dest.title}
@@ -247,10 +254,10 @@ export default function InteractiveMap({
                 ${dest.address}
               </p>
               <div style="display: flex; gap: 8px; border-top: 1px solid #E7E2D7; padding-top: 8px;">
-                <a href="/destinations/${dest.slug}" style="
+                <a href="${isFood ? '/mon-ngon' : `/destinations/${dest.slug}`}" style="
                   flex: 1;
                   display: inline-block;
-                  background: #0066CC;
+                  background: ${isFood ? '#D9452B' : '#0066CC'};
                   color: white;
                   font-size: 12px;
                   font-weight: 600;
@@ -258,7 +265,7 @@ export default function InteractiveMap({
                   padding: 6px 0;
                   border-radius: 6px;
                   text-decoration: none;
-                ">Xem bài viết</a>
+                ">${isFood ? '🍽️ Món ngon & Rủ đi' : 'Xem bài viết'}</a>
                 <a href="https://www.google.com/maps/dir/?api=1&destination=${dest.latitude},${dest.longitude}" target="_blank" rel="noopener noreferrer" style="
                   display: flex;
                   align-items: center;

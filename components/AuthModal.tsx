@@ -1,0 +1,606 @@
+'use client';
+
+import React, { useState, useEffect } from 'react';
+import { signIn as nextAuthSignIn } from 'next-auth/react';
+import GoogleSignInButton from './GoogleSignInButton';
+import {
+  X,
+  Store,
+  Compass,
+  CheckCircle,
+  AlertCircle,
+  Sparkles,
+  Phone,
+  MapPin,
+  Mail,
+  User as UserIcon,
+  ShieldCheck,
+  Lock,
+} from 'lucide-react';
+
+interface AuthModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onSuccess: (user: any) => void;
+  defaultMode?: 'login' | 'register_owner';
+}
+
+export default function AuthModal({
+  isOpen,
+  onClose,
+  onSuccess,
+  defaultMode = 'login',
+}: AuthModalProps) {
+  const [mode, setMode] = useState<'login' | 'register_owner'>(defaultMode);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [successMsg, setSuccessMsg] = useState('');
+
+  // Form Chủ quán
+  const [ownerForm, setOwnerForm] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    restaurantName: '',
+    restaurantAddress: '',
+  });
+
+  // Direct Gmail Input
+  const [customGmail, setCustomGmail] = useState('');
+  const [customName, setCustomName] = useState('');
+
+  // Sub-tab dành riêng cho Chủ Quán
+  const [ownerSubTab, setOwnerSubTab] = useState<'login' | 'register'>('login');
+  const [ownerLoginGmail, setOwnerLoginGmail] = useState('');
+  const [ownerLoginPassword, setOwnerLoginPassword] = useState('');
+  const [ownerRegisterPassword, setOwnerRegisterPassword] = useState('');
+
+  useEffect(() => {
+    setMode(defaultMode);
+    setError('');
+    setSuccessMsg('');
+  }, [defaultMode, isOpen]);
+
+  if (!isOpen) return null;
+
+  // Xử lý gửi login Google
+  const handleGoogleAuth = async (
+    targetEmail: string,
+    targetName: string,
+    role: 'TRAVELER' | 'OWNER' | 'ADMIN' | 'EDITOR' = 'TRAVELER',
+    extraData: any = {}
+  ) => {
+    try {
+      setLoading(true);
+      setError('');
+      setSuccessMsg('');
+
+      const res = await fetch('/api/auth/google', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          googleProfile: {
+            email: targetEmail,
+            name: targetName,
+            avatar: `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(targetName)}`,
+          },
+          roleRequest: role,
+          ...extraData,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.message || 'Đăng nhập Google thất bại');
+      }
+
+      // Lưu vào localStorage
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('easup_auth_user', JSON.stringify(data.user));
+      }
+
+      if (data.user.role === 'OWNER') {
+        if (data.user.status === 'PENDING') {
+          setSuccessMsg(`Hồ sơ mở quán "${data.user.restaurantName || ''}" đã gửi! Đang chờ Ban Quản Trị phê duyệt để kích hoạt.`);
+          setTimeout(() => {
+            onSuccess(data.user);
+            onClose();
+          }, 2200);
+          return;
+        } else if (data.user.status === 'BLOCKED') {
+          throw new Error('Tài khoản quán của bạn đã bị tạm khóa bởi Ban Quản Trị.');
+        } else {
+          // Chủ quán đã được duyệt ACTIVE: Vào trực tiếp giao diện quán của mình
+          setSuccessMsg(`Chào mừng ${data.user.name}! Đang mở Không Gian Quán của bạn...`);
+          setTimeout(() => {
+            onSuccess(data.user);
+            onClose();
+            window.location.href = '/chu-quan';
+          }, 700);
+          return;
+        }
+      } else {
+        // Khách hàng: tự động kích hoạt ngay không cần phê duyệt
+        setSuccessMsg(`Chào mừng ${data.user.name} (Khách du lịch)! Đăng nhập thành công.`);
+        setTimeout(() => {
+          onSuccess(data.user);
+          onClose();
+          window.location.reload();
+        }, 700);
+      }
+    } catch (err: any) {
+      setError(err.message || 'Lỗi kết nối máy chủ');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+
+  // Submit đăng nhập chủ quán bằng Gmail và Mật khẩu
+  const handleOwnerPasswordLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!ownerLoginGmail.includes('@')) {
+      setError('Vui lòng nhập tài khoản Gmail hợp lệ');
+      return;
+    }
+    if (!ownerLoginPassword) {
+      setError('Vui lòng nhập mật khẩu quán của bạn');
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setError('');
+      setSuccessMsg('');
+
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: ownerLoginGmail.trim(),
+          password: ownerLoginPassword,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        if (data.status === 'PENDING') {
+          setError(
+            data.message ||
+              'Tài khoản Chủ Quán của bạn đang chờ Ban Quản Trị phê duyệt. Vui lòng quay lại sau.'
+          );
+          return;
+        }
+        throw new Error(data.message || 'Gmail hoặc mật khẩu không chính xác');
+      }
+
+      // Kiểm tra nếu vai trò không phải OWNER hay ADMIN
+      if (data.user.role !== 'OWNER' && data.user.role !== 'ADMIN') {
+        throw new Error('Tài khoản này là Khách du lịch. Vui lòng đăng nhập ở tab Khách Du Lịch.');
+      }
+
+      // Lưu thông tin đăng nhập vào localStorage
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('easup_auth_user', JSON.stringify(data.user));
+      }
+
+      setSuccessMsg(`Chào mừng ${data.user.name}! Đang mở Không Gian Quán của bạn...`);
+      setTimeout(() => {
+        onSuccess(data.user);
+        onClose();
+        window.location.href = '/chu-quan';
+      }, 700);
+    } catch (err: any) {
+      setError(err.message || 'Lỗi đăng nhập');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Submit đăng ký chủ quán mới (kèm Gmail và mật khẩu)
+  const handleSubmitOwnerRegister = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!ownerForm.email.includes('@')) {
+      setError('Vui lòng nhập tài khoản Gmail hợp lệ');
+      return;
+    }
+    if (!ownerForm.restaurantName) {
+      setError('Vui lòng nhập tên quán ăn của bạn');
+      return;
+    }
+    if (!ownerRegisterPassword || ownerRegisterPassword.length < 6) {
+      setError('Mật khẩu khởi tạo phải có tối thiểu 6 ký tự');
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setError('');
+      setSuccessMsg('');
+
+      // Gọi API tạo tài khoản chủ quán vai trò OWNER
+      const res = await fetch('/api/users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: ownerForm.name || 'Chủ Quán Ea Súp',
+          email: ownerForm.email.trim(),
+          password: ownerRegisterPassword,
+          role: 'OWNER',
+          phone: ownerForm.phone,
+          restaurantName: ownerForm.restaurantName,
+          restaurantAddress: ownerForm.restaurantAddress || 'Xã Ea Súp, Tỉnh Đắk Lắk',
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.message || 'Lỗi khi đăng ký hồ sơ quán');
+      }
+
+      setSuccessMsg(
+        `Đăng ký thành công! Hồ sơ quán "${ownerForm.restaurantName}" đang chờ Admin phê duyệt. Sau khi được duyệt, bạn đăng nhập bằng Gmail và mật khẩu vừa tạo.`
+      );
+      setTimeout(() => {
+        setOwnerSubTab('login');
+        setOwnerLoginGmail(ownerForm.email);
+        setOwnerLoginPassword(ownerRegisterPassword);
+      }, 2500);
+    } catch (err: any) {
+      setError(err.message || 'Lỗi gửi hồ sơ mở quán');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
+      <div className="relative w-full max-w-md bg-white rounded-3xl shadow-2xl border border-[#E7E2D7] overflow-hidden flex flex-col max-h-[92vh]">
+        {/* Header với tông màu đẹp */}
+        <div className="bg-gradient-to-r from-[#D9452B] via-[#E05A3F] to-[#0066CC] p-5 text-white relative">
+          <button
+            onClick={onClose}
+            className="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center text-white transition-colors"
+          >
+            <X className="w-5 h-5" />
+          </button>
+
+          <div className="flex items-center gap-2 mb-1">
+            <span className="w-7 h-7 rounded-lg bg-white/20 flex items-center justify-center">
+              <Sparkles className="w-4 h-4 text-amber-200" />
+            </span>
+            <span className="text-xs uppercase tracking-wider font-bold text-amber-200">
+              Hệ thống Du lịch Ea Súp
+            </span>
+          </div>
+
+          <h3 className="font-serif text-xl font-bold text-white">
+            {mode === 'login' ? 'Đăng Nhập' : 'Chủ Quán Ăn (Gmail & Mật Khẩu)'}
+          </h3>
+          <p className="text-xs text-white/90 mt-1">
+            {mode === 'login'
+              ? 'Đăng nhập Google để đặt món, kết nối bàn ăn và khám phá ẩm thực đại ngàn.'
+              : 'Đăng nhập Không Gian Quán bằng tài khoản Gmail và Mật khẩu của bạn.'}
+          </p>
+        </div>
+
+        {/* Tab chuyển đổi chế độ */}
+        <div className="grid grid-cols-2 p-1.5 bg-[#FBF9F5] border-b border-[#E7E2D7] text-xs font-semibold">
+          <button
+            type="button"
+            onClick={() => setMode('login')}
+            className={`py-2 px-3 rounded-xl flex items-center justify-center gap-1.5 transition-all ${
+              mode === 'login'
+                ? 'bg-white text-[#0066CC] shadow-xs'
+                : 'text-stone-500 hover:text-stone-800'
+            }`}
+          >
+            <Compass className="w-4 h-4" />
+            <span>Khách</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setMode('register_owner')}
+            className={`py-2 px-3 rounded-xl flex items-center justify-center gap-1.5 transition-all ${
+              mode === 'register_owner'
+                ? 'bg-[#D9452B] text-white shadow-xs'
+                : 'text-stone-500 hover:text-stone-800'
+            }`}
+          >
+            <Store className="w-4 h-4" />
+            <span>Chủ Quán Ăn</span>
+          </button>
+        </div>
+
+        {/* Body content */}
+        <div className="p-5 overflow-y-auto space-y-4">
+          {error && (
+            <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 shrink-0" />
+              <span>{error}</span>
+            </div>
+          )}
+
+          {successMsg && (
+            <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-center gap-2">
+              <CheckCircle className="w-4 h-4 shrink-0" />
+              <span>{successMsg}</span>
+            </div>
+          )}
+
+          {mode === 'login' ? (
+            /* TAB 1: ĐĂNG NHẬP KHÁCH DU LỊCH BẰNG GOOGLE */
+            <div className="space-y-4">
+              <div className="text-center py-1">
+                <p className="text-xs text-stone-600">
+                  Đăng nhập một chạm an toàn bằng tài khoản Google Gmail của bạn.
+                </p>
+              </div>
+
+              {/* Nút Đăng nhập Google chính thức qua Auth.js v5 */}
+              <GoogleSignInButton text="Đăng Nhập Bằng Google (Gmail)" />
+
+              {/* Nút Đăng nhập nhanh 1 chạm */}
+              <button
+                type="button"
+                disabled={loading}
+                onClick={() =>
+                  handleGoogleAuth('khach.dulich@gmail.com', 'Du Khách Ea Súp', 'TRAVELER')
+                }
+                className="w-full py-2.5 px-3 bg-[#FBF9F5] hover:bg-stone-100 text-stone-700 border border-[#E7E2D7] rounded-xl font-semibold text-xs flex items-center justify-center gap-2 transition-colors disabled:opacity-50"
+              >
+                <span>⚡ Đăng nhập thử nghiệm 1 chạm (Khách du lịch)</span>
+              </button>
+
+              <div className="relative flex items-center justify-center my-3">
+                <div className="border-t border-stone-200 w-full"></div>
+                <span className="bg-white px-3 text-[11px] text-stone-400 uppercase tracking-wider shrink-0 font-medium">
+                  Hoặc nhập Gmail của bạn
+                </span>
+                <div className="border-t border-stone-200 w-full"></div>
+              </div>
+
+              {/* Nhập Gmail cá nhân */}
+              <div className="space-y-2">
+                <div className="flex gap-2">
+                  <input
+                    type="email"
+                    placeholder="nguyenvana@gmail.com"
+                    value={customGmail}
+                    onChange={(e) => setCustomGmail(e.target.value)}
+                    className="flex-1 text-xs p-2.5 rounded-xl border border-stone-300 focus:outline-none focus:border-[#0066CC]"
+                  />
+                  <input
+                    type="text"
+                    placeholder="Họ tên"
+                    value={customName}
+                    onChange={(e) => setCustomName(e.target.value)}
+                    className="w-28 text-xs p-2.5 rounded-xl border border-stone-300 focus:outline-none focus:border-[#0066CC]"
+                  />
+                </div>
+                <button
+                  type="button"
+                  disabled={loading || !customGmail}
+                  onClick={() =>
+                    handleGoogleAuth(
+                      customGmail,
+                      customName || customGmail.split('@')[0],
+                      'TRAVELER'
+                    )
+                  }
+                  className="w-full py-2.5 px-4 bg-[#0066CC] hover:bg-[#0052A3] text-white text-xs font-bold rounded-xl shadow-xs transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+                >
+                  <Mail className="w-4 h-4" />
+                  <span>Xác thực & Vào hệ thống</span>
+                </button>
+              </div>
+            </div>
+          ) : (
+            /* TAB 2: CHỦ QUÁN ĂN - CHỈ ĐĂNG NHẬP BẰNG GMAIL VÀ MẬT KHẨU */
+            <div className="space-y-4">
+              {/* Thông báo quy định dành cho Chủ Quán */}
+              <div className="p-3 bg-amber-50/80 rounded-2xl border border-amber-200 text-xs text-amber-900 space-y-1">
+                <p className="font-bold flex items-center gap-1.5 text-[#D9452B]">
+                  <Store className="w-4 h-4 text-[#D9452B]" />
+                  <span>Quy định dành cho Chủ Quán:</span>
+                </p>
+                <ul className="text-[11px] list-disc list-inside space-y-0.5 text-stone-700">
+                  <li>Chủ quán đăng nhập bằng <strong>Gmail và Mật khẩu</strong> của quán.</li>
+                  <li>Khi đăng ký quán mới: cần <strong>Ban Quản Trị phê duyệt</strong> để kích hoạt.</li>
+                  <li>Khi đã được duyệt: đăng nhập sẽ <strong>chuyển thẳng vào giao diện quán của bạn</strong>.</li>
+                </ul>
+              </div>
+
+              {ownerSubTab === 'login' ? (
+                /* PHẦN 1: ĐĂNG NHẬP CHỦ QUÁN BẰNG GMAIL & MẬT KHẨU */
+                <form onSubmit={handleOwnerPasswordLogin} className="space-y-3.5">
+                  <div className="text-center">
+                    <p className="text-xs text-stone-600">
+                      Nhập tài khoản Gmail và Mật khẩu để vào Không Gian Quán của bạn.
+                    </p>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-semibold text-stone-700 flex items-center gap-1.5">
+                      <Mail className="w-3.5 h-3.5 text-stone-400" />
+                      <span>Tài khoản Gmail Chủ Quán *</span>
+                    </label>
+                    <input
+                      type="email"
+                      required
+                      placeholder="tranhuongzip@gmail.com"
+                      value={ownerLoginGmail}
+                      onChange={(e) => setOwnerLoginGmail(e.target.value)}
+                      className="w-full text-xs p-3 rounded-xl border border-stone-300 focus:outline-none focus:border-[#D9452B]"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-semibold text-stone-700 flex items-center gap-1.5">
+                      <Lock className="w-3.5 h-3.5 text-stone-400" />
+                      <span>Mật khẩu quán *</span>
+                    </label>
+                    <input
+                      type="password"
+                      required
+                      placeholder="Nhập mật khẩu..."
+                      value={ownerLoginPassword}
+                      onChange={(e) => setOwnerLoginPassword(e.target.value)}
+                      className="w-full text-xs p-3 rounded-xl border border-stone-300 focus:outline-none focus:border-[#D9452B]"
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={loading || !ownerLoginGmail || !ownerLoginPassword}
+                    className="w-full py-3 px-4 bg-[#D9452B] hover:bg-[#BF3A22] text-white text-xs font-bold rounded-2xl shadow-md shadow-[#D9452B]/30 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                  >
+                    <Store className="w-4 h-4" />
+                    <span>{loading ? 'Đang xác thực...' : 'Đăng Nhập Không Gian Quán'}</span>
+                  </button>
+
+                  <div className="text-center pt-2">
+                    <button
+                      type="button"
+                      onClick={() => setOwnerSubTab('register')}
+                      className="text-xs text-[#D9452B] hover:underline font-semibold"
+                    >
+                      Chưa có hồ sơ quán trên hệ thống? 👉 Đăng ký mở quán mới
+                    </button>
+                  </div>
+                </form>
+              ) : (
+                /* PHẦN 2: ĐĂNG KÝ MỞ QUÁN MỚI (GMAIL & MẬT KHẨU) */
+                <form onSubmit={handleSubmitOwnerRegister} className="space-y-3">
+                  <div className="flex items-center justify-between pb-1.5 border-b border-stone-200">
+                    <p className="text-xs font-bold text-[#D9452B] flex items-center gap-1.5">
+                      <Store className="w-4 h-4" />
+                      <span>Hồ sơ đăng ký mở quán mới</span>
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => setOwnerSubTab('login')}
+                      className="text-[11px] text-stone-500 hover:text-[#D9452B] font-medium"
+                    >
+                      ← Quay lại Đăng nhập
+                    </button>
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="text-xs font-semibold text-stone-700 flex items-center gap-1.5">
+                      <Store className="w-3.5 h-3.5 text-[#D9452B]" />
+                      <span>Tên Quán Ăn / Nhà Hàng *</span>
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="VD: Gà Nướng Cơm Lam Bản Đôn Ea Súp"
+                      value={ownerForm.restaurantName}
+                      onChange={(e) => setOwnerForm({ ...ownerForm, restaurantName: e.target.value })}
+                      className="w-full text-xs p-2.5 rounded-xl border border-stone-300 focus:outline-none focus:border-[#D9452B]"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="space-y-1">
+                      <label className="text-xs font-semibold text-stone-700 flex items-center gap-1.5">
+                        <UserIcon className="w-3.5 h-3.5 text-stone-400" />
+                        <span>Họ tên chủ quán *</span>
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        placeholder="VD: Trần Thị Hương"
+                        value={ownerForm.name}
+                        onChange={(e) => setOwnerForm({ ...ownerForm, name: e.target.value })}
+                        className="w-full text-xs p-2.5 rounded-xl border border-stone-300 focus:outline-none focus:border-[#D9452B]"
+                      />
+                    </div>
+
+                    <div className="space-y-1">
+                      <label className="text-xs font-semibold text-stone-700 flex items-center gap-1.5">
+                        <Phone className="w-3.5 h-3.5 text-stone-400" />
+                        <span>Số điện thoại *</span>
+                      </label>
+                      <input
+                        type="tel"
+                        required
+                        placeholder="09xx xxx xxx"
+                        value={ownerForm.phone}
+                        onChange={(e) => setOwnerForm({ ...ownerForm, phone: e.target.value })}
+                        className="w-full text-xs p-2.5 rounded-xl border border-stone-300 focus:outline-none focus:border-[#D9452B]"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="text-xs font-semibold text-stone-700 flex items-center gap-1.5">
+                      <Mail className="w-3.5 h-3.5 text-stone-400" />
+                      <span>Tài khoản Gmail đăng ký *</span>
+                    </label>
+                    <input
+                      type="email"
+                      required
+                      placeholder="chuquan@gmail.com"
+                      value={ownerForm.email}
+                      onChange={(e) => setOwnerForm({ ...ownerForm, email: e.target.value })}
+                      className="w-full text-xs p-2.5 rounded-xl border border-stone-300 focus:outline-none focus:border-[#D9452B]"
+                    />
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="text-xs font-semibold text-stone-700 flex items-center gap-1.5">
+                      <Lock className="w-3.5 h-3.5 text-stone-400" />
+                      <span>Mật khẩu khởi tạo * (tối thiểu 6 ký tự)</span>
+                    </label>
+                    <input
+                      type="password"
+                      required
+                      placeholder="Tối thiểu 6 ký tự..."
+                      value={ownerRegisterPassword}
+                      onChange={(e) => setOwnerRegisterPassword(e.target.value)}
+                      className="w-full text-xs p-2.5 rounded-xl border border-stone-300 focus:outline-none focus:border-[#D9452B]"
+                    />
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="text-xs font-semibold text-stone-700 flex items-center gap-1.5">
+                      <MapPin className="w-3.5 h-3.5 text-stone-400" />
+                      <span>Địa chỉ quán tại Ea Súp</span>
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="Thôn/Buôn, Xã Ea Súp, Tỉnh Đắk Lắk"
+                      value={ownerForm.restaurantAddress}
+                      onChange={(e) => setOwnerForm({ ...ownerForm, restaurantAddress: e.target.value })}
+                      className="w-full text-xs p-2.5 rounded-xl border border-stone-300 focus:outline-none focus:border-[#D9452B]"
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="w-full mt-2 py-3 px-4 bg-[#D9452B] hover:bg-[#BF3A22] text-white text-xs font-bold rounded-2xl shadow-md shadow-[#D9452B]/30 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                  >
+                    <Store className="w-4 h-4" />
+                    <span>{loading ? 'Đang gửi hồ sơ...' : 'Đăng Ký Quán (Gửi Admin Phê Duyệt)'}</span>
+                  </button>
+
+                  <div className="text-center pt-1">
+                    <button
+                      type="button"
+                      onClick={() => setOwnerSubTab('login')}
+                      className="text-xs text-stone-500 hover:text-stone-800 font-semibold"
+                    >
+                      Đã có tài khoản quán? 👉 Đăng nhập bằng Gmail & Mật khẩu
+                    </button>
+                  </div>
+                </form>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}

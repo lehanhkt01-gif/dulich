@@ -52,3 +52,21 @@ export function requireRole(user: TokenPayload | null, allowedRoles: Role[]): bo
   if (!user) return false;
   return allowedRoles.includes(user.role);
 }
+
+export function isAdmin(user: TokenPayload | null): boolean {
+  return !!user && user.role === 'ADMIN';
+}
+
+export function isOwner(user: TokenPayload | null): boolean {
+  return !!user && (user.role === 'OWNER' || user.role === 'ADMIN');
+}
+
+export function canManageEntity(user: TokenPayload | null, entityOwnerId?: string | null): boolean {
+  if (!user) return false;
+  if (user.role === 'ADMIN') return true;
+  if (user.role === 'OWNER' && entityOwnerId && (entityOwnerId === user.userId || entityOwnerId === user.email)) {
+    return true;
+  }
+  return false;
+}
+

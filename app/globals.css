@@ -92,3 +92,41 @@ input[type="range"] {
   box-shadow: 0 12px 30px -4px rgba(0, 102, 204, 0.16), 0 4px 12px -2px rgba(28, 25, 23, 0.06);
   transform: translateY(-2px);
 }
+
+/* ==========================================================================
+   MÓN NGON EA SÚP – hiệu ứng chuyển động (/mon-ngon)
+   ========================================================================== */
+@keyframes mn-fade-up {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes mn-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes mn-sheet {
+  from { opacity: 0; transform: translateY(40px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes mn-pop {
+  0%   { opacity: 0; transform: scale(0.9); }
+  60%  { opacity: 1; transform: scale(1.03); }
+  100% { transform: scale(1); }
+}
+@keyframes mn-shake {
+  0%, 100% { transform: rotate(0deg); }
+  20% { transform: rotate(-18deg) translateY(-2px); }
+  40% { transform: rotate(14deg); }
+  60% { transform: rotate(-10deg) translateY(-1px); }
+  80% { transform: rotate(8deg); }
+}
+.mn-fade-up { animation: mn-fade-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.mn-fade    { animation: mn-fade 0.25s ease-out both; }
+.mn-sheet   { animation: mn-sheet 0.35s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.mn-pop     { animation: mn-pop 0.4s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.mn-shake   { animation: mn-shake 0.45s ease-in-out infinite; }
+.mn-press   { transition: transform 0.15s ease; }
+.mn-press:active { transform: scale(0.96); }
+.no-scrollbar { scrollbar-width: none; }
+.no-scrollbar::-webkit-scrollbar { display: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .mn-fade-up, .mn-fade, .mn-sheet, .mn-pop, .mn-shake { animation: none !important; }
+}

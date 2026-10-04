@@ -1,0 +1,30 @@
+[
+  {
+    "id": "order-1791101116895",
+    "restaurantId": "res-user-1791083128585",
+    "userId": "user-1791082874824",
+    "customerName": "Hanh MTTQ",
+    "customerPhone": "0888023023",
+    "status": "APPROVED",
+    "totalAmount": 300000,
+    "note": "Trưa nay lấy nhé, ngon vào nha",
+    "orderItems": [
+      {
+        "id": "oi-1791101116890-dmtn",
+        "orderId": "",
+        "menuItemId": "menu-1791098118461",
+        "quantity": 1,
+        "price": 150000
+      },
+      {
+        "id": "oi-1791101116890-jwtm",
+        "orderId": "",
+        "menuItemId": "menu-1791098160802",
+        "quantity": 1,
+        "price": 150000
+      }
+    ],
+    "createdAt": "2026-10-04T08:05:16.895Z",
+    "updatedAt": "2026-10-04T08:06:27.093Z"
+  }
+]

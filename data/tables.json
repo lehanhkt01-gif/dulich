@@ -1,0 +1,58 @@
+[
+  {
+    "id": "tab-1",
+    "restaurantId": "res-ga-nuong",
+    "name": "Bàn Tròn Nhà Rông 1",
+    "capacity": 6,
+    "status": "AVAILABLE",
+    "createdAt": "2026-10-04T04:53:00.924Z"
+  },
+  {
+    "id": "tab-2",
+    "restaurantId": "res-ga-nuong",
+    "name": "Bàn Dài Hội Họp 2",
+    "capacity": 10,
+    "status": "AVAILABLE",
+    "createdAt": "2026-10-04T04:53:00.924Z"
+  },
+  {
+    "id": "tab-3",
+    "restaurantId": "res-ga-nuong",
+    "name": "Chòi Lá Sân Vườn 3",
+    "capacity": 4,
+    "status": "AVAILABLE",
+    "createdAt": "2026-10-04T04:53:00.924Z"
+  },
+  {
+    "id": "tab-4",
+    "restaurantId": "res-ho-ea-sup",
+    "name": "Bàn Bờ Hồ Ngắm Cảnh 1",
+    "capacity": 4,
+    "status": "AVAILABLE",
+    "createdAt": "2026-10-04T04:53:00.924Z"
+  },
+  {
+    "id": "tab-5",
+    "restaurantId": "res-ho-ea-sup",
+    "name": "Nhà Nổi Trên Nước 2",
+    "capacity": 8,
+    "status": "AVAILABLE",
+    "createdAt": "2026-10-04T04:53:00.924Z"
+  },
+  {
+    "id": "tab-6",
+    "restaurantId": "res-bo-mot-nang",
+    "name": "Bàn Gỗ Mộc 1",
+    "capacity": 4,
+    "status": "AVAILABLE",
+    "createdAt": "2026-10-04T04:53:00.924Z"
+  },
+  {
+    "id": "tab-7",
+    "restaurantId": "res-ca-phe-gio-ho",
+    "name": "Bàn View Hồ Hoàng Hôn 1",
+    "capacity": 2,
+    "status": "AVAILABLE",
+    "createdAt": "2026-10-04T04:53:00.924Z"
+  }
+]

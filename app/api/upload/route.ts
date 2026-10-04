@@ -2,11 +2,16 @@ import { NextRequest, NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
 import { getAuthUser, requireRole } from '@/lib/auth';
+import { getCurrentUser } from '@/actions/guards';
 
 export async function POST(req: NextRequest) {
   try {
-    const user = getAuthUser(req);
-    if (user && !requireRole(user, ['EDITOR', 'ADMIN'])) {
+    // Kiểm tra quyền từ JWT token hoặc NextAuth session
+    const jwtUser = getAuthUser(req);
+    const sessionUser = await getCurrentUser();
+    const effectiveRole = jwtUser?.role || sessionUser?.role;
+
+    if (effectiveRole && !['OWNER', 'EDITOR', 'ADMIN'].includes(effectiveRole)) {
       return NextResponse.json(
         { success: false, message: 'Quyền truy cập bị từ chối' },
         { status: 403 }
@@ -19,6 +24,15 @@ export async function POST(req: NextRequest) {
     if (!file) {
       return NextResponse.json(
         { success: false, message: 'Không tìm thấy tệp tải lên' },
+        { status: 400 }
+      );
+    }
+
+    // Giới hạn kích thước tệp dưới 3MB
+    const MAX_SIZE = 3 * 1024 * 1024; // 3MB
+    if (file.size > MAX_SIZE) {
+      return NextResponse.json(
+        { success: false, message: 'Kích thước tệp vượt quá giới hạn 3MB' },
         { status: 400 }
       );
     }

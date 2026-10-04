@@ -4,6 +4,7 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'),
   title: 'KHÁM PHÁ EA SÚP | ĐIỂM HẸN SINH THÁI & DI SẢN',
   description:
     'Ea Súp mở ra hành trình trải nghiệm độc đáo với ngọn tháp Chăm duy nhất trên cao nguyên Tây Nguyên, công trình biển hồ Ea Súp Thượng trù phú và bức tranh giao thoa văn hóa đa sắc tộc rực rỡ.',
@@ -37,6 +38,9 @@ export const metadata: Metadata = {
   },
 };
 
+import AuthProvider from '@/components/AuthProvider';
+import { Toaster } from 'sonner';
+
 export default function RootLayout({
   children,
 }: {
@@ -61,9 +65,12 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-screen flex flex-col bg-[#FBF9F5] text-[#1C1917] antialiased">
-        <Navbar />
-        <main className="flex-1 pt-[96px] md:pt-20">{children}</main>
-        <Footer />
+        <AuthProvider>
+          <Navbar />
+          <main className="flex-1 pt-[96px] md:pt-20">{children}</main>
+          <Footer />
+          <Toaster position="top-right" richColors closeButton />
+        </AuthProvider>
       </body>
     </html>
   );

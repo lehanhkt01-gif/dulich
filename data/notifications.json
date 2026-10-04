@@ -1,0 +1,38 @@
+[
+  {
+    "id": "notif-1791101187119-54cd",
+    "userId": "user-1791082874824",
+    "title": "Đơn đặt món đã được xác nhận!",
+    "message": "Quán \"Ẩm thực Ja Rai\" đã phê duyệt đơn đặt món của bạn lúc 15:06. Quán đang chuẩn bị món thơm ngon chờ đón bạn!",
+    "link": "/mon-ngon/lich-su-dat",
+    "isRead": false,
+    "createdAt": "2026-10-04T08:06:27.120Z"
+  },
+  {
+    "id": "notif-1791101116906-hfe0",
+    "userId": "user-1791083128585",
+    "title": "Có đơn đặt món mới cần duyệt!",
+    "message": "Khách Hanh MTTQ (SĐT: 0888023023) vừa đặt món với tổng giá trị 300.000đ. Vui lòng kiểm tra và phê duyệt.",
+    "link": "/chu-quan/dashboard",
+    "isRead": false,
+    "createdAt": "2026-10-04T08:05:16.906Z"
+  },
+  {
+    "id": "notif-1791091170252-z77d",
+    "userId": "user-1791089367634",
+    "title": "Hồ sơ Chủ Quán đã được phê duyệt!",
+    "message": "Chúc mừng bạn! Hồ sơ quán \"QuQuan Nuong Rung Xanh Ea Sup\" đã được Ban Quản trị Ea Súp chính thức phê duyệt. Bạn có thể vào Không Gian Chủ Quán để đăng thêm món và đón khách ngay.",
+    "link": "/chu-quan/dashboard",
+    "isRead": false,
+    "createdAt": "2026-10-04T05:19:30.252Z"
+  },
+  {
+    "id": "notif-1791089367659-e89q",
+    "userId": "user-admin-default",
+    "title": "Hồ sơ Chủ Quán mới đăng ký",
+    "message": "Chủ quán Nguyen Van Nam vừa đăng ký mở quán \"QuQuan Nuong Rung Xanh Ea Sup\" tại Buôn A2. Vui lòng phê duyệt.",
+    "link": "/admin/mon-ngon",
+    "isRead": false,
+    "createdAt": "2026-10-04T04:49:27.659Z"
+  }
+]

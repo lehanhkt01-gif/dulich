@@ -1,11 +1,20 @@
 [
   {
     "id": "user-admin-1",
-    "name": "Cán Bộ Văn Hóa Ea Súp",
+    "name": "Quản Trị Viên Ea Súp",
     "email": "admin@easup.daklak.gov.vn",
     "role": "ADMIN",
-    "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80",
-    "createdAt": "2025-01-01T00:00:00.000Z"
+    "avatar": "https://api.dicebear.com/7.x/initials/svg?seed=Qu%E1%BA%A3n%20Tr%E1%BB%8B%20Vi%C3%AAn%20Ea%20S%C3%BAp",
+    "createdAt": "2025-01-01T00:00:00.000Z",
+    "phone": "0888023023",
+    "restaurantName": "Món nướng Vỉa hè Hồ Trung Chuyển",
+    "restaurantAddress": "Xã Ea Súp, Tỉnh Đắk Lắk",
+    "restaurantPhone": "0888023023",
+    "restaurantLat": 13.2456,
+    "restaurantLng": 107.8381,
+    "password": "google_oauth_authenticated",
+    "updatedAt": "2026-10-04T05:36:36.663Z",
+    "status": "ACTIVE"
   },
   {
     "id": "user-editor-1",
@@ -14,5 +23,76 @@
     "role": "EDITOR",
     "avatar": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&q=80",
     "createdAt": "2025-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "user-google-1791070222036",
+    "name": "Chu Quan Test Ea Sup",
+    "email": "test_owner@gmail.com",
+    "role": "OWNER",
+    "avatar": "https://api.dicebear.com/7.x/initials/svg?seed=Chu%20Quan%20Test%20Ea%20Sup",
+    "phone": "0912345678",
+    "restaurantName": "Quan Nuong Dai Ngan Test",
+    "restaurantAddress": "Quoc Lo 14C, Ea Sup",
+    "restaurantPhone": "0912345678",
+    "restaurantLat": 13.2456,
+    "restaurantLng": 107.8381,
+    "password": "google_oauth_authenticated",
+    "updatedAt": "2026-10-03T23:30:22.037Z",
+    "createdAt": "2026-10-03T23:30:22.044Z"
+  },
+  {
+    "name": "Hanh MTTQ",
+    "email": "zipzenhanh@gmail.com",
+    "avatar": "https://lh3.googleusercontent.com/a/ACg8ocLqES8eeda8FCyXUWJWSNMcROWdUsj8sBNKZVopkTJiIWbkhY8=s96-c",
+    "role": "TRAVELER",
+    "id": "user-1791082874824",
+    "createdAt": "2026-10-04T03:01:14.824Z"
+  },
+  {
+    "name": "tranhuongzip",
+    "email": "tranhuongzip@gmail.com",
+    "password": "$2a$10$daEDCGkuHRCBpTg2EEG4KeEDapzL2So3Ia3zDfAd9s8d7Bg5wqrG.",
+    "role": "OWNER",
+    "status": "ACTIVE",
+    "avatar": "https://api.dicebear.com/7.x/initials/svg?seed=tranhuongzip",
+    "phone": "0912 345 678",
+    "restaurantName": "Quán Ẩm Thực Rừng Xanh Ea Súp",
+    "restaurantAddress": "Buôn A2, Xã Ea Súp, Huyện Ea Súp, Đắk Lắk",
+    "id": "user-1791083128585",
+    "createdAt": "2026-10-04T03:05:28.585Z",
+    "restaurantPhone": null,
+    "restaurantLat": 13.2456,
+    "restaurantLng": 107.8381,
+    "updatedAt": "2026-10-04T06:18:50.828Z"
+  },
+  {
+    "id": "user-google-1791085145088",
+    "name": "Chủ Quán Lẩu Cá Hồ",
+    "email": "chuquan.easup@gmail.com",
+    "role": "OWNER",
+    "avatar": "https://api.dicebear.com/7.x/initials/svg?seed=Ch%E1%BB%A7%20Qu%C3%A1n%20L%E1%BA%A9u%20C%C3%A1%20H%E1%BB%93",
+    "phone": "0988 123 456",
+    "restaurantName": "Nhà Hàng Lòng Hồ Ea Súp",
+    "restaurantAddress": "Khu vực đập chính hồ Ea Súp Thượng",
+    "restaurantPhone": "0988 123 456",
+    "restaurantLat": 13.2456,
+    "restaurantLng": 107.8381,
+    "password": "google_oauth_authenticated",
+    "updatedAt": "2026-10-04T06:12:36.270Z",
+    "createdAt": "2026-10-04T03:39:05.103Z",
+    "status": "PENDING"
+  },
+  {
+    "name": "Nguyen Van Nam",
+    "email": "nam.quan@gmail.com",
+    "phone": "0912345678",
+    "role": "OWNER",
+    "status": "ACTIVE",
+    "restaurantName": "QuQuan Nuong Rung Xanh Ea Sup",
+    "restaurantAddress": "123 Hung Vuong, Buon A2",
+    "restaurantPhone": "0912345678",
+    "avatar": "https://api.dicebear.com/7.x/initials/svg?seed=Nguyen%20Van%20Nam",
+    "id": "user-1791089367634",
+    "createdAt": "2026-10-04T04:49:27.634Z"
   }
 ]

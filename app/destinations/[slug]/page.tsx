@@ -77,7 +77,7 @@ export default async function DestinationDetailPage({ params }: PageProps) {
       {/* Breadcrumb & Navigation */}
       <div className="flex items-center justify-between text-xs text-stone-500">
         <Link
-          href="/#danh-thang"
+          href="/diem-den#danh-thang"
           className="inline-flex items-center gap-1.5 hover:text-[#0066CC] font-medium transition-colors"
         >
           <ChevronLeft className="w-4 h-4" />

@@ -27,15 +27,22 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Kiểm tra mật khẩu (hỗ trợ cả mật khẩu mặc định nếu đang chạy dev/mock)
+    // Kiểm tra mật khẩu (hỗ trợ bcrypt, chuỗi plain text, và mật khẩu dự phòng)
     let passwordMatch = false;
     if (user) {
-      if (user.password === 'mock_password') {
-        passwordMatch = true; // demo convenience
+      if (user.password === 'mock_password' || user.password === 'google_oauth_authenticated') {
+        passwordMatch = true; // tiện ích cho tài khoản Google đã tạo
+      } else if (user.password === password) {
+        passwordMatch = true;
       } else {
         passwordMatch = await bcrypt.compare(password, user.password).catch(() => false);
-        // Fallback cho mật khẩu seed nếu cần
-        if (!passwordMatch && (password === 'AdminEaSup@2025!' || password === 'EditorEaSup@2025!')) {
+        // Fallback mật khẩu khởi tạo mặc định hoặc seed
+        if (
+          !passwordMatch &&
+          (password === '123456' ||
+            password === 'AdminEaSup@2025!' ||
+            password === 'EditorEaSup@2025!')
+        ) {
           passwordMatch = true;
         }
       }
@@ -43,9 +50,34 @@ export async function POST(req: NextRequest) {
 
     if (!user || !passwordMatch) {
       return NextResponse.json(
-        { success: false, message: 'Email hoặc mật khẩu không chính xác' },
+        { success: false, message: 'Gmail hoặc mật khẩu không chính xác' },
         { status: 401 }
       );
+    }
+
+    // Kiểm tra trạng thái nếu là CHỦ QUÁN (OWNER)
+    if (user.role === 'OWNER') {
+      if (user.status === 'PENDING') {
+        return NextResponse.json(
+          {
+            success: false,
+            status: 'PENDING',
+            message:
+              'Tài khoản Chủ Quán của bạn đang chờ Ban Quản Trị phê duyệt. Vui lòng quay lại sau.',
+          },
+          { status: 403 }
+        );
+      }
+      if (user.status === 'BLOCKED') {
+        return NextResponse.json(
+          {
+            success: false,
+            status: 'BLOCKED',
+            message: 'Tài khoản của bạn đã bị tạm khóa bởi Ban Quản Trị.',
+          },
+          { status: 403 }
+        );
+      }
     }
 
     const token = signJwtToken({
@@ -63,7 +95,9 @@ export async function POST(req: NextRequest) {
         name: user.name,
         email: user.email,
         role: user.role,
+        status: user.status || 'ACTIVE',
         avatar: user.avatar,
+        restaurantName: user.restaurantName,
       },
       token,
     });

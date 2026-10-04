@@ -47,6 +47,13 @@ export const INITIAL_CATEGORIES: Category[] = [
     slug: 'du-lich-sinh-thai-nong-nghiep',
     icon: 'Trees',
     description: 'Trải nghiệm vườn xoài cát Ea Súp OCOP 4 sao, ngắm hệ sinh thái rừng khộp và du lịch voi thân thiện.'
+  },
+  {
+    id: 'cat-am-thuc',
+    name: 'Ẩm thực & Quán ngon Bản địa',
+    slug: 'am-thuc-quan-ngon',
+    icon: 'UtensilsCrossed',
+    description: 'Thưởng thức gà nướng cơm lam, cá hồ Ea Súp, canh thụt Ê Đê, bò một nắng và cà phê Tây Nguyên tại các quán nổi tiếng.'
   }
 ];
 

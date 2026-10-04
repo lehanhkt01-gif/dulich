@@ -1,0 +1,122 @@
+[
+  {
+    "id": "menu-1791098160802",
+    "restaurantId": "res-user-1791083128585",
+    "name": "Món lá mì",
+    "description": "Lá mì tây nguyên, ăn với cơm nóng ngon tuyệt",
+    "price": 150000,
+    "image": "/uploads/La_mi-1791099244546.jpg",
+    "category": "Món nướng đặc sản",
+    "isAvailable": true,
+    "createdAt": "2026-10-04T07:16:00.802Z",
+    "updatedAt": "2026-10-04T07:34:12.569Z"
+  },
+  {
+    "id": "menu-1791098118461",
+    "restaurantId": "res-user-1791083128585",
+    "name": "Gà nướng",
+    "description": "Thơm ngoan, đậm vị",
+    "price": 150000,
+    "image": "/mon-ngon/ga-nuong.jpg",
+    "category": "Món nướng đặc sản",
+    "isAvailable": true,
+    "createdAt": "2026-10-04T07:15:18.461Z",
+    "updatedAt": "2026-10-04T07:15:18.461Z"
+  },
+  {
+    "id": "menu-1",
+    "restaurantId": "res-ga-nuong",
+    "name": "Gà Nướng Mọi Than Củi Bản Đôn",
+    "description": "Gà thả vườn Ea Súp tẩm ướp lá é, sả ớt rừng nướng trực tiếp trên than hồng giòn da đậm vị.",
+    "price": 240000,
+    "image": "/mon-ngon/ga-nuong.jpg",
+    "category": "Món chính",
+    "isAvailable": true,
+    "createdAt": "2026-10-04T04:16:29.556Z",
+    "updatedAt": "2026-10-04T04:16:29.556Z"
+  },
+  {
+    "id": "menu-2",
+    "restaurantId": "res-ga-nuong",
+    "name": "Cơm Lam Ống Nứa Thơm Dẻo",
+    "description": "Gạo nếp nương Ea Súp ngâm nước suối rừng, nướng trong ống nứa non, ăn kèm muối mè đen.",
+    "price": 35000,
+    "image": "/mon-ngon/com-lam.jpg",
+    "category": "Món chính",
+    "isAvailable": true,
+    "createdAt": "2026-10-04T04:16:29.556Z",
+    "updatedAt": "2026-10-04T04:16:29.556Z"
+  },
+  {
+    "id": "menu-3",
+    "restaurantId": "res-ga-nuong",
+    "name": "Canh Thụt Đọt Mây Ống Tre",
+    "description": "Đặc sản truyền thống nấu trong ống tre với đọt mây, cà đắng rừng và thịt nướng thái mỏng.",
+    "price": 95000,
+    "image": "/mon-ngon/canh-thut.jpg",
+    "category": "Đặc sản Tây Nguyên",
+    "isAvailable": true,
+    "createdAt": "2026-10-04T04:16:29.556Z",
+    "updatedAt": "2026-10-04T04:16:29.556Z"
+  },
+  {
+    "id": "menu-4",
+    "restaurantId": "res-ho-ea-sup",
+    "name": "Cá Lăng Hồ Ea Súp Nướng Muối Ớt Rừng",
+    "description": "Cá lăng tươi đánh bắt tự nhiên từ hồ Ea Súp Thượng, thịt ngọt chắc nướng kèm muối ớt sim.",
+    "price": 220000,
+    "image": "/mon-ngon/ca-nuong.jpg",
+    "category": "Món chính",
+    "isAvailable": true,
+    "createdAt": "2026-10-04T04:16:29.556Z",
+    "updatedAt": "2026-10-04T04:16:29.556Z"
+  },
+  {
+    "id": "menu-5",
+    "restaurantId": "res-ho-ea-sup",
+    "name": "Lẩu Cá Chép Giòn Măng Chua Rừng",
+    "description": "Nồi lẩu chua thanh nấu từ măng giang rừng Ea Súp, cá chép lòng hồ giòn sần sật.",
+    "price": 280000,
+    "image": "/mon-ngon/lau-ca.jpg",
+    "category": "Món chính",
+    "isAvailable": true,
+    "createdAt": "2026-10-04T04:16:29.556Z",
+    "updatedAt": "2026-10-04T04:16:29.556Z"
+  },
+  {
+    "id": "menu-6",
+    "restaurantId": "res-bo-mot-nang",
+    "name": "Bò Một Nắng Muối Kiến Vàng",
+    "description": "Thịt bò tơ chăn thả đồng cỏ Ea Súp phơi đúng 1 nắng gắt bazan, chấm muối kiến vàng Krông Pa chua cay bùi béo.",
+    "price": 180000,
+    "image": "/mon-ngon/bo-mot-nang.jpg",
+    "category": "Đặc sản Tây Nguyên",
+    "isAvailable": true,
+    "createdAt": "2026-10-04T04:16:29.556Z",
+    "updatedAt": "2026-10-04T04:16:29.556Z"
+  },
+  {
+    "id": "menu-7",
+    "restaurantId": "res-ca-phe-gio-ho",
+    "name": "Cà Phê Robusta Ea Súp Nguyên Chất",
+    "description": "Hạt cà phê hái chín vùng cao Ea Súp rang mộc thủ công, pha phin nhỏ giọt đậm đà.",
+    "price": 25000,
+    "image": "/mon-ngon/ca-phe.jpg",
+    "category": "Đồ uống",
+    "isAvailable": true,
+    "createdAt": "2026-10-04T04:16:29.556Z",
+    "updatedAt": "2026-10-04T04:16:29.556Z"
+  },
+  {
+    "id": "menu-8",
+    "restaurantId": "res-ca-phe-gio-ho",
+    "name": "Xoài Cát Ea Súp Ướp Lạnh",
+    "description": "Xoài cát Ea Súp nức tiếng vỏ mỏng ngọt lịm, thái múi ướp lạnh tráng miệng thơm mát.",
+    "price": 35000,
+    "image": "/mon-ngon/xoai-cat.jpg",
+    "category": "Ăn vặt",
+    "isAvailable": true,
+    "createdAt": "2026-10-04T04:16:29.556Z",
+    "updatedAt": "2026-10-04T04:16:29.556Z"
+  }
+]

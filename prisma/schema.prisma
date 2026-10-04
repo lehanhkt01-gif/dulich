@@ -9,30 +9,245 @@ generator client {
   binaryTargets = ["native", "debian-openssl-3.0.x", "linux-musl-openssl-3.0.x"]
 }
 
+// ==============================================================================
+// PHÂN QUYỀN VÀ TRẠNG THÁI (RBAC & STATUS)
+// ==============================================================================
 enum Role {
-  TRAVELER
-  EDITOR
+  USER
+  OWNER
+  CADRE
   ADMIN
+  TRAVELER // Tương thích ngược với hệ thống cũ
+  EDITOR   // Tương thích ngược với hệ thống cũ
 }
 
+enum UserStatus {
+  ACTIVE
+  PENDING
+  BLOCKED
+}
+
+enum TableStatus {
+  AVAILABLE
+  OCCUPIED
+  RESERVED
+}
+
+enum OrderStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  COMPLETED
+  CANCELLED
+}
+
+enum BookingStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  CANCELLED
+}
+
+// ==============================================================================
+// NGƯỜI DÙNG & TÀI KHOẢN
+// ==============================================================================
 model User {
-  id           String        @id @default(cuid())
-  name         String
-  email        String        @unique
-  password     String
-  role         Role          @default(TRAVELER)
-  avatar       String?
-  destinations Destination[]
-  reviews      Review[]
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
+  id                String         @id @default(cuid())
+  name              String
+  email             String         @unique
+  password          String?
+  role              Role           @default(USER)
+  status            UserStatus     @default(ACTIVE)
+  avatar            String?
+  phone             String?
+  restaurantName    String?
+  restaurantAddress String?
+  restaurantPhone   String?
+  restaurantLat     Float?
+  restaurantLng     Float?
+
+  // Quan hệ Ẩm thực & Quán ăn
+  restaurants       Restaurant[]
+  orders            Order[]
+  bookings          Booking[]
+  notifications     Notification[]
+
+  // Quan hệ Di sản & Du lịch
+  destinations      Destination[]
+  reviews           Review[]
+
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+
+  @@index([role])
+  @@index([status])
 }
 
+// ==============================================================================
+// QUÁN ĂN / NHÀ HÀNG (RESTAURANT)
+// ==============================================================================
+model Restaurant {
+  id          String      @id @default(cuid())
+  name        String
+  slug        String      @unique
+  address     String
+  village     String?     // Thôn/buôn tại Ea Súp (Buôn A2, Thôn 1, Thôn 2, Hồ Ea Súp...)
+  phone       String?
+  coverImage  String?
+  openTime    String?     // VD: 08:00
+  closeTime   String?     // VD: 22:00
+  isApproved  Boolean     @default(false)
+  ownerId     String
+  owner       User        @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+
+  menuItems   MenuItem[]
+  tables      Table[]
+  orders      Order[]
+  bookings    Booking[]
+
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  @@index([slug])
+  @@index([ownerId])
+  @@index([isApproved])
+}
+
+// ==============================================================================
+// MÓN ĂN & THỰC ĐƠN (MENU ITEM)
+// ==============================================================================
+model MenuItem {
+  id           String      @id @default(cuid())
+  restaurantId String
+  restaurant   Restaurant  @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  name         String
+  description  String?     @db.Text
+  price        Int
+  image        String?
+  category     String      // Món chính, Ăn vặt, Đồ uống, Đặc sản Tây Nguyên...
+  isAvailable  Boolean     @default(true)
+
+  orderItems   OrderItem[]
+
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  @@index([restaurantId])
+  @@index([category])
+  @@index([isAvailable])
+}
+
+// ==============================================================================
+// BÀN ĂN CỦA QUÁN (TABLE)
+// ==============================================================================
+model Table {
+  id           String      @id @default(cuid())
+  restaurantId String
+  restaurant   Restaurant  @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  name         String      // Bàn 1, Bàn VIP 2, Chòi lá 3...
+  capacity     Int         @default(4)
+  status       TableStatus @default(AVAILABLE)
+
+  bookings     Booking[]
+
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  @@index([restaurantId])
+  @@index([status])
+}
+
+// ==============================================================================
+// ĐƠN ĐẶT MÓN (ORDER & ORDER ITEM)
+// ==============================================================================
+model Order {
+  id            String      @id @default(cuid())
+  restaurantId  String
+  restaurant    Restaurant  @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  userId        String
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  customerName  String
+  customerPhone String
+  status        OrderStatus @default(PENDING)
+  totalAmount   Int         @default(0)
+  note          String?     @db.Text
+
+  orderItems    OrderItem[]
+
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  @@index([restaurantId])
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model OrderItem {
+  id         String   @id @default(cuid())
+  orderId    String
+  order      Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  menuItemId String
+  menuItem   MenuItem @relation(fields: [menuItemId], references: [id], onDelete: Cascade)
+  quantity   Int      @default(1)
+  price      Int
+
+  @@index([orderId])
+  @@index([menuItemId])
+}
+
+// ==============================================================================
+// ĐẶT BÀN TRƯỚC (BOOKING)
+// ==============================================================================
+model Booking {
+  id            String        @id @default(cuid())
+  restaurantId  String
+  restaurant    Restaurant    @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  userId        String
+  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tableId       String?
+  table         Table?        @relation(fields: [tableId], references: [id], onDelete: SetNull)
+  customerName  String
+  customerPhone String
+  bookingTime   DateTime
+  guestCount    Int           @default(2)
+  status        BookingStatus @default(PENDING)
+  note          String?       @db.Text
+
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  @@index([restaurantId])
+  @@index([userId])
+  @@index([status])
+  @@index([bookingTime])
+}
+
+// ==============================================================================
+// THÔNG BÁO HỆ THỐNG / HỘP THƯ (NOTIFICATION)
+// ==============================================================================
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  message   String   @db.Text
+  link      String?
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([isRead])
+}
+
+// ==============================================================================
+// DI SẢN, DANH THẮNG & LỊCH TRÌNH (GIỮ NGUYÊN TƯƠNG THÍCH)
+// ==============================================================================
 model Category {
   id           String        @id @default(cuid())
   name         String
   slug         String        @unique
-  icon         String?       // Lucide icon name or svg
+  icon         String?
   description  String?
   destinations Destination[]
   createdAt    DateTime      @default(now())
@@ -44,29 +259,22 @@ model Destination {
   title            String
   slug             String    @unique
   subTitle         String?
-  historicalPeriod String?   // Niên đại / Thời kỳ lịch sử
-  content          String    @db.Text // Bài thuyết minh chuyên sâu
-  audioVoiceUrl    String?   // Link file audio thuyết minh AI
+  historicalPeriod String?
+  content          String    @db.Text
+  audioVoiceUrl    String?
   thumbnail        String
-  gallery          String[]  // Danh sách ảnh chất lượng cao
-  
-  // Địa chỉ & Tọa độ địa lý
-  address          String    // Thôn/buôn, xã Ea Súp, tỉnh Đắk Lắk
-  latitude         Float     // Tọa độ Vĩ độ GPS
-  longitude        Float     // Tọa độ Kinh độ GPS
-
-  // Sổ tay trải nghiệm & Cẩm nang du khách
-  bestSeason       String?   // Mùa đẹp nhất (Tháng 11 - Tháng 4 mùa hoa dã quỳ, mùa lúa chín...)
-  entryFee         String?   // Giá vé / Miễn phí
-  visitingHours    String?   // Giờ mở cửa / đón khách
-  culturalNotes    String?   @db.Text // Lưu ý phong tục, tập quán, kiêng kỵ của đồng bào bản địa
-
-  // Trạng thái & Thống kê
+  gallery          String[]
+  address          String
+  latitude         Float
+  longitude        Float
+  bestSeason       String?
+  entryFee         String?
+  visitingHours    String?
+  culturalNotes    String?   @db.Text
   isPublished      Boolean   @default(true)
   isFeatured       Boolean   @default(false)
   viewsCount       Int       @default(0)
 
-  // Quan hệ
   categoryId       String
   category         Category  @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   createdById      String?
@@ -83,14 +291,14 @@ model Destination {
 
 model Review {
   id            String      @id @default(cuid())
-  rating        Int         @default(5) // 1 - 5 sao
+  rating        Int         @default(5)
   comment       String      @db.Text
   photos        String[]    @default([])
   destinationId String
   destination   Destination @relation(fields: [destinationId], references: [id], onDelete: Cascade)
   userId        String?
   user          User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
-  userName      String?     // Cho phép du khách vãng lai để lại tên
+  userName      String?
   isApproved    Boolean     @default(true)
   createdAt     DateTime    @default(now())
 
@@ -100,10 +308,54 @@ model Review {
 model ItineraryItem {
   id             String   @id @default(cuid())
   title          String
-  durationDays   String   // Ví dụ: "1 ngày", "2 ngày 1 đêm", "3 ngày 2 đêm"
-  targetAudience String   // "Gia đình", "Phượt thủ & Khám phá", "Nghiên cứu văn hóa"
-  routeDetails   Json     // Danh sách các chặng dừng chân, thời gian, mô tả, mẹo ăn uống
+  durationDays   String
+  targetAudience String
+  routeDetails   Json
   coverImage     String?
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
+}
+
+// Bàn ăn mẫu cộng đồng / phòng chat giao lưu cũ (giữ nguyên tương thích)
+model FoodTable {
+  id          String   @id @default(cuid())
+  dishId      String
+  restaurant  String
+  address     String
+  startAt     DateTime
+  durationMin Int      @default(90)
+  capacity    Int      @default(4)
+  joined      Int      @default(1)
+  host        String
+  note        String?  @db.Text
+  latitude    Float?
+  longitude   Float?
+  isCancelled Boolean  @default(false)
+  ownerId     String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([startAt])
+  @@index([dishId])
+  @@index([isCancelled])
+}
+
+// Món ăn cũ (giữ nguyên tương thích)
+model Dish {
+  id                String   @id @default(cuid())
+  name              String
+  category          String
+  shortDesc         String
+  story             String   @db.Text
+  image             String
+  priceRange        String
+  tags              String[] @default([])
+  ownerId           String?
+  restaurantName    String?
+  restaurantAddress String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@index([category])
+  @@index([ownerId])
 }
