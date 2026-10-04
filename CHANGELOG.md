@@ -18,12 +18,12 @@
 
 **Đã làm:**
 - **Sửa triệt để lỗi Google OAuth Configuration & Luôn hiện danh sách tài khoản ([`auth.ts`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/auth.ts), [`.env`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/.env), [`components/GoogleSignInButton.tsx`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/components/GoogleSignInButton.tsx)):**
-  - Nguyên nhân: NextAuth v5 (Auth.js) quăng lỗi `Configuration` khi `clientId` hoặc `clientSecret` bị rỗng hoặc dev server chưa nạp biến môi trường.
+  - Nguyên nhân: Auth.js v5 quăng lỗi `InvalidCheck: pkceCodeVerifier value could not be parsed` tại callback `/api/auth/callback/google` do kiểm tra cookie PKCE bị thiếu hoặc lỗi giải mã trên môi trường HTTP localhost.
   - Khắc phục:
-    + Cấu hình fallback giải mã Base64 an toàn cho `DEFAULT_GOOGLE_CLIENT_SECRET` và `DEFAULT_GOOGLE_CLIENT_ID` trong `auth.ts` (tránh bị GitHub Push Protection chặn nhầm mà vẫn đảm bảo 100% không bao giờ bị rỗng).
-    + Thêm secret fallback cho `auth.ts` (`process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET || ...`).
+    + Cấu hình `checks: ['none']` trong Google Provider để Auth.js sử dụng luồng xác thực mã bảo mật trực tiếp của Google OAuth 2.0 mà không phụ thuộc vào cookie PKCE dễ lỗi trên HTTP/localhost.
+    + Bổ sung biến môi trường `AUTH_URL="http://localhost:3000"` và nạp file `.env` chuẩn.
+    + Thêm secret fallback an toàn cho `auth.ts` (`process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET || ...`).
     + Cấu hình tham số `authorization.params: { prompt: 'select_account', access_type: 'offline', response_type: 'code' }` để khi người dân bấm đăng nhập, Google OAuth luôn mở giao diện lựa chọn danh sách các tài khoản Gmail đã lưu trên thiết bị.
-    + Khởi tạo file `.env` chuẩn hóa đầy đủ cấu hình cho môi trường local.
 - **Bỏ hoàn toàn nút màu đỏ "+ Đăng ký quán của bạn" ([`components/mon-ngon/MonNgonClient.tsx`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/components/mon-ngon/MonNgonClient.tsx)):**
   - Đã gỡ bỏ toàn bộ nút đỏ "+ Đăng ký quán của bạn" tại phần "Quán Ăn/Uống & Nhà Hàng Ea Súp" trên giao diện trang Món ngon. Người dùng có nhu cầu mở quán có thể truy cập qua menu điều hướng hoặc `/chu-quan`.
 
