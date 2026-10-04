@@ -417,20 +417,22 @@ export default function MonNgonClient() {
               <p className="mt-3 text-base sm:text-lg text-[#6B5B53] leading-relaxed max-w-xl">
                 Chọn món bạn thèm, tìm bàn tại quán ngon ở Ea Súp và cùng ăn với những người yêu ẩm thực đại ngàn.
               </p>
-              <div className="mt-5 grid grid-cols-2 sm:flex gap-3">
+              <div className="mt-5 flex items-center gap-2 sm:gap-3">
                 <button
                   id="mn-btn-ru-nhau"
                   onClick={() => setCreateFor('')}
-                  className="mn-press inline-flex items-center justify-center gap-2 rounded-full bg-[#D9452B] hover:bg-[#BF3A22] text-white font-bold px-6 py-3.5 shadow-lg shadow-[#D9452B]/30 transition-colors"
+                  className="mn-press flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 sm:gap-2 rounded-full bg-[#D9452B] hover:bg-[#BF3A22] text-white font-bold text-xs sm:text-base px-3.5 sm:px-6 py-2.5 sm:py-3.5 whitespace-nowrap shadow-md sm:shadow-lg shadow-[#D9452B]/30 transition-colors"
                 >
-                  <Plus className="w-5 h-5" /> Rủ nhau đi
+                  <Plus className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
+                  <span>Rủ nhau đi</span>
                 </button>
                 <button
                   id="mn-btn-lac-mon"
                   onClick={() => setShakeOpen(true)}
-                  className="mn-press group inline-flex items-center justify-center gap-2 rounded-full bg-white border-2 border-[#EADBD0] hover:border-[#F5B82E] text-[#2B1D16] font-bold px-6 py-3.5 transition-colors"
+                  className="mn-press group flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 sm:gap-2 rounded-full bg-white border-2 border-[#EADBD0] hover:border-[#F5B82E] text-[#2B1D16] font-bold text-xs sm:text-base px-3.5 sm:px-6 py-2.5 sm:py-3.5 whitespace-nowrap transition-colors"
                 >
-                  <Dices className="w-5 h-5 group-hover:rotate-180 transition-transform duration-500" /> Lắc món
+                  <Dices className="w-4 h-4 sm:w-5 sm:h-5 shrink-0 group-hover:rotate-180 transition-transform duration-500" />
+                  <span>Lắc món</span>
                 </button>
               </div>
 
@@ -465,18 +467,31 @@ export default function MonNgonClient() {
           ).map((t) => {
             const Icon = t.icon;
             const active = tab === t.id;
+            
+            // Nút Khám phá món: nền xanh lá cây chữ trắng, khi chọn thì chuyển nền màu đỏ. Các tab khác khi chọn cũng chuyển sang nền màu đỏ.
+            let buttonStyle = '';
+            if (t.id === 'kham-pha') {
+              buttonStyle = active
+                ? 'bg-[#D9452B] text-white shadow-md font-bold'
+                : 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs font-bold';
+            } else {
+              buttonStyle = active
+                ? 'bg-[#D9452B] text-white shadow-md font-bold'
+                : 'text-[#6B5B53] hover:text-[#2B1D16] hover:bg-white/60 font-semibold';
+            }
+
             return (
               <button
                 key={t.id}
                 id={`mn-tab-${t.id}`}
                 onClick={() => setTab(t.id)}
-                className={`flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold transition-all ${
-                  active ? 'bg-white text-[#D9452B] shadow-sm' : 'text-[#6B5B53] hover:text-[#2B1D16]'
-                }`}
+                className={`flex items-center gap-2 rounded-full px-5 py-2.5 text-sm transition-all ${buttonStyle}`}
               >
                 <Icon className="w-4 h-4" /> {t.label}
                 {t.id === 'lich-hen' && mounted && upcomingMine > 0 && (
-                  <span className="ml-0.5 min-w-5 h-5 px-1.5 rounded-full bg-[#D9452B] text-white text-[11px] grid place-items-center">
+                  <span className={`ml-0.5 min-w-5 h-5 px-1.5 rounded-full text-[11px] grid place-items-center ${
+                    active ? 'bg-white text-[#D9452B]' : 'bg-[#D9452B] text-white'
+                  }`}>
                     {upcomingMine}
                   </span>
                 )}
@@ -672,13 +687,16 @@ export default function MonNgonClient() {
                     Các địa điểm ẩm thực uy tín đã được xác thực bởi Ban Quản Trị địa phương.
                   </p>
                 </div>
-                <Link
-                  href="/mon-ngon/dang-ky-chu-quan"
-                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-[#D9452B] hover:bg-[#BF3A22] text-white text-xs sm:text-sm font-bold shadow-sm transition self-start sm:self-auto"
-                >
-                  <Plus className="w-4 h-4" />
-                  <span>Đăng ký quán của bạn</span>
-                </Link>
+                {/* Nút Đăng ký quán của bạn: Ẩn hoàn toàn khi đã đăng nhập tài khoản Khách */}
+                {(!isLoggedIn || (customUser?.role !== 'TRAVELER' && (session?.user as any)?.role !== 'TRAVELER')) && (
+                  <Link
+                    href="/mon-ngon/dang-ky-chu-quan"
+                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-[#D9452B] hover:bg-[#BF3A22] text-white text-xs sm:text-sm font-bold shadow-sm transition self-start sm:self-auto"
+                  >
+                    <Plus className="w-4 h-4" />
+                    <span>Đăng ký quán của bạn</span>
+                  </Link>
+                )}
               </div>
 
               {restaurants.length === 0 ? (

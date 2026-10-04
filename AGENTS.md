@@ -97,6 +97,7 @@ docker compose up -d --build   # trên VPS
 - [x] Tối ưu Modal Đăng Nhập: Đưa nút "Đăng Nhập Bằng Google (Gmail)" lên trên cùng tab Khách, loại bỏ hoàn toàn form nhập thủ công (Gmail & Họ tên) để thao tác nhanh 1 chạm.
 - [x] Tối ưu Form Mở Bàn Mới (Quán ăn dạng List thanh mảnh chỉ hiện khi có món chọn, đổi nhãn "Chọn món ăn", bổ sung ô "Số điện thoại liên hệ") & Ẩn hoàn toàn banner Chủ quán trên giao diện Khách hàng.
 - [x] Bổ sung ô nhập Tọa độ bản đồ du lịch (GPS) khi đăng ký Chủ Quán, tích hợp icon ánh mắt ẩn/hiện mật khẩu, khắc phục triệt để lỗi tài khoản Chủ Quán chưa được duyệt vẫn đăng nhập được, và tối ưu giao diện Mobile Navbar (đưa nút vào menu 3 gạch, rút gọn tên tài khoản chỉ hiện Avatar và Quán/Khách).
+- [x] Sửa triệt để lỗi đăng nhập Google OAuth (Missing client_id), tối ưu nút "Rủ nhau đi" & "Lắc món" vừa 1 dòng trên mobile, ẩn nút "+ Đăng ký quán của bạn" khi là Khách, và làm nổi bật tab "Khám phá món" nền xanh chữ trắng / khi chọn đổi màu đỏ.
 - [ ] Mở rộng tính năng bình luận và đánh giá món ăn/quán ăn cho du khách.
 
 ## 8. Lưu ý quan trọng

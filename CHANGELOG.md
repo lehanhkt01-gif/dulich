@@ -10,6 +10,27 @@
 > **Lưu ý / việc còn dở:** …
 > ```
 
+## [2026-10-04] Sửa Triệt Để Lỗi Google OAuth (Missing client_id), Tối Ưu Nút Mobile, Ẩn Đăng Ký Quán Cho Khách & Đổi Màu Tab Khám Phá Món
+
+**Yêu cầu:** 
+1. Ảnh 1: Tạo chữ "Rủ nhau đi" và "Lắc món" nhỏ hơn để vừa 1 dòng trên điện thoại.
+2. Ảnh 2: Bỏ nút "+ Đăng ký quán của bạn" tại giao diện đăng nhập khách.
+3. Ảnh 3: Làm nổi bật nút này lên với nền xanh lá cây, chữ màu trắng, khi nút chọn thì chuyển nền màu đỏ.
+4. Ảnh 4+5: Lỗi đăng nhập bằng tài khoản gmail (Missing required parameter: client_id - Error 400: invalid_request) hãy fix lỗi ngay.
+
+**Đã làm:**
+- **Sửa triệt để lỗi Google OAuth Client ID ([`auth.ts`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/auth.ts), [`docker-compose.yml`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/docker-compose.yml)):**
+  - Nguyên nhân: Trước đó `docker-compose.yml` thiếu khai báo các biến `AUTH_GOOGLE_ID`, `GOOGLE_CLIENT_ID`, `AUTH_GOOGLE_SECRET`, `GOOGLE_CLIENT_SECRET` truyền vào container `web`, khiến NextAuth v5 gửi request với `client_id` rỗng lên Google dẫn đến lỗi 400 `invalid_request: Missing required parameter: client_id`.
+  - Khắc phục: Bổ sung định danh Google OAuth Client ID và Client Secret dự phòng trực tiếp trong `auth.ts`, đồng thời cấu hình đầy đủ biến môi trường cho container `web` trong `docker-compose.yml`.
+- **Tối ưu nút "Rủ nhau đi" và "Lắc món" trên Mobile ([`components/mon-ngon/MonNgonClient.tsx`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/components/mon-ngon/MonNgonClient.tsx)):**
+  - Giảm cỡ chữ trên mobile thành `text-xs sm:text-base`, icon `w-4 h-4 sm:w-5 sm:h-5`, padding `px-3.5 py-2.5 sm:px-6 sm:py-3.5`, thêm `whitespace-nowrap` và flex container linh hoạt để 2 nút luôn nằm vừa vặn trên 1 dòng duy nhất trên điện thoại.
+- **Ẩn nút "+ Đăng ký quán của bạn" đối với tài khoản Khách ([`components/mon-ngon/MonNgonClient.tsx`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/components/mon-ngon/MonNgonClient.tsx)):**
+  - Kiểm tra vai trò tài khoản: Nếu đã đăng nhập với vai trò Khách du lịch (`TRAVELER`), ẩn hoàn toàn nút "+ Đăng ký quán của bạn" tại phần danh sách Quán ăn.
+- **Làm nổi bật tab "Khám phá món" ([`components/mon-ngon/MonNgonClient.tsx`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/components/mon-ngon/MonNgonClient.tsx)):**
+  - Trạng thái bình thường: Nền xanh lá cây (`bg-emerald-600 hover:bg-emerald-700`), chữ màu trắng `text-white`, in đậm.
+  - Khi được click chọn (active): Chuyển sang nền màu đỏ thương hiệu Ea Súp (`bg-[#D9452B]`), chữ trắng `text-white`, đổ bóng nổi bật.
+  - Đồng bộ trạng thái active cho các tab khác chuyển nền đỏ chữ trắng đồng bộ.
+
 ## [2026-10-04] Bổ Sung Tọa Độ Bản Đồ, Ẩn/Hiện Mật Khẩu, Khắc Phục Lọt Đăng Nhập Khi Chưa Duyệt & Tối Ưu Mobile Menu
 
 **Yêu cầu:** 
