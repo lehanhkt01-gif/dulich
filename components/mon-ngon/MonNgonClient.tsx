@@ -2,6 +2,7 @@
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
+import { useSession } from 'next-auth/react';
 import {
   ArrowRight,
   CalendarDays,
@@ -80,6 +81,22 @@ export default function MonNgonClient() {
   const [mounted, setMounted] = useState(false);
   const [now, setNow] = useState<Date | null>(null);
   const [tab, setTab] = useState<Tab>('kham-pha');
+
+  const { data: session } = useSession();
+  const [customUser, setCustomUser] = useState<any>(null);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('easup_auth_user');
+      if (saved) {
+        try {
+          setCustomUser(JSON.parse(saved));
+        } catch (e) {}
+      }
+    }
+  }, []);
+
+  const isLoggedIn = !!session?.user || !!customUser;
 
   // Khám phá
   const [search, setSearch] = useState('');
@@ -433,63 +450,65 @@ export default function MonNgonClient() {
 
         {/* ================= NỘI DUNG ================= */}
         <div className="mt-5 md:mt-6">
-          {/* Banner tiện ích kép: Khách đặt món & Chủ quán */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
-            {/* Banner Khách */}
-            <div className="p-3.5 sm:p-4 rounded-2xl bg-gradient-to-r from-[#EFF6FF] to-[#DBEAFE] border border-blue-200 flex items-center justify-between gap-3 shadow-xs">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center shrink-0 shadow-xs">
-                  <ShoppingBag className="w-5 h-5" />
+          {/* Banner tiện ích kép: Khách đặt món & Chủ quán (Chỉ hiện khi đã đăng nhập) */}
+          {isLoggedIn && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
+              {/* Banner Khách */}
+              <div className="p-3.5 sm:p-4 rounded-2xl bg-gradient-to-r from-[#EFF6FF] to-[#DBEAFE] border border-blue-200 flex items-center justify-between gap-3 shadow-xs">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+                    <ShoppingBag className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <p className="text-xs sm:text-sm font-bold text-stone-900">
+                      Lịch Sử Đặt Món & Đặt Bàn Của Bạn
+                    </p>
+                    <p className="text-[11px] sm:text-xs text-stone-600">
+                      Theo dõi tiến độ đơn hàng và thông báo xác nhận từ quán.
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-xs sm:text-sm font-bold text-stone-900">
-                    Lịch Sử Đặt Món & Đặt Bàn Của Bạn
-                  </p>
-                  <p className="text-[11px] sm:text-xs text-stone-600">
-                    Theo dõi tiến độ đơn hàng và thông báo xác nhận từ quán.
-                  </p>
-                </div>
+                <Link
+                  href="/mon-ngon/lich-su-dat"
+                  className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition-all shadow-xs shrink-0"
+                >
+                  <span>Xem đơn</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
               </div>
-              <Link
-                href="/mon-ngon/lich-su-dat"
-                className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition-all shadow-xs shrink-0"
-              >
-                <span>Xem đơn</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </Link>
-            </div>
 
-            {/* Banner Chủ quán */}
-            <div className="p-3.5 sm:p-4 rounded-2xl bg-gradient-to-r from-[#FDEDE8] to-[#FFF6ED] border border-[#EADBD0] flex items-center justify-between gap-3 shadow-xs">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-[#D9452B] text-white flex items-center justify-center shrink-0 shadow-xs">
-                  <Store className="w-5 h-5" />
+              {/* Banner Chủ quán */}
+              <div className="p-3.5 sm:p-4 rounded-2xl bg-gradient-to-r from-[#FDEDE8] to-[#FFF6ED] border border-[#EADBD0] flex items-center justify-between gap-3 shadow-xs">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-[#D9452B] text-white flex items-center justify-center shrink-0 shadow-xs">
+                    <Store className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <p className="text-xs sm:text-sm font-bold text-[#2B1D16]">
+                      Dành Cho Chủ Quán Ăn Ea Súp
+                    </p>
+                    <p className="text-[11px] sm:text-xs text-[#7D6B62]">
+                      Đăng ký mở quán, quản lý món ăn và tiếp nhận đơn đặt.
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-xs sm:text-sm font-bold text-[#2B1D16]">
-                    Dành Cho Chủ Quán Ăn Ea Súp
-                  </p>
-                  <p className="text-[11px] sm:text-xs text-[#7D6B62]">
-                    Đăng ký mở quán, quản lý món ăn và tiếp nhận đơn đặt.
-                  </p>
+                <div className="flex items-center gap-1.5 shrink-0">
+                  <Link
+                    href="/mon-ngon/dang-ky-chu-quan"
+                    className="inline-flex items-center justify-center px-3 py-2 rounded-xl bg-[#D9452B] hover:bg-[#BF3A22] text-white text-xs font-bold transition-all shadow-xs"
+                  >
+                    <span>Mở Quán</span>
+                  </Link>
+                  <Link
+                    href="/chu-quan/dashboard"
+                    className="inline-flex items-center justify-center px-3 py-2 rounded-xl bg-white border border-[#EADBD0] hover:border-[#D9452B] text-[#2B1D16] text-xs font-bold transition-all shadow-xs"
+                  >
+                    <span>Quản lý</span>
+                  </Link>
                 </div>
-              </div>
-              <div className="flex items-center gap-1.5 shrink-0">
-                <Link
-                  href="/mon-ngon/dang-ky-chu-quan"
-                  className="inline-flex items-center justify-center px-3 py-2 rounded-xl bg-[#D9452B] hover:bg-[#BF3A22] text-white text-xs font-bold transition-all shadow-xs"
-                >
-                  <span>Mở Quán</span>
-                </Link>
-                <Link
-                  href="/chu-quan/dashboard"
-                  className="inline-flex items-center justify-center px-3 py-2 rounded-xl bg-white border border-[#EADBD0] hover:border-[#D9452B] text-[#2B1D16] text-xs font-bold transition-all shadow-xs"
-                >
-                  <span>Quản lý</span>
-                </Link>
               </div>
             </div>
-          </div>
+          )}
 
           {tab === 'kham-pha' && (
             <section key="kp" className="mn-fade-up" aria-labelledby="mn-h-kham-pha">

@@ -41,12 +41,21 @@
     "createdAt": "2026-10-03T23:30:22.044Z"
   },
   {
-    "name": "Hanh MTTQ",
+    "name": "zipzenhanh",
     "email": "zipzenhanh@gmail.com",
-    "avatar": "https://lh3.googleusercontent.com/a/ACg8ocLqES8eeda8FCyXUWJWSNMcROWdUsj8sBNKZVopkTJiIWbkhY8=s96-c",
+    "avatar": "https://api.dicebear.com/7.x/initials/svg?seed=zipzenhanh",
     "role": "TRAVELER",
     "id": "user-1791082874824",
-    "createdAt": "2026-10-04T03:01:14.824Z"
+    "createdAt": "2026-10-04T03:01:14.824Z",
+    "status": "ACTIVE",
+    "phone": null,
+    "restaurantName": null,
+    "restaurantAddress": null,
+    "restaurantPhone": null,
+    "restaurantLat": 13.2456,
+    "restaurantLng": 107.8381,
+    "password": "google_oauth_authenticated",
+    "updatedAt": "2026-10-04T08:49:13.570Z"
   },
   {
     "name": "tranhuongzip",

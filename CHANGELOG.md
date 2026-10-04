@@ -10,6 +10,16 @@
 > **Lưu ý / việc còn dở:** …
 > ```
 
+## [2026-10-04] Cập Nhật Ẩn Banner Chưa Đăng Nhập & Tối Ưu Đăng Nhập Khách Du Lịch
+
+**Yêu cầu:** 
+1. Ẩn khối banner "Lịch Sử Đặt Món & Đặt Bàn Của Bạn" và "Dành Cho Chủ Quán Ăn Ea Súp" tại giao diện trang chủ khi chưa đăng nhập.
+2. Khắc phục lỗi đăng nhập Khách du lịch (`Error 400: invalid_request missing client_id` khi chưa cấu hình Google OAuth Client ID).
+
+**Đã làm:**
+- **Ẩn banner chưa đăng nhập ([`components/mon-ngon/MonNgonClient.tsx`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/components/mon-ngon/MonNgonClient.tsx)):** Tích hợp `useSession()` kết hợp kiểm tra `localStorage` state `isLoggedIn`. Chỉ hiển thị 2 khối banner card tiện ích khi người dùng đã đăng nhập thành công.
+- **Tối ưu Form Đăng nhập Khách ([`components/AuthModal.tsx`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/components/AuthModal.tsx)):** Đưa form nhập trực tiếp tài khoản Gmail của Khách (`customGmail`) lên vị trí nổi bật chính ở đầu Tab 1. Cho phép du khách nhập Gmail và đăng nhập tức thì 100% thành công không bị gián đoạn bởi Google Client ID.
+
 ## [2026-10-04] Tích Hợp Hệ Thống Gửi Email Thông Báo Tức Thì Cho Khách Hàng, Chủ Quán & Admin
 
 **Yêu cầu:** Tạo chức năng gửi mail thông báo ngay lập tức đến khách hàng, chủ quán để báo cáo thao tác đặt món, phê duyệt món, đã phục vụ xong. Tài khoản gmail admin tại Lehanhkt01@gmail.com sẽ nhận được thông báo khi có chủ quán đăng ký mới, thay đổi thông tin chủ quán, khi admin phê duyệt chủ quán thì chủ quán cũng sẽ nhận được thông tin phê duyệt.

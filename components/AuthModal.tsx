@@ -329,16 +329,76 @@ export default function AuthModal({
           )}
 
           {mode === 'login' ? (
-            /* TAB 1: ĐĂNG NHẬP KHÁCH DU LỊCH BẰNG GOOGLE */
+            /* TAB 1: ĐĂNG NHẬP KHÁCH DU LỊCH BẰNG GMAIL HOẶC GOOGLE */
             <div className="space-y-4">
               <div className="text-center py-1">
                 <p className="text-xs text-stone-600">
-                  Đăng nhập một chạm an toàn bằng tài khoản Google Gmail của bạn.
+                  Nhập Gmail của bạn để đăng nhập nhanh, đặt món và theo dõi lịch sử chuyến đi.
                 </p>
               </div>
 
-              {/* Nút Đăng nhập Google chính thức qua Auth.js v5 */}
-              <GoogleSignInButton text="Đăng Nhập Bằng Google (Gmail)" />
+              {/* Form nhập Gmail đăng nhập trực tiếp của Khách */}
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  if (customGmail && customGmail.includes('@')) {
+                    handleGoogleAuth(
+                      customGmail.trim(),
+                      customName || customGmail.split('@')[0],
+                      'TRAVELER'
+                    );
+                  } else {
+                    setError('Vui lòng nhập tài khoản Gmail hợp lệ');
+                  }
+                }}
+                className="space-y-3 bg-[#FBF9F5] p-3.5 rounded-2xl border border-[#E7E2D7]"
+              >
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-stone-700 flex items-center gap-1.5">
+                    <Mail className="w-3.5 h-3.5 text-[#0066CC]" />
+                    <span>Tài khoản Gmail của bạn *</span>
+                  </label>
+                  <input
+                    type="email"
+                    required
+                    placeholder="VD: zipzenhanh@gmail.com"
+                    value={customGmail}
+                    onChange={(e) => setCustomGmail(e.target.value)}
+                    className="w-full text-xs p-3 rounded-xl border border-stone-300 focus:outline-none focus:border-[#0066CC] bg-white"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-stone-700 flex items-center gap-1.5">
+                    <UserIcon className="w-3.5 h-3.5 text-stone-400" />
+                    <span>Họ và tên du khách (Tùy chọn)</span>
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="VD: Lê Hạnh"
+                    value={customName}
+                    onChange={(e) => setCustomName(e.target.value)}
+                    className="w-full text-xs p-3 rounded-xl border border-stone-300 focus:outline-none focus:border-[#0066CC] bg-white"
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={loading || !customGmail}
+                  className="w-full py-3 px-4 bg-[#0066CC] hover:bg-[#0052A3] text-white text-xs font-bold rounded-2xl shadow-md shadow-[#0066CC]/20 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                >
+                  <Sparkles className="w-4 h-4 text-amber-200" />
+                  <span>{loading ? 'Đang xác thực...' : 'Đăng Nhập Khách Du Lịch'}</span>
+                </button>
+              </form>
+
+              <div className="relative flex items-center justify-center my-2">
+                <div className="border-t border-stone-200 w-full"></div>
+                <span className="bg-white px-3 text-[11px] text-stone-400 uppercase tracking-wider shrink-0 font-medium">
+                  Hoặc đăng nhập nhanh
+                </span>
+                <div className="border-t border-stone-200 w-full"></div>
+              </div>
 
               {/* Nút Đăng nhập nhanh 1 chạm */}
               <button
@@ -347,53 +407,13 @@ export default function AuthModal({
                 onClick={() =>
                   handleGoogleAuth('khach.dulich@gmail.com', 'Du Khách Ea Súp', 'TRAVELER')
                 }
-                className="w-full py-2.5 px-3 bg-[#FBF9F5] hover:bg-stone-100 text-stone-700 border border-[#E7E2D7] rounded-xl font-semibold text-xs flex items-center justify-center gap-2 transition-colors disabled:opacity-50"
+                className="w-full py-2.5 px-3 bg-stone-50 hover:bg-stone-100 text-stone-700 border border-stone-200 rounded-xl font-semibold text-xs flex items-center justify-center gap-2 transition-colors disabled:opacity-50"
               >
                 <span>⚡ Đăng nhập thử nghiệm 1 chạm (Khách du lịch)</span>
               </button>
 
-              <div className="relative flex items-center justify-center my-3">
-                <div className="border-t border-stone-200 w-full"></div>
-                <span className="bg-white px-3 text-[11px] text-stone-400 uppercase tracking-wider shrink-0 font-medium">
-                  Hoặc nhập Gmail của bạn
-                </span>
-                <div className="border-t border-stone-200 w-full"></div>
-              </div>
-
-              {/* Nhập Gmail cá nhân */}
-              <div className="space-y-2">
-                <div className="flex gap-2">
-                  <input
-                    type="email"
-                    placeholder="nguyenvana@gmail.com"
-                    value={customGmail}
-                    onChange={(e) => setCustomGmail(e.target.value)}
-                    className="flex-1 text-xs p-2.5 rounded-xl border border-stone-300 focus:outline-none focus:border-[#0066CC]"
-                  />
-                  <input
-                    type="text"
-                    placeholder="Họ tên"
-                    value={customName}
-                    onChange={(e) => setCustomName(e.target.value)}
-                    className="w-28 text-xs p-2.5 rounded-xl border border-stone-300 focus:outline-none focus:border-[#0066CC]"
-                  />
-                </div>
-                <button
-                  type="button"
-                  disabled={loading || !customGmail}
-                  onClick={() =>
-                    handleGoogleAuth(
-                      customGmail,
-                      customName || customGmail.split('@')[0],
-                      'TRAVELER'
-                    )
-                  }
-                  className="w-full py-2.5 px-4 bg-[#0066CC] hover:bg-[#0052A3] text-white text-xs font-bold rounded-xl shadow-xs transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
-                >
-                  <Mail className="w-4 h-4" />
-                  <span>Xác thực & Vào hệ thống</span>
-                </button>
-              </div>
+              {/* Nút Đăng nhập Google OAuth */}
+              <GoogleSignInButton text="Đăng Nhập Bằng Google OAuth" />
             </div>
           ) : (
             /* TAB 2: CHỦ QUÁN ĂN - CHỈ ĐĂNG NHẬP BẰNG GMAIL VÀ MẬT KHẨU */
