@@ -687,16 +687,6 @@ export default function MonNgonClient() {
                     Các địa điểm ẩm thực & giải khát uy tín đã được xác thực bởi Ban Quản Trị địa phương.
                   </p>
                 </div>
-                {/* Nút Đăng ký quán của bạn: Ẩn hoàn toàn khi đã đăng nhập tài khoản Khách */}
-                {(!isLoggedIn || (customUser?.role !== 'TRAVELER' && (session?.user as any)?.role !== 'TRAVELER')) && (
-                  <Link
-                    href="/mon-ngon/dang-ky-chu-quan"
-                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-[#D9452B] hover:bg-[#BF3A22] text-white text-xs sm:text-sm font-bold shadow-sm transition self-start sm:self-auto"
-                  >
-                    <Plus className="w-4 h-4" />
-                    <span>Đăng ký quán của bạn</span>
-                  </Link>
-                )}
               </div>
 
               {restaurants.length === 0 ? (

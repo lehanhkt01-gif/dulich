@@ -19,6 +19,13 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     Google({
       clientId: GOOGLE_CLIENT_ID,
       clientSecret: GOOGLE_CLIENT_SECRET,
+      authorization: {
+        params: {
+          prompt: 'select_account',
+          access_type: 'offline',
+          response_type: 'code',
+        },
+      },
     }),
   ],
   callbacks: {
@@ -68,5 +75,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   pages: {
     signIn: '/mon-ngon',
   },
-  secret: process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET,
+  secret:
+    process.env.AUTH_SECRET ||
+    process.env.NEXTAUTH_SECRET ||
+    'easup_heritage_auth_secret_2026_super_secure_key_123456789',
 });

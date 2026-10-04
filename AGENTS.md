@@ -99,6 +99,7 @@ docker compose up -d --build   # trên VPS
 - [x] Bổ sung ô nhập Tọa độ bản đồ du lịch (GPS) khi đăng ký Chủ Quán, tích hợp icon ánh mắt ẩn/hiện mật khẩu, khắc phục triệt để lỗi tài khoản Chủ Quán chưa được duyệt vẫn đăng nhập được, và tối ưu giao diện Mobile Navbar (đưa nút vào menu 3 gạch, rút gọn tên tài khoản chỉ hiện Avatar và Quán/Khách).
 - [x] Sửa triệt để lỗi đăng nhập Google OAuth (Missing client_id), tối ưu nút "Rủ nhau đi" & "Lắc món" vừa 1 dòng trên mobile, ẩn nút "+ Đăng ký quán của bạn" khi là Khách, và làm nổi bật tab "Khám phá món" nền xanh chữ trắng / khi chọn đổi màu đỏ.
 - [x] Cho phép Chủ quán thay đổi ảnh bìa quán (tải ảnh máy tính/điện thoại < 3MB hoặc chọn từ kho ảnh Ea Súp), và chuẩn hoá toàn bộ các từ "ăn" thành "ăn/uống" phù hợp cho cả món ăn và giải khát.
+- [x] Sửa triệt để lỗi Configuration Google OAuth, cấu hình prompt select_account hiển thị danh sách tài khoản Gmail đã đăng nhập trên máy cho người dân chọn, và bỏ hoàn toàn nút màu đỏ "+ Đăng ký quán của bạn" tại trang Món ngon.
 - [ ] Mở rộng tính năng bình luận và đánh giá món ăn/quán ăn cho du khách.
 
 ## 8. Lưu ý quan trọng

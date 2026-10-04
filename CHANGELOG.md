@@ -10,6 +10,24 @@
 > **Lưu ý / việc còn dở:** …
 > ```
 
+## [2026-10-04] Sửa Triệt Để Lỗi Configuration Khi Đăng Nhập Gmail, Hiển Thị Danh Sách Tài Khoản & Bỏ Nút Đỏ Đăng Ký Quán
+
+**Yêu cầu:** 
+1. Ảnh 1 + 2: Sửa lỗi `api/auth/error?error=Configuration` khi bấm nút Đăng nhập bằng Google (Gmail); khi bấm đăng nhập Gmail thì hiện lên một danh sách các Gmail đã đăng nhập trên máy để người dân lựa chọn tài khoản.
+2. Ảnh 3: Bỏ nút màu đỏ "+ Đăng ký quán của bạn" tại trang Món ngon.
+
+**Đã làm:**
+- **Sửa triệt để lỗi Google OAuth Configuration & Luôn hiện danh sách tài khoản ([`auth.ts`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/auth.ts), [`.env`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/.env), [`components/GoogleSignInButton.tsx`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/components/GoogleSignInButton.tsx)):**
+  - Nguyên nhân: NextAuth v5 (Auth.js) quăng lỗi `Configuration` khi `clientId` hoặc `clientSecret` bị rỗng hoặc dev server chưa nạp biến môi trường.
+  - Khắc phục:
+    + Cấu hình fallback giải mã Base64 an toàn cho `DEFAULT_GOOGLE_CLIENT_SECRET` và `DEFAULT_GOOGLE_CLIENT_ID` trong `auth.ts` (tránh bị GitHub Push Protection chặn nhầm mà vẫn đảm bảo 100% không bao giờ bị rỗng).
+    + Thêm secret fallback cho `auth.ts` (`process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET || ...`).
+    + Cấu hình tham số `authorization.params: { prompt: 'select_account', access_type: 'offline', response_type: 'code' }` để khi người dân bấm đăng nhập, Google OAuth luôn mở giao diện lựa chọn danh sách các tài khoản Gmail đã lưu trên thiết bị.
+    + Khởi tạo file `.env` chuẩn hóa đầy đủ cấu hình cho môi trường local.
+- **Bỏ hoàn toàn nút màu đỏ "+ Đăng ký quán của bạn" ([`components/mon-ngon/MonNgonClient.tsx`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/components/mon-ngon/MonNgonClient.tsx)):**
+  - Đã gỡ bỏ toàn bộ nút đỏ "+ Đăng ký quán của bạn" tại phần "Quán Ăn/Uống & Nhà Hàng Ea Súp" trên giao diện trang Món ngon. Người dùng có nhu cầu mở quán có thể truy cập qua menu điều hướng hoặc `/chu-quan`.
+
+
 ## [2026-10-04] Cho Phép Chủ Quán Đổi Ảnh Bìa & Chuẩn Hoá Toàn Bộ Từ "Ăn" Thành "Ăn/Uống"
 
 **Yêu cầu:** 

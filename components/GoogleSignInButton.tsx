@@ -9,7 +9,7 @@ interface GoogleSignInButtonProps {
   text?: string;
   variant?: 'default' | 'outline' | 'pill';
   onSuccess?: () => void;
-  onClick?: () => void;
+  onClick?: () => void | Promise<void>;
 }
 
 export default function GoogleSignInButton({
@@ -22,15 +22,16 @@ export default function GoogleSignInButton({
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSignIn = async () => {
-    if (onClick) {
-      onClick();
-      return;
-    }
     try {
       setIsLoading(true);
-      await signIn('google', { callbackUrl });
+      if (onClick) {
+        await onClick();
+      } else {
+        await signIn('google', { callbackUrl });
+      }
     } catch (error) {
       console.error('Lỗi khi kích hoạt đăng nhập Google:', error);
+    } finally {
       setIsLoading(false);
     }
   };
