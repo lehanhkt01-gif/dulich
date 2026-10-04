@@ -10,6 +10,21 @@
 > **Lưu ý / việc còn dở:** …
 > ```
 
+## [2026-10-04] Tối Ưu Lắc Món & Mở Bàn Độc Quyền Quán Ăn (Chỉ Mở Bàn Tại 1 Quán Duy Nhất)
+
+**Yêu cầu:** 
+Tại giao diện khi lắc món, nút "mở bàn" chọn món đã lắc trúng thì chỉ hiện các món ăn của quán ăn đã lắc trúng (chỉ mở bàn ở tại 1 quán duy nhất, chứ không thể mở bàn ở cả 2 nơi được), xuất hiện đầy đủ các thông tin của "quán ăn".
+
+**Đã làm:**
+- **Nâng cấp Modal Lắc món ([`components/mon-ngon/MonNgonClient.tsx`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/components/mon-ngon/MonNgonClient.tsx)):**
+  - Hiển thị đầy đủ thông tin quán ăn phục vụ món đã lắc trúng ngay trên thẻ kết quả: Tên quán kèm biểu tượng Store, huy hiệu "Đã xác thực", Chủ quán, Địa chỉ cụ thể, Hotline gọi điện thoại và Giờ mở cửa.
+  - Nút "Mở bàn" chuyển thẳng sang form tạo bàn với món đã lắc trúng và quán ăn tương ứng được khóa cố định.
+- **Tối ưu hóa Modal Mở bàn mới ([`components/mon-ngon/MonNgonClient.tsx`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/components/mon-ngon/MonNgonClient.tsx)):**
+  - **Mục 1 "Chọn món":** Khóa chặt theo quán đã chọn/lắc trúng. Chỉ hiển thị các món ăn thuộc về thực đơn của chính quán đó, món lắc trúng được tích chọn sẵn. Loại bỏ hoàn toàn tình trạng hiển thị lẫn lộn món của các quán khác nhau, đảm bảo nguyên tắc: *Một bàn ăn chỉ mở tại 1 quán duy nhất*.
+  - **Mục 2 "Quán & thời gian":** Hiển thị khối thông tin quán ăn nổi bật, chuyên nghiệp gồm Tên quán, Huy hiệu xác thực, Chủ quán, Địa chỉ chi tiết, Hotline hỗ trợ và Giờ mở cửa; kèm thông báo quy định đặt bàn độc quyền tại quán và nút "Đổi quán khác" nếu du khách muốn chuyển sang quán khác.
+- **Cập nhật dữ liệu mặc định ([`lib/data/mon-ngon.ts`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/lib/data/mon-ngon.ts)):**
+  - Bổ sung `DEFAULT_RESTAURANTS` với đầy đủ thông tin địa chỉ, chủ quán, hotline, giờ phục vụ chuẩn của các quán đặc sản Ea Súp, đảm bảo hàm `resolveRestaurant` luôn tìm thấy quán kể cả khi chưa tải xong API.
+
 ## [2026-10-04] Đồng Bộ Chuẩn Hoá Số Liệu Admin & Bổ Sung Thông Tin Quán Ăn Kèm Hotline Cho Từng Món Ăn
 
 **Yêu cầu:** 

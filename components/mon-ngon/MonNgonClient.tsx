@@ -50,6 +50,7 @@ import {
   type DishRestaurant,
   type FoodTable,
   type TimeSlot,
+  DEFAULT_RESTAURANTS,
 } from '@/lib/data/mon-ngon';
 import { SEED_DISH_RESTAURANT } from '@/lib/account-sync';
 
@@ -117,19 +118,26 @@ export default function MonNgonClient() {
       if (d.restaurant) return d.restaurant;
       const rid = d.restaurantId || SEED_DISH_RESTAURANT[d.id];
       const r = restaurants.find((x) => x.id === rid);
-      if (!r) return null;
-      return {
-        id: r.id,
-        name: r.name,
-        slug: r.slug,
-        address: r.address,
-        village: r.village,
-        phone: r.phone,
-        openTime: r.openTime,
-        closeTime: r.closeTime,
-        coverImage: r.coverImage,
-        ownerName: r.owner?.name || r.ownerName || null,
-      };
+      if (r) {
+        return {
+          id: r.id,
+          name: r.name,
+          slug: r.slug,
+          address: r.address,
+          village: r.village,
+          phone: r.phone || r.owner?.phone,
+          openTime: r.openTime,
+          closeTime: r.closeTime,
+          coverImage: r.coverImage,
+          ownerName: r.owner?.name || r.ownerName || null,
+          isApproved: !!r.isApproved,
+        };
+      }
+      if (rid) {
+        const def = DEFAULT_RESTAURANTS.find((x) => x.id === rid);
+        if (def) return def;
+      }
+      return null;
     },
     [restaurants]
   );
@@ -931,7 +939,19 @@ export default function MonNgonClient() {
       </nav>
 
       {/* ================= MODALS ================= */}
-      {shakeOpen && <ShakeModal onClose={() => setShakeOpen(false)} onFind={findTablesFor} onCreate={(id) => { setShakeOpen(false); setCreateFor(id); }} hasTables={(id) => !!activeTablesByDish[id]} />}
+      {shakeOpen && (
+        <ShakeModal
+          allDishes={allDishes}
+          resolveRestaurant={resolveRestaurant}
+          onClose={() => setShakeOpen(false)}
+          onFind={findTablesFor}
+          onCreate={(id) => {
+            setShakeOpen(false);
+            setCreateFor(id);
+          }}
+          hasTables={(id) => !!activeTablesByDish[id]}
+        />
+      )}
       {detail && (
         <DishModal
           dish={detail}
@@ -939,11 +959,23 @@ export default function MonNgonClient() {
           tables={activeTablesByDish[detail.id] || 0}
           onClose={() => setDetail(null)}
           onFind={() => findTablesFor(detail.id)}
-          onCreate={() => { const id = detail.id; setDetail(null); setCreateFor(id); }}
+          onCreate={() => {
+            const id = detail.id;
+            setDetail(null);
+            setCreateFor(id);
+          }}
         />
       )}
       {createFor !== null && (
-        <CreateTableModal initialDish={createFor} nickname={nickname} onClose={() => setCreateFor(null)} onSubmit={createTable} />
+        <CreateTableModal
+          initialDish={createFor}
+          nickname={session?.user?.name || customUser?.name || nickname}
+          allDishes={allDishes}
+          restaurants={restaurants}
+          resolveRestaurant={resolveRestaurant}
+          onClose={() => setCreateFor(null)}
+          onSubmit={createTable}
+        />
       )}
 
       {/* Toast */}
@@ -1176,8 +1208,23 @@ function ModalShell({ onClose, children, labelledBy, wide }: { onClose: () => vo
 }
 
 /* ---------- Lắc món ---------- */
-function ShakeModal({ onClose, onFind, onCreate, hasTables }: { onClose: () => void; onFind: (id: string) => void; onCreate: (id: string) => void; hasTables: (id: string) => boolean }) {
-  const [idx, setIdx] = useState(() => Math.floor(Math.random() * DISHES.length));
+function ShakeModal({
+  allDishes = DISHES,
+  resolveRestaurant,
+  onClose,
+  onFind,
+  onCreate,
+  hasTables,
+}: {
+  allDishes?: Dish[];
+  resolveRestaurant?: (d: Dish) => DishRestaurant | null;
+  onClose: () => void;
+  onFind: (id: string) => void;
+  onCreate: (id: string) => void;
+  hasTables: (id: string) => boolean;
+}) {
+  const pool = allDishes && allDishes.length > 0 ? allDishes : DISHES;
+  const [idx, setIdx] = useState(() => Math.floor(Math.random() * pool.length));
   const [rolling, setRolling] = useState(false);
   const [rolls, setRolls] = useState(0);
 
@@ -1188,7 +1235,7 @@ function ShakeModal({ onClose, onFind, onCreate, hasTables }: { onClose: () => v
     const total = 14 + Math.floor(Math.random() * 6);
     const tick = () => {
       step++;
-      setIdx((i) => (i + 1 + Math.floor(Math.random() * (DISHES.length - 1))) % DISHES.length);
+      setIdx((i) => (i + 1 + Math.floor(Math.random() * (pool.length - 1))) % pool.length);
       if (step < total) setTimeout(tick, 50 + step * 12);
       else {
         setRolling(false);
@@ -1196,46 +1243,102 @@ function ShakeModal({ onClose, onFind, onCreate, hasTables }: { onClose: () => v
       }
     };
     tick();
-  }, [rolling]);
+  }, [rolling, pool.length]);
 
   useEffect(() => {
     roll();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const d = DISHES[idx];
+  const d = pool[idx];
+  const r = resolveRestaurant ? resolveRestaurant(d) : (d.restaurant || null);
+
   return (
     <ModalShell onClose={onClose} labelledBy="mn-shake-title">
-      <div className="p-6 pt-8 text-center">
+      <div className="p-6 pt-7 text-center">
         <div className={`mx-auto w-14 h-14 rounded-2xl bg-[#F5B82E] grid place-items-center shadow-lg shadow-[#F5B82E]/40 ${rolling ? 'mn-shake' : ''}`}>
           <Dices className="w-7 h-7 text-[#2B1D16]" />
         </div>
         <h2 id="mn-shake-title" className="mt-3 text-2xl font-bold text-[#2B1D16]">
           {rolling ? 'Đang lắc món…' : 'Hôm nay ăn món này nhé!'}
         </h2>
-        <div className={`mt-5 rounded-3xl overflow-hidden border border-[#F1E4D8] ${rolling ? '' : 'mn-pop'}`}>
+        <div className={`mt-5 rounded-3xl overflow-hidden border border-[#F1E4D8] bg-white text-left ${rolling ? '' : 'mn-pop'}`}>
           <div className="aspect-[4/3] overflow-hidden">
             <img src={d.image} alt={d.name} className={`w-full h-full object-cover transition ${rolling ? 'blur-[2px] scale-105' : ''}`} />
           </div>
-          <div className="p-4 text-left">
+          <div className="p-4">
             <span className="text-xs font-bold text-[#D9452B] uppercase tracking-wide">{CATEGORY_LABEL[d.category]}</span>
             <h3 className="font-sans text-xl font-bold text-[#2B1D16]">{d.name}</h3>
-            <p className="mt-1 text-sm text-[#7D6B62]">{d.shortDesc}</p>
+            <p className="mt-1 text-sm text-[#7D6B62] leading-relaxed">{d.shortDesc}</p>
+
+            {/* Thông tin Quán ăn phục vụ món đã lắc trúng */}
+            {r && !rolling && (
+              <div className="mt-3 pt-3 border-t border-[#F1E4D8] bg-[#FFF8F3] -mx-4 -mb-4 p-3.5 space-y-1.5 text-xs text-[#2B1D16]">
+                <div className="flex items-center justify-between gap-1.5">
+                  <span className="text-xs font-bold text-[#D9452B] flex items-center gap-1.5 truncate">
+                    <Store className="w-3.5 h-3.5 shrink-0 text-[#D9452B]" />
+                    <span className="truncate">{r.name}</span>
+                  </span>
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 shrink-0">
+                    Đã xác thực
+                  </span>
+                </div>
+                {r.ownerName && (
+                  <p className="text-stone-600">
+                    <span className="font-semibold text-stone-700">Chủ quán:</span> {r.ownerName}
+                  </p>
+                )}
+                <p className="text-stone-600 flex items-start gap-1">
+                  <MapPin className="w-3.5 h-3.5 text-[#D9452B] shrink-0 mt-0.5" />
+                  <span className="truncate">{r.address}</span>
+                </p>
+                <div className="flex items-center justify-between gap-2 pt-0.5 text-[11px] text-stone-600">
+                  {r.phone && (
+                    <span className="flex items-center gap-1 font-bold text-emerald-700">
+                      <Phone className="w-3 h-3 text-emerald-600" /> {r.phone}
+                    </span>
+                  )}
+                  {(r.openTime || r.closeTime) && (
+                    <span className="flex items-center gap-1 text-amber-700 font-medium">
+                      <Clock className="w-3 h-3" /> {r.openTime || '07:30'} – {r.closeTime || '22:00'}
+                    </span>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         </div>
+
         <div className="mt-5 grid grid-cols-2 gap-3">
-          <button onClick={roll} disabled={rolling} className="mn-press inline-flex items-center justify-center gap-2 rounded-full border-2 border-[#EADBD0] hover:border-[#F5B82E] font-bold py-3 disabled:opacity-60 transition-colors">
+          <button
+            onClick={roll}
+            disabled={rolling}
+            className="mn-press inline-flex items-center justify-center gap-2 rounded-full border-2 border-[#EADBD0] hover:border-[#F5B82E] font-bold py-3 disabled:opacity-60 transition-colors"
+          >
             <RotateCcw className={`w-4 h-4 ${rolling ? 'animate-spin' : ''}`} /> Lắc lại
           </button>
           <button
             disabled={rolling}
-            onClick={() => (hasTables(d.id) ? onFind(d.id) : onCreate(d.id))}
-            className="mn-press inline-flex items-center justify-center gap-2 rounded-full bg-[#D9452B] hover:bg-[#BF3A22] text-white font-bold py-3 disabled:opacity-60 transition-colors"
+            onClick={() => onCreate(d.id)}
+            className="mn-press inline-flex items-center justify-center gap-2 rounded-full bg-[#D9452B] hover:bg-[#BF3A22] text-white font-bold py-3 disabled:opacity-60 transition-colors shadow-lg shadow-[#D9452B]/30"
           >
-            {hasTables(d.id) ? 'Tìm bàn' : 'Mở bàn'} <ArrowRight className="w-4 h-4" />
+            Mở bàn <ArrowRight className="w-4 h-4" />
           </button>
         </div>
-        {rolls > 2 && !rolling && <p className="mt-3 text-xs text-[#A8968C]">Lắc {rolls} lần rồi đó, chốt món thôi! 😄</p>}
+
+        {hasTables(d.id) && !rolling && (
+          <div className="mt-2.5">
+            <button
+              type="button"
+              onClick={() => onFind(d.id)}
+              className="text-xs font-semibold text-[#0066CC] hover:underline"
+            >
+              Hoặc xem các bàn ăn đang mở cho món này →
+            </button>
+          </div>
+        )}
+
+        {rolls > 2 && !rolling && <p className="mt-2 text-xs text-[#A8968C]">Lắc {rolls} lần rồi đó, chốt món này luôn thôi! 😄</p>}
       </div>
     </ModalShell>
   );
@@ -1425,11 +1528,17 @@ function DishModal({
 function CreateTableModal({
   initialDish,
   nickname,
+  allDishes = DISHES,
+  restaurants = [],
+  resolveRestaurant,
   onClose,
   onSubmit,
 }: {
   initialDish: string;
   nickname: string;
+  allDishes?: Dish[];
+  restaurants?: any[];
+  resolveRestaurant?: (d: Dish) => DishRestaurant | null;
   onClose: () => void;
   onSubmit: (t: Omit<FoodTable, 'id' | 'joined' | 'mine'>) => void;
 }) {
@@ -1443,9 +1552,55 @@ function CreateTableModal({
     };
   }, []);
 
+  // Hàm tra cứu thông tin quán ăn phục vụ món
+  const getDishRes = useCallback(
+    (dishObj: Dish | undefined): DishRestaurant | null => {
+      if (!dishObj) return null;
+      if (resolveRestaurant) {
+        const r = resolveRestaurant(dishObj);
+        if (r) return r;
+      }
+      if (dishObj.restaurant) return dishObj.restaurant;
+      const rid = dishObj.restaurantId || SEED_DISH_RESTAURANT[dishObj.id];
+      if (rid) {
+        const found = restaurants.find((x) => x.id === rid);
+        if (found) {
+          return {
+            id: found.id,
+            name: found.name,
+            slug: found.slug,
+            address: found.address,
+            village: found.village,
+            phone: found.phone || found.owner?.phone,
+            openTime: found.openTime,
+            closeTime: found.closeTime,
+            coverImage: found.coverImage,
+            ownerName: found.owner?.name || found.ownerName || null,
+            isApproved: !!found.isApproved,
+          };
+        }
+        const def = DEFAULT_RESTAURANTS.find((x) => x.id === rid);
+        if (def) return def;
+      }
+      return null;
+    },
+    [resolveRestaurant, restaurants]
+  );
+
+  // Món ban đầu được chọn (từ Lắc món hoặc Thẻ món)
+  const initDishObj = useMemo(
+    () => (initialDish ? allDishes.find((d) => d.id === initialDish) || DISHES.find((d) => d.id === initialDish) : null),
+    [initialDish, allDishes]
+  );
+
+  const initRes = useMemo(() => (initDishObj ? getDishRes(initDishObj) : null), [initDishObj, getDishRes]);
+
+  const [selectedRestaurant, setSelectedRestaurant] = useState<DishRestaurant | null>(initRes);
   const [dishId, setDishId] = useState(initialDish);
-  const [restaurant, setRestaurant] = useState('');
-  const [address, setAddress] = useState('');
+  const [restaurant, setRestaurant] = useState(initRes?.name || '');
+  const [address, setAddress] = useState(initRes?.address || '');
+  const [showPickRestaurant, setShowPickRestaurant] = useState(!initRes);
+
   const [date, setDate] = useState(defaults.date);
   const [time, setTime] = useState(defaults.time);
   const [duration, setDuration] = useState(90);
@@ -1454,11 +1609,75 @@ function CreateTableModal({
   const [note, setNote] = useState('');
   const [error, setError] = useState<string | null>(null);
 
+  // Chỉ hiển thị các món ăn thuộc về quán ăn đã chọn (hoặc tất cả nếu chưa chọn quán)
+  const availableDishes = useMemo(() => {
+    if (!selectedRestaurant) return allDishes;
+    const list = allDishes.filter((d) => {
+      const r = getDishRes(d);
+      return r && (r.id === selectedRestaurant.id || r.name.toLowerCase() === selectedRestaurant.name.toLowerCase());
+    });
+    if (list.length === 0 && dishId) {
+      const cur = allDishes.find((d) => d.id === dishId) || DISHES.find((d) => d.id === dishId);
+      if (cur) return [cur];
+    }
+    return list.length > 0 ? list : allDishes;
+  }, [allDishes, selectedRestaurant, getDishRes, dishId]);
+
+  // Danh sách các quán ẩm thực tại Ea Súp để chọn
+  const approvedRestaurantsList = useMemo(() => {
+    const list: DishRestaurant[] = [];
+    const seen = new Set<string>();
+
+    for (const r of restaurants) {
+      if (r.id && !seen.has(r.id)) {
+        seen.add(r.id);
+        list.push({
+          id: r.id,
+          name: r.name,
+          slug: r.slug,
+          address: r.address,
+          village: r.village,
+          phone: r.phone || r.owner?.phone,
+          openTime: r.openTime,
+          closeTime: r.closeTime,
+          coverImage: r.coverImage,
+          ownerName: r.owner?.name || r.ownerName || null,
+          isApproved: !!r.isApproved,
+        });
+      }
+    }
+
+    for (const def of DEFAULT_RESTAURANTS) {
+      if (!seen.has(def.id)) {
+        seen.add(def.id);
+        list.push(def);
+      }
+    }
+    return list;
+  }, [restaurants]);
+
+  // Xử lý đổi quán: cập nhật thông tin quán và chuyển sang món của quán mới
+  const handleSelectRestaurant = (r: DishRestaurant) => {
+    setSelectedRestaurant(r);
+    setRestaurant(r.name);
+    setAddress(r.address);
+    setShowPickRestaurant(false);
+
+    const dishesOfRes = allDishes.filter((d) => {
+      const res = getDishRes(d);
+      return res && (res.id === r.id || res.name.toLowerCase() === r.name.toLowerCase());
+    });
+    if (dishesOfRes.length > 0) {
+      setDishId(dishesOfRes[0].id);
+    }
+    setError(null);
+  };
+
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!dishId) return setError('Hãy chọn món bạn muốn ăn.');
-    if (!restaurant.trim()) return setError('Hãy nhập tên quán.');
-    if (!host.trim()) return setError('Hãy nhập tên của bạn để mọi người biết chủ bàn.');
+    if (!restaurant.trim()) return setError('Hãy chọn quán ăn.');
+    if (!host.trim()) return setError('Hãy nhập họ tên của bạn để chủ bàn tiếp đón.');
     const start = new Date(`${date}T${time}`);
     if (isNaN(start.getTime())) return setError('Thời gian không hợp lệ.');
     if (start.getTime() < Date.now() - 5 * 60000) return setError('Thời gian hẹn phải ở tương lai.');
@@ -1480,29 +1699,66 @@ function CreateTableModal({
   return (
     <ModalShell onClose={onClose} labelledBy="mn-create-title" wide>
       <form onSubmit={submit} className="p-5 sm:p-7">
-        <span className="inline-flex items-center gap-1.5 rounded-full bg-[#FFF1C9] text-[#7A4B00] px-3 py-1 text-xs font-semibold">
-          <Users className="w-3.5 h-3.5" /> Rủ nhau đi ăn
-        </span>
+        <div className="flex items-center justify-between gap-2 flex-wrap">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-[#FFF1C9] text-[#7A4B00] px-3 py-1 text-xs font-semibold">
+            <Users className="w-3.5 h-3.5" /> Rủ nhau đi ăn
+          </span>
+          <span className="text-[11px] font-semibold text-[#7A4B00] bg-[#FFF1C9] px-2.5 py-0.5 rounded-full flex items-center gap-1">
+            <UtensilsCrossed className="w-3 h-3 text-[#D9452B]" /> Mở bàn tại 1 quán duy nhất
+          </span>
+        </div>
         <h2 id="mn-create-title" className="mt-2 text-2xl sm:text-3xl font-bold text-[#2B1D16]">Mở bàn mới</h2>
 
+        {/* 1. Chọn món (Chỉ hiển thị các món của quán đã lắc trúng / đã chọn) */}
         <fieldset className="mt-5">
-          <legend className="text-sm font-bold text-[#2B1D16] mb-2">1. Chọn món</legend>
-          <div className="grid grid-cols-4 gap-2">
-            {DISHES.map((d) => {
+          <div className="flex items-center justify-between gap-2 mb-2 flex-wrap">
+            <legend className="text-sm font-bold text-[#2B1D16] flex items-center gap-1.5">
+              <span>1. Chọn món</span>
+              {selectedRestaurant && (
+                <span className="text-xs font-bold text-[#D9452B] bg-[#FDEDE8] px-2.5 py-0.5 rounded-full truncate max-w-[260px] sm:max-w-none">
+                  Thực đơn: {selectedRestaurant.name}
+                </span>
+              )}
+            </legend>
+          </div>
+
+          {selectedRestaurant && (
+            <p className="text-xs text-[#7D6B62] mb-3">
+              Chỉ hiển thị các món do <strong>{selectedRestaurant.name}</strong> phục vụ. Bạn chỉ mở bàn tại quán này, không thể chọn món của quán khác trên cùng một bàn.
+            </p>
+          )}
+
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+            {availableDishes.map((d) => {
               const active = dishId === d.id;
               return (
                 <button
                   type="button"
                   key={d.id}
-                  onClick={() => setDishId(d.id)}
-                  className={`relative rounded-2xl overflow-hidden border-2 transition-all ${active ? 'border-[#D9452B] ring-4 ring-[#D9452B]/15' : 'border-transparent hover:border-[#EADBD0]'}`}
+                  onClick={() => {
+                    setDishId(d.id);
+                    if (!selectedRestaurant) {
+                      const r = getDishRes(d);
+                      if (r) {
+                        setSelectedRestaurant(r);
+                        setRestaurant(r.name);
+                        setAddress(r.address);
+                      }
+                    }
+                  }}
+                  className={`relative rounded-2xl overflow-hidden border-2 transition-all text-left bg-white shadow-xs ${
+                    active ? 'border-[#D9452B] ring-4 ring-[#D9452B]/15' : 'border-[#F1E4D8] hover:border-[#D9452B]/60'
+                  }`}
                 >
-                  <img src={d.image} alt="" className="w-full aspect-square object-cover" />
-                  <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 to-transparent text-white text-[10px] sm:text-xs font-semibold px-1.5 pb-1 pt-4 leading-tight text-left">
-                    {d.name}
-                  </span>
+                  <div className="aspect-[4/3] w-full overflow-hidden bg-stone-100">
+                    <img src={d.image} alt={d.name} className="w-full h-full object-cover" />
+                  </div>
+                  <div className="p-2">
+                    <p className="text-xs font-bold text-[#2B1D16] line-clamp-1">{d.name}</p>
+                    <p className="text-[10px] text-[#D9452B] font-semibold mt-0.5">{d.priceRange}</p>
+                  </div>
                   {active && (
-                    <span className="absolute top-1.5 right-1.5 w-5 h-5 rounded-full bg-[#D9452B] grid place-items-center">
+                    <span className="absolute top-1.5 right-1.5 w-5 h-5 rounded-full bg-[#D9452B] grid place-items-center shadow-sm">
                       <Check className="w-3 h-3 text-white" />
                     </span>
                   )}
@@ -1512,40 +1768,140 @@ function CreateTableModal({
           </div>
         </fieldset>
 
+        {/* 2. Quán & thời gian (Hiển thị đầy đủ thông tin quán ăn) */}
         <fieldset className="mt-5 grid sm:grid-cols-2 gap-3">
-          <legend className="text-sm font-bold text-[#2B1D16] mb-2">2. Quán & thời gian</legend>
-          
-          <div className="sm:col-span-2 bg-[#FFF8F3] border border-[#F1E4D8] rounded-2xl p-3">
-            <span className="block text-xs font-bold text-[#7D6B62] mb-2">Gợi ý quán đặc sản tại Ea Súp:</span>
-            <div className="flex flex-wrap gap-1.5">
-              {[
-                { name: 'Quán Gà Nướng Cơm Lam Bản Đôn Ea Súp', addr: 'Đường Hùng Vương, TT Ea Súp' },
-                { name: 'Nhà Hàng Lòng Hồ Ea Súp Thượng', addr: 'Bờ đập chính hồ Ea Súp Thượng' },
-                { name: 'Không Gian Ẩm Thực Buôn A2', addr: 'Buôn A2, xã Ea Súp' },
-                { name: 'Cà Phê Gió Hồ Ea Súp', addr: 'Tuyến đường ven hồ Ea Súp Thượng' },
-              ].map((r) => (
+          <legend className="text-sm font-bold text-[#2B1D16] mb-2 sm:col-span-2">2. Quán & thời gian</legend>
+
+          {/* Khối thông tin quán ăn đã chọn */}
+          {selectedRestaurant && !showPickRestaurant ? (
+            <div className="sm:col-span-2 rounded-2xl bg-gradient-to-br from-[#FFF8F3] to-[#FFF1E8] border-2 border-[#F1D5C4] p-3.5 sm:p-4 shadow-xs">
+              <div className="flex items-start justify-between gap-2">
+                <div className="flex items-start gap-3">
+                  <div className="w-11 h-11 rounded-2xl bg-[#D9452B] text-white flex items-center justify-center shrink-0 shadow-md shadow-[#D9452B]/20">
+                    <Store className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <h3 className="text-base font-bold text-[#2B1D16]">{selectedRestaurant.name}</h3>
+                      <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
+                        <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" /> Đã xác thực
+                      </span>
+                    </div>
+                    {selectedRestaurant.ownerName && (
+                      <p className="text-xs text-stone-600 mt-1">
+                        <span className="font-semibold text-stone-700">Chủ quán:</span> {selectedRestaurant.ownerName}
+                      </p>
+                    )}
+                    <p className="text-xs text-stone-600 mt-1 flex items-start gap-1">
+                      <MapPin className="w-3.5 h-3.5 text-[#D9452B] shrink-0 mt-0.5" />
+                      <span>{selectedRestaurant.address}</span>
+                    </p>
+                    <div className="mt-1.5 flex items-center gap-3.5 flex-wrap text-xs text-stone-600">
+                      {selectedRestaurant.phone && (
+                        <a
+                          href={`tel:${selectedRestaurant.phone}`}
+                          className="flex items-center gap-1 font-bold text-emerald-700 hover:underline"
+                        >
+                          <Phone className="w-3.5 h-3.5 text-emerald-600" />
+                          <span>Hotline: {selectedRestaurant.phone}</span>
+                        </a>
+                      )}
+                      {(selectedRestaurant.openTime || selectedRestaurant.closeTime) && (
+                        <span className="flex items-center gap-1 text-amber-700 font-medium">
+                          <Clock className="w-3.5 h-3.5" />
+                          <span>Mở cửa: {selectedRestaurant.openTime || '07:30'} – {selectedRestaurant.closeTime || '22:00'}</span>
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
                 <button
                   type="button"
-                  key={r.name}
-                  onClick={() => {
-                    setRestaurant(r.name);
-                    setAddress(r.addr);
-                  }}
-                  className="rounded-full bg-white border border-[#EADBD0] hover:border-[#D9452B] hover:bg-[#FDEDE8] text-[#2B1D16] text-xs font-semibold px-3 py-1 transition-colors flex items-center gap-1"
+                  onClick={() => setShowPickRestaurant(true)}
+                  className="text-xs font-semibold text-[#D9452B] hover:text-[#BF3A22] bg-white border border-[#EADBD0] hover:border-[#D9452B] px-3 py-1 rounded-full shrink-0 transition-colors shadow-xs"
                 >
-                  <MapPin className="w-3 h-3 text-[#D9452B]" />
-                  <span>{r.name}</span>
+                  Đổi quán khác
                 </button>
-              ))}
-            </div>
-          </div>
+              </div>
 
-          <input id="mn-in-restaurant" className={inputCls} placeholder="Tên quán *" value={restaurant} onChange={(e) => setRestaurant(e.target.value)} />
-          <input id="mn-in-address" className={inputCls} placeholder="Địa chỉ (tùy chọn)" value={address} onChange={(e) => setAddress(e.target.value)} />
-          <input id="mn-in-date" type="date" className={inputCls} value={date} onChange={(e) => setDate(e.target.value)} aria-label="Ngày hẹn" />
+              <div className="mt-3 pt-2.5 border-t border-[#F1E4D8] text-[11px] text-[#7D6B62] flex items-center gap-1.5">
+                <UtensilsCrossed className="w-3.5 h-3.5 text-[#D9452B] shrink-0" />
+                <span>Bàn ăn này được đặt độc quyền tại <strong>{selectedRestaurant.name}</strong>. Chỉ mở bàn tại 1 địa điểm duy nhất.</span>
+              </div>
+            </div>
+          ) : (
+            /* Danh sách chọn quán nếu muốn đổi hoặc chưa chọn */
+            <div className="sm:col-span-2 bg-[#FFF8F3] border border-[#F1E4D8] rounded-2xl p-3.5">
+              <div className="flex items-center justify-between mb-2">
+                <span className="block text-xs font-bold text-[#7D6B62] uppercase tracking-wide">
+                  Chọn quán ẩm thực đặc sản tại Ea Súp:
+                </span>
+                {selectedRestaurant && (
+                  <button
+                    type="button"
+                    onClick={() => setShowPickRestaurant(false)}
+                    className="text-xs text-stone-500 hover:underline"
+                  >
+                    Đóng
+                  </button>
+                )}
+              </div>
+              <div className="grid sm:grid-cols-2 gap-2">
+                {approvedRestaurantsList.map((r) => {
+                  const isSel = selectedRestaurant?.id === r.id;
+                  return (
+                    <button
+                      type="button"
+                      key={r.id}
+                      onClick={() => handleSelectRestaurant(r)}
+                      className={`text-left rounded-xl p-2.5 border transition-all ${
+                        isSel
+                          ? 'bg-[#FDEDE8] border-[#D9452B] ring-2 ring-[#D9452B]/20'
+                          : 'bg-white border-[#EADBD0] hover:border-[#D9452B] hover:bg-[#FFFDFB]'
+                      }`}
+                    >
+                      <p className="text-xs font-bold text-[#2B1D16] flex items-center gap-1">
+                        <Store className="w-3.5 h-3.5 text-[#D9452B] shrink-0" />
+                        <span className="truncate">{r.name}</span>
+                      </p>
+                      <p className="text-[11px] text-stone-500 truncate mt-0.5">{r.address}</p>
+                      <div className="flex items-center gap-2 mt-1 text-[10px] text-stone-600">
+                        {r.phone && <span>SĐT: {r.phone}</span>}
+                        {r.openTime && <span>· {r.openTime}–{r.closeTime}</span>}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* Ngày hẹn và giờ hẹn */}
+          <input
+            id="mn-in-date"
+            type="date"
+            className={inputCls}
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+            aria-label="Ngày hẹn"
+          />
           <div className="grid grid-cols-2 gap-3">
-            <input id="mn-in-time" type="time" className={inputCls} value={time} onChange={(e) => setTime(e.target.value)} aria-label="Giờ hẹn" />
-            <select id="mn-in-duration" className={inputCls} value={duration} onChange={(e) => setDuration(Number(e.target.value))} aria-label="Thời lượng">
+            <input
+              id="mn-in-time"
+              type="time"
+              className={inputCls}
+              value={time}
+              onChange={(e) => setTime(e.target.value)}
+              aria-label="Giờ hẹn"
+            />
+            <select
+              id="mn-in-duration"
+              className={inputCls}
+              value={duration}
+              onChange={(e) => setDuration(Number(e.target.value))}
+              aria-label="Thời lượng"
+            >
               <option value={30}>30 phút</option>
               <option value={60}>1 giờ</option>
               <option value={90}>1,5 giờ</option>
@@ -1555,22 +1911,46 @@ function CreateTableModal({
           </div>
         </fieldset>
 
+        {/* 3. Thông tin bàn */}
         <fieldset className="mt-5 grid sm:grid-cols-2 gap-3">
-          <legend className="text-sm font-bold text-[#2B1D16] mb-2">3. Thông tin bàn</legend>
+          <legend className="text-sm font-bold text-[#2B1D16] mb-2 sm:col-span-2">3. Thông tin bàn</legend>
           <div className="flex items-center justify-between rounded-2xl bg-[#FFFBF8] border border-[#EADBD0] px-4 py-2">
             <span className="text-[15px] text-[#5A4A42]">Số chỗ</span>
             <div className="flex items-center gap-3">
-              <button type="button" aria-label="Giảm" onClick={() => setCapacity((c) => Math.max(2, c - 1))} className="w-8 h-8 rounded-full bg-white border border-[#EADBD0] grid place-items-center hover:border-[#D9452B]">
+              <button
+                type="button"
+                aria-label="Giảm"
+                onClick={() => setCapacity((c) => Math.max(2, c - 1))}
+                className="w-8 h-8 rounded-full bg-white border border-[#EADBD0] grid place-items-center hover:border-[#D9452B]"
+              >
                 <Minus className="w-4 h-4" />
               </button>
               <span className="w-6 text-center font-bold text-lg">{capacity}</span>
-              <button type="button" aria-label="Tăng" onClick={() => setCapacity((c) => Math.min(12, c + 1))} className="w-8 h-8 rounded-full bg-white border border-[#EADBD0] grid place-items-center hover:border-[#D9452B]">
+              <button
+                type="button"
+                aria-label="Tăng"
+                onClick={() => setCapacity((c) => Math.min(12, c + 1))}
+                className="w-8 h-8 rounded-full bg-white border border-[#EADBD0] grid place-items-center hover:border-[#D9452B]"
+              >
                 <Plus className="w-4 h-4" />
               </button>
             </div>
           </div>
-          <input id="mn-in-host" className={inputCls} placeholder="Tên của bạn *" value={host} onChange={(e) => setHost(e.target.value)} />
-          <textarea id="mn-in-note" className={`${inputCls} sm:col-span-2 resize-none`} rows={2} placeholder="Lời nhắn (vd: chia tiền đều, có chỗ đậu xe…)" value={note} onChange={(e) => setNote(e.target.value)} />
+          <input
+            id="mn-in-host"
+            className={inputCls}
+            placeholder="Họ tên của bạn *"
+            value={host}
+            onChange={(e) => setHost(e.target.value)}
+          />
+          <textarea
+            id="mn-in-note"
+            className={`${inputCls} sm:col-span-2 resize-none`}
+            rows={2}
+            placeholder="Lời nhắn (vd: chia tiền đều, có chỗ đậu xe, chọn vị trí ngồi gần cửa sổ…)"
+            value={note}
+            onChange={(e) => setNote(e.target.value)}
+          />
         </fieldset>
 
         {error && (
@@ -1580,10 +1960,18 @@ function CreateTableModal({
         )}
 
         <div className="mt-6 grid grid-cols-[auto_1fr] gap-3">
-          <button type="button" onClick={onClose} className="mn-press rounded-full border-2 border-[#EADBD0] hover:border-[#2B1D16] font-bold px-6 py-3.5 transition-colors">
+          <button
+            type="button"
+            onClick={onClose}
+            className="mn-press rounded-full border-2 border-[#EADBD0] hover:border-[#2B1D16] font-bold px-6 py-3.5 transition-colors"
+          >
             Hủy
           </button>
-          <button id="mn-submit-create" type="submit" className="mn-press rounded-full bg-[#D9452B] hover:bg-[#BF3A22] text-white font-bold py-3.5 shadow-lg shadow-[#D9452B]/30 transition-colors inline-flex items-center justify-center gap-2">
+          <button
+            id="mn-submit-create"
+            type="submit"
+            className="mn-press rounded-full bg-[#D9452B] hover:bg-[#BF3A22] text-white font-bold py-3.5 shadow-lg shadow-[#D9452B]/30 transition-colors inline-flex items-center justify-center gap-2"
+          >
             <Check className="w-5 h-5" /> Tạo bàn
           </button>
         </div>

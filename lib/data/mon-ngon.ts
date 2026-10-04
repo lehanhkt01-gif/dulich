@@ -20,6 +20,7 @@ export interface DishRestaurant {
   closeTime?: string | null;
   coverImage?: string | null;
   ownerName?: string | null;
+  isApproved?: boolean;
 }
 
 export interface Dish {
@@ -288,3 +289,55 @@ export function relativeDayLabel(iso: string, now: Date = new Date()): string {
   if (diff > 1) return `${diff} ngày nữa`;
   return `${-diff} ngày trước`;
 }
+
+export const DEFAULT_RESTAURANTS: DishRestaurant[] = [
+  {
+    id: 'res-ga-nuong',
+    name: 'Gà Nướng Cơm Lam Bản Đôn Ea Súp',
+    slug: 'ga-nuong-ban-don-ea-sup',
+    address: 'Buôn A2, Xã Ea Súp, Huyện Ea Súp, Tỉnh Đắk Lắk',
+    village: 'Buôn A2',
+    phone: '0987 654 321',
+    openTime: '08:00',
+    closeTime: '21:30',
+    ownerName: 'A Siu',
+    isApproved: true,
+  },
+  {
+    id: 'res-ho-ea-sup',
+    name: 'Ẩm Thực Sinh Thái Lòng Hồ Ea Súp Thượng',
+    slug: 'am-thuc-ho-ea-sup-thuong',
+    address: 'Khu du lịch sinh thái Hồ Ea Súp Thượng, Xã Ea Súp',
+    village: 'Hồ Ea Súp',
+    phone: '0912 345 678',
+    openTime: '07:30',
+    closeTime: '22:00',
+    ownerName: 'Trần Văn Bình',
+    isApproved: true,
+  },
+  {
+    id: 'res-bo-mot-nang',
+    name: 'Bò Một Nắng & Ẩm Thực Tây Nguyên Thôn 1',
+    slug: 'bo-mot-nang-thon-1-ea-sup',
+    address: 'Thôn 1, Xã Ea Súp, Huyện Ea Súp, Tỉnh Đắk Lắk',
+    village: 'Thôn 1',
+    phone: '0934 567 890',
+    openTime: '09:00',
+    closeTime: '22:00',
+    ownerName: 'Lê Thị Hoa',
+    isApproved: true,
+  },
+  {
+    id: 'res-ca-phe-gio-ho',
+    name: 'Cà Phê Gió Hồ & Điểm Hẹn Đại Ngàn',
+    slug: 'ca-phe-gio-ho-ea-sup',
+    address: 'Đường ven hồ sinh thái, Xã Ea Súp, Huyện Ea Súp',
+    village: 'Thôn 2',
+    phone: '0945 678 123',
+    openTime: '06:30',
+    closeTime: '22:30',
+    ownerName: 'Nguyễn Văn Nam',
+    isApproved: true,
+  },
+];
+
