@@ -10,6 +10,21 @@
 > **Lưu ý / việc còn dở:** …
 > ```
 
+## [2026-10-04] Tối Ưu Mở Bàn Mới (Quán Dạng List, Ô Số Điện Thoại) & Ẩn Banner Chủ Quán Cho Khách
+
+**Yêu cầu:** 
+1. Ảnh 1: Các ô quán ăn chỉ ghi rút gọn tên quán và địa chỉ chữ nhỏ (thiết kế theo dạng list), chỉ khi nào có khách chọn món ăn thì mới xuất hiện tên quán ăn, nếu quán nào không được chọn món ăn thì không hiện. Bỏ chữ "(Tên quán nằm phía trên)". Sửa chữ "Phía dưới là các món ăn" thành "Chọn món ăn".
+2. Ảnh 3: Bổ sung thêm "Số điện thoại" trong phần "Thông tin người đặt chỗ".
+3. Ảnh 2: Bỏ phần "Dành Cho Chủ Quán Ăn Ea Súp" tại giao diện khách hàng đăng nhập.
+
+**Đã làm:**
+- **Modal Mở bàn mới ([`components/mon-ngon/MonNgonClient.tsx`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/components/mon-ngon/MonNgonClient.tsx)):**
+  - **Quán ăn dạng List thanh mảnh:** Bỏ chữ `(Tên quán nằm phía trên)`. Chỉ hiển thị danh sách quán ăn khi có món được chọn (`activeRestaurants`), quán nào không được chọn món thì không hiện. Thiết kế dạng List nằm ngang gọn gàng, nền đỏ `#D9452B`, chữ trắng, icon Store, tên quán rút gọn đậm, địa chỉ chữ nhỏ thanh lịch kèm số lượng món đã chọn.
+  - **Đổi nhãn món ăn:** Đổi tiêu đề `Phía dưới là các món ăn` thành `Chọn món ăn`.
+  - **Bổ sung Số điện thoại người đặt:** Thêm trường input `Số điện thoại liên hệ *` (hỗ trợ tự động điền từ profile người dùng), đính kèm số điện thoại vào thông tin chủ bàn và ghi chú đơn đặt.
+- **Ẩn banner Chủ quán khi Khách đăng nhập ([`components/mon-ngon/MonNgonClient.tsx`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/components/mon-ngon/MonNgonClient.tsx)):**
+  - Kiểm tra vai trò tài khoản đăng nhập: Chỉ hiển thị banner *"Dành Cho Chủ Quán Ăn Ea Súp"* khi tài khoản là `OWNER` hoặc `ADMIN`. Với tài khoản du khách (`TRAVELER`), banner này được ẩn hoàn toàn để giao diện tinh gọn, tập trung vào lịch sử đặt món của khách.
+
 ## [2026-10-04] Tối Ưu Modal Đăng Nhập: Đưa Nút Google (Gmail) Lên Đầu & Bỏ Form Nhập Thủ Công Của Khách
 
 **Yêu cầu:** 

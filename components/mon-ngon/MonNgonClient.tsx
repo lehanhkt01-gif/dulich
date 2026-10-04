@@ -487,65 +487,72 @@ export default function MonNgonClient() {
 
         {/* ================= NỘI DUNG ================= */}
         <div className="mt-5 md:mt-6">
-          {/* Banner tiện ích kép: Khách đặt món & Chủ quán (Chỉ hiện khi đã đăng nhập) */}
-          {isLoggedIn && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
-              {/* Banner Khách */}
-              <div className="p-3.5 sm:p-4 rounded-2xl bg-gradient-to-r from-[#EFF6FF] to-[#DBEAFE] border border-blue-200 flex items-center justify-between gap-3 shadow-xs">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center shrink-0 shadow-xs">
-                    <ShoppingBag className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <p className="text-xs sm:text-sm font-bold text-stone-900">
-                      Lịch Sử Đặt Món & Đặt Bàn Của Bạn
-                    </p>
-                    <p className="text-[11px] sm:text-xs text-stone-600">
-                      Theo dõi tiến độ đơn hàng và thông báo xác nhận từ quán.
-                    </p>
-                  </div>
-                </div>
-                <Link
-                  href="/mon-ngon/lich-su-dat"
-                  className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition-all shadow-xs shrink-0"
-                >
-                  <span>Xem đơn</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </Link>
-              </div>
+          {/* Banner tiện ích: Khách đặt món & Chủ quán (Chỉ hiện khi đã đăng nhập) */}
+          {isLoggedIn && (() => {
+            const userRole = customUser?.role || (session?.user as any)?.role || 'TRAVELER';
+            const isOwnerOrAdmin = userRole === 'OWNER' || userRole === 'ADMIN';
 
-              {/* Banner Chủ quán */}
-              <div className="p-3.5 sm:p-4 rounded-2xl bg-gradient-to-r from-[#FDEDE8] to-[#FFF6ED] border border-[#EADBD0] flex items-center justify-between gap-3 shadow-xs">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-[#D9452B] text-white flex items-center justify-center shrink-0 shadow-xs">
-                    <Store className="w-5 h-5" />
+            return (
+              <div className={`gap-3 mb-6 ${isOwnerOrAdmin ? 'grid grid-cols-1 sm:grid-cols-2' : 'flex flex-col'}`}>
+                {/* Banner Khách */}
+                <div className="p-3.5 sm:p-4 rounded-2xl bg-gradient-to-r from-[#EFF6FF] to-[#DBEAFE] border border-blue-200 flex items-center justify-between gap-3 shadow-xs">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+                      <ShoppingBag className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <p className="text-xs sm:text-sm font-bold text-stone-900">
+                        Lịch Sử Đặt Món & Đặt Bàn Của Bạn
+                      </p>
+                      <p className="text-[11px] sm:text-xs text-stone-600">
+                        Theo dõi tiến độ đơn hàng và thông báo xác nhận từ quán.
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-xs sm:text-sm font-bold text-[#2B1D16]">
-                      Dành Cho Chủ Quán Ăn Ea Súp
-                    </p>
-                    <p className="text-[11px] sm:text-xs text-[#7D6B62]">
-                      Đăng ký mở quán, quản lý món ăn và tiếp nhận đơn đặt.
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-1.5 shrink-0">
                   <Link
-                    href="/mon-ngon/dang-ky-chu-quan"
-                    className="inline-flex items-center justify-center px-3 py-2 rounded-xl bg-[#D9452B] hover:bg-[#BF3A22] text-white text-xs font-bold transition-all shadow-xs"
+                    href="/mon-ngon/lich-su-dat"
+                    className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition-all shadow-xs shrink-0"
                   >
-                    <span>Mở Quán</span>
-                  </Link>
-                  <Link
-                    href="/chu-quan/dashboard"
-                    className="inline-flex items-center justify-center px-3 py-2 rounded-xl bg-white border border-[#EADBD0] hover:border-[#D9452B] text-[#2B1D16] text-xs font-bold transition-all shadow-xs"
-                  >
-                    <span>Quản lý</span>
+                    <span>Xem đơn</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
                   </Link>
                 </div>
+
+                {/* Banner Chủ quán (Chỉ hiển thị cho Chủ Quán / Ban Quản Trị, ẩn hoàn toàn với Khách hàng) */}
+                {isOwnerOrAdmin && (
+                  <div className="p-3.5 sm:p-4 rounded-2xl bg-gradient-to-r from-[#FDEDE8] to-[#FFF6ED] border border-[#EADBD0] flex items-center justify-between gap-3 shadow-xs">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-[#D9452B] text-white flex items-center justify-center shrink-0 shadow-xs">
+                        <Store className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <p className="text-xs sm:text-sm font-bold text-[#2B1D16]">
+                          Dành Cho Chủ Quán Ăn Ea Súp
+                        </p>
+                        <p className="text-[11px] sm:text-xs text-[#7D6B62]">
+                          Đăng ký mở quán, quản lý món ăn và tiếp nhận đơn đặt.
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      <Link
+                        href="/mon-ngon/dang-ky-chu-quan"
+                        className="inline-flex items-center justify-center px-3 py-2 rounded-xl bg-[#D9452B] hover:bg-[#BF3A22] text-white text-xs font-bold transition-all shadow-xs"
+                      >
+                        <span>Mở Quán</span>
+                      </Link>
+                      <Link
+                        href="/chu-quan/dashboard"
+                        className="inline-flex items-center justify-center px-3 py-2 rounded-xl bg-white border border-[#EADBD0] hover:border-[#D9452B] text-[#2B1D16] text-xs font-bold transition-all shadow-xs"
+                      >
+                        <span>Quản lý</span>
+                      </Link>
+                    </div>
+                  </div>
+                )}
               </div>
-            </div>
-          )}
+            );
+          })()}
 
           {tab === 'kham-pha' && (
             <section key="kp" className="mn-fade-up" aria-labelledby="mn-h-kham-pha">
@@ -971,6 +978,7 @@ export default function MonNgonClient() {
         <CreateTableModal
           initialDish={createFor}
           nickname={session?.user?.name || customUser?.name || nickname}
+          defaultPhone={(session?.user as any)?.phone || customUser?.phone || ''}
           allDishes={allDishes}
           restaurants={restaurants}
           resolveRestaurant={resolveRestaurant}
@@ -1529,6 +1537,7 @@ function DishModal({
 function CreateTableModal({
   initialDish,
   nickname,
+  defaultPhone = '',
   allDishes = DISHES,
   restaurants = [],
   resolveRestaurant,
@@ -1537,6 +1546,7 @@ function CreateTableModal({
 }: {
   initialDish: string;
   nickname: string;
+  defaultPhone?: string;
   allDishes?: Dish[];
   restaurants?: any[];
   resolveRestaurant?: (d: Dish) => DishRestaurant | null;
@@ -1631,6 +1641,7 @@ function CreateTableModal({
   const [duration, setDuration] = useState(90);
   const [capacity, setCapacity] = useState(4);
   const [host, setHost] = useState(nickname);
+  const [phone, setPhone] = useState(defaultPhone);
   const [note, setNote] = useState('');
   const [error, setError] = useState<string | null>(null);
 
@@ -1720,6 +1731,19 @@ function CreateTableModal({
     const targetRes = primaryRestaurant || approvedRestaurantsList[0];
     const targetDishId = selectedDishIds[0];
 
+    let fullNote = note.trim();
+    if (phone.trim()) {
+      fullNote = `SĐT liên hệ: ${phone.trim()}${fullNote ? ` | ${fullNote}` : ''}`;
+    }
+    const dishesNote = selectedDishIds.length > 0
+      ? `Món đã chọn: ${selectedDishIds.map((id) => allDishes.find((d) => d.id === id)?.name || id).join(', ')}`
+      : '';
+    if (dishesNote) {
+      fullNote = fullNote ? `${fullNote} (${dishesNote})` : dishesNote;
+    }
+
+    const hostDisplay = phone.trim() ? `${host.trim()} (${phone.trim()})` : host.trim();
+
     onSubmit({
       dishId: targetDishId,
       restaurant: targetRes?.name || 'Quán ăn Ea Súp',
@@ -1727,12 +1751,8 @@ function CreateTableModal({
       startAt: start.toISOString(),
       durationMin: duration,
       capacity,
-      host: host.trim(),
-      note: note.trim()
-        ? `${note.trim()} (Món đã chọn: ${selectedDishIds.map((id) => allDishes.find((d) => d.id === id)?.name || id).join(', ')})`
-        : selectedDishIds.length > 1
-        ? `Món đã chọn: ${selectedDishIds.map((id) => allDishes.find((d) => d.id === id)?.name || id).join(', ')}`
-        : undefined,
+      host: hostDisplay,
+      note: fullNote || undefined,
     });
   };
 
@@ -1752,62 +1772,52 @@ function CreateTableModal({
         </div>
         <h2 id="mn-create-title" className="mt-2 text-2xl sm:text-3xl font-bold text-[#2B1D16]">Mở bàn mới</h2>
 
-        {/* ================= 1. TÊN QUÁN ĂN NẰM PHÍA TRÊN ================= */}
-        <fieldset className="mt-5">
-          <div className="flex items-center justify-between gap-2 mb-2 flex-wrap">
-            <legend className="text-sm font-bold text-[#2B1D16] flex items-center gap-1.5">
-              <Store className="w-4 h-4 text-[#D9452B]" />
-              <span>Quán ăn tại Ea Súp (Tên quán nằm phía trên)</span>
-            </legend>
-            <span className="text-xs text-[#7D6B62]">
-              Quán có món chọn được <strong>đánh dấu nền màu đỏ</strong>
-            </span>
-          </div>
+        {/* ================= 1. QUÁN ĂN PHỤC VỤ (DẠNG LIST, CHỈ HIỆN KHI CÓ KHÁCH CHỌN MÓN) ================= */}
+        {activeRestaurants.length > 0 && (
+          <fieldset className="mt-5">
+            <div className="flex items-center justify-between gap-2 mb-2 flex-wrap">
+              <legend className="text-sm font-bold text-[#2B1D16] flex items-center gap-1.5">
+                <Store className="w-4 h-4 text-[#D9452B]" />
+                <span>Quán ăn tại Ea Súp</span>
+              </legend>
+              <span className="text-xs text-[#7D6B62]">
+                Quán phục vụ món bạn đã chọn
+              </span>
+            </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
-            {approvedRestaurantsList.map((r) => {
-              const count = getSelectedCountForRestaurant(r.id, r.name);
-              const isSelected = count > 0;
-              return (
-                <div
-                  key={r.id}
-                  onClick={() => selectAllDishesOfRestaurant(r.id, r.name)}
-                  className={`rounded-2xl p-3 border-2 transition-all text-left relative cursor-pointer ${
-                    isSelected
-                      ? 'bg-[#D9452B] text-white border-[#BF3A22] shadow-md shadow-[#D9452B]/25 ring-2 ring-[#D9452B]/20'
-                      : 'bg-[#FFF8F3] text-[#2B1D16] border-[#F1E4D8] hover:border-[#D9452B]/40 hover:bg-[#FFFDFB]'
-                  }`}
-                >
-                  <div className="flex items-start justify-between gap-1.5">
-                    <p className="text-xs font-bold flex items-center gap-1.5 truncate">
-                      <Store className={`w-3.5 h-3.5 shrink-0 ${isSelected ? 'text-white' : 'text-[#D9452B]'}`} />
-                      <span className="truncate">{r.name}</span>
-                    </p>
-                    {isSelected ? (
-                      <span className="shrink-0 text-[10px] font-black px-2 py-0.5 rounded-full bg-white text-[#D9452B] shadow-xs animate-in zoom-in-50">
+            <div className="space-y-2">
+              {activeRestaurants.map((r) => {
+                const count = getSelectedCountForRestaurant(r.id, r.name);
+                return (
+                  <div
+                    key={r.id}
+                    className="flex items-center justify-between gap-3 px-3.5 py-2.5 rounded-xl bg-[#D9452B] text-white border border-[#BF3A22] shadow-xs transition-all"
+                  >
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <div className="w-7 h-7 rounded-lg bg-white/20 flex items-center justify-center shrink-0">
+                        <Store className="w-4 h-4 text-white" />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-xs sm:text-sm font-bold text-white truncate leading-tight">
+                          {r.name}
+                        </p>
+                        <p className="text-[11px] text-white/80 truncate flex items-center gap-1 mt-0.5">
+                          <MapPin className="w-3 h-3 shrink-0 text-white/70" />
+                          <span className="truncate">{r.address}</span>
+                        </p>
+                      </div>
+                    </div>
+                    <div className="shrink-0 flex items-center gap-2">
+                      <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-white text-[#D9452B] shadow-2xs">
                         {count} món
                       </span>
-                    ) : (
-                      <span className="shrink-0 text-[10px] font-medium text-stone-400">
-                        0 món
-                      </span>
-                    )}
+                    </div>
                   </div>
-
-                  <p className={`text-[11px] truncate mt-1 ${isSelected ? 'text-white/90' : 'text-stone-500'}`}>
-                    <MapPin className={`w-3 h-3 inline mr-1 ${isSelected ? 'text-white/80' : 'text-stone-400'}`} />
-                    {r.address}
-                  </p>
-
-                  <div className={`mt-1.5 pt-1.5 border-t flex items-center justify-between text-[10px] ${isSelected ? 'border-white/20 text-white/90' : 'border-[#F1E4D8] text-stone-500'}`}>
-                    <span>{r.ownerName ? `Chủ: ${r.ownerName}` : 'Quán Ea Súp'}</span>
-                    {r.phone && <span>{r.phone}</span>}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </fieldset>
+                );
+              })}
+            </div>
+          </fieldset>
+        )}
 
         {/* ================= NHẮC NHỞ KHI CHỌN MÓN Ở 2 QUÁN ĂN TRỞ LÊN ================= */}
         {isMultiRestaurantWarning && (
@@ -1846,12 +1856,12 @@ function CreateTableModal({
           </div>
         )}
 
-        {/* ================= 2. PHÍA DƯỚI LÀ CÁC MÓN ĂN (CHỌN NHIỀU MÓN) ================= */}
+        {/* ================= 2. CHỌN MÓN ĂN (CHỌN NHIỀU MÓN) ================= */}
         <fieldset className="mt-5">
           <div className="flex items-center justify-between gap-2 mb-2 flex-wrap">
             <legend className="text-sm font-bold text-[#2B1D16] flex items-center gap-2">
               <Utensils className="w-4 h-4 text-[#D9452B]" />
-              <span>Phía dưới là các món ăn</span>
+              <span>Chọn món ăn</span>
               {selectedDishIds.length > 0 && (
                 <span className="text-xs font-bold text-[#D9452B] bg-[#FDEDE8] px-2.5 py-0.5 rounded-full">
                   Đã chọn {selectedDishIds.length} món
@@ -2035,6 +2045,15 @@ function CreateTableModal({
             placeholder="Họ tên của bạn *"
             value={host}
             onChange={(e) => setHost(e.target.value)}
+            required
+          />
+          <input
+            id="mn-in-phone"
+            type="tel"
+            className={`${inputCls} sm:col-span-2`}
+            placeholder="Số điện thoại liên hệ *"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
           />
           <textarea
             id="mn-in-note"

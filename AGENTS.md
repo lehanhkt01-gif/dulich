@@ -95,6 +95,7 @@ docker compose up -d --build   # trên VPS
 - [x] Tối ưu tính năng Lắc Món: hiển thị đầy đủ thông tin quán ăn; nút "Mở bàn" khóa cố định quán đã lắc trúng, chỉ hiển thị thực đơn món của quán đó (độc quyền 1 quán duy nhất).
 - [x] Nâng cấp giao diện "Mở bàn mới": Tên quán ăn nằm phía trên (đánh dấu nền đỏ + số lượng món khi được chọn), phía dưới là các món ăn (chọn được nhiều món), cảnh báo nhắc nhở khi chọn món ở 2 quán ăn trở lên kèm nút xử lý nhanh.
 - [x] Tối ưu Modal Đăng Nhập: Đưa nút "Đăng Nhập Bằng Google (Gmail)" lên trên cùng tab Khách, loại bỏ hoàn toàn form nhập thủ công (Gmail & Họ tên) để thao tác nhanh 1 chạm.
+- [x] Tối ưu Form Mở Bàn Mới (Quán ăn dạng List thanh mảnh chỉ hiện khi có món chọn, đổi nhãn "Chọn món ăn", bổ sung ô "Số điện thoại liên hệ") & Ẩn hoàn toàn banner Chủ quán trên giao diện Khách hàng.
 - [ ] Mở rộng tính năng bình luận và đánh giá món ăn/quán ăn cho du khách.
 
 ## 8. Lưu ý quan trọng
