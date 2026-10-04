@@ -10,6 +10,27 @@
 > **Lưu ý / việc còn dở:** …
 > ```
 
+## [2026-10-04] Cho Phép Chủ Quán Đổi Ảnh Bìa & Chuẩn Hoá Toàn Bộ Từ "Ăn" Thành "Ăn/Uống"
+
+**Yêu cầu:** 
+1. Tại giao diện chủ quán, cho phép chủ quán được thay đổi ảnh bìa.
+2. Sửa toàn bộ các từ "ăn" thành "ăn/uống" để phù hợp với những món ăn và món giải khát.
+
+**Đã làm:**
+- **Tính năng thay đổi ảnh bìa quán ([`app/chu-quan/dashboard/page.tsx`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/app/chu-quan/dashboard/page.tsx), [`actions/owner-actions.ts`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/actions/owner-actions.ts), [`app/mon-ngon/[slug]/page.tsx`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/app/mon-ngon/[slug]/page.tsx)):**
+  - Trong Tab "Thông Tin Quán Ăn/Uống", bổ sung khối **Ảnh Bìa Quán Ăn/Uống** chuyên nghiệp:
+    + Hiển thị trực tiếp khung xem trước ảnh bìa tỷ lệ chuẩn banner kèm tên quán, thôn/buôn và giờ phục vụ.
+    + Nút **📷 Tải ảnh bìa mới (< 3MB)**: Tải ảnh trực tiếp từ máy tính hoặc điện thoại lên hệ thống (lưu qua `/api/upload` và tự động cập nhật ngay vào cơ sở dữ liệu).
+    + Nút **✨ Kho ảnh bìa đẹp Ea Súp**: Sổ ra kho ảnh bìa đặc sản & phong cảnh Ea Súp được tuyển chọn sẵn (Gà nướng, Cá lòng hồ, Cơm lam, Lẩu cá, Cà phê, Bò một nắng, Rượu cần...) để chủ quán chọn nhanh 1 chạm.
+    + Cập nhật `updateRestaurantInfoAction` lưu trường `coverImage` vào Prisma và dữ liệu lưu trữ.
+    + Tại trang chi tiết quán (`/mon-ngon/[slug]`), bổ sung nút nhanh **📷 Đổi ảnh bìa quán** ở góc trên bên phải banner.
+- **Chuẩn hoá toàn bộ các từ "ăn" thành "ăn/uống" ([`app/chu-quan/dashboard/page.tsx`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/app/chu-quan/dashboard/page.tsx), [`app/mon-ngon/[slug]/page.tsx`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/app/mon-ngon/[slug]/page.tsx), [`components/mon-ngon/MonNgonClient.tsx`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/components/mon-ngon/MonNgonClient.tsx), [`components/AuthModal.tsx`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/components/AuthModal.tsx)):**
+  - "Quán Ăn" -> "Quán Ăn/Uống" (Quán Ăn/Uống & Nhà Hàng Ea Súp, Thông Tin Quán Ăn/Uống, Hồ Sơ Quán Ăn/Uống, Chủ Quán Ăn/Uống).
+  - "Món ăn" -> "Món ăn/uống" (Thực Đơn Món Ăn/Uống & Giải Khát, Thêm Món Ăn/Uống Mới, Chỉnh Sửa Món Ăn/Uống, Xóa món ăn/uống, Đơn Đặt Món Ăn/Uống).
+  - "Bàn ăn" -> "Bàn ăn/uống" (Quản Lý Bàn Ăn/Uống, Danh Sách Bàn Ăn/Uống Tại Quán, Thêm Bàn Ăn/Uống Mới, Xóa bàn ăn/uống, Bàn ăn/uống đang mở).
+  - "Ăn vặt" -> "Ăn vặt / Giải khát", "Đồ uống" -> "Đồ uống & Trà cà phê".
+  - Giữ vững tính tương thích của logic hệ thống, URL route và cơ sở dữ liệu.
+
 ## [2026-10-04] Sửa Triệt Để Lỗi Google OAuth (Missing client_id), Tối Ưu Nút Mobile, Ẩn Đăng Ký Quán Cho Khách & Đổi Màu Tab Khám Phá Món
 
 **Yêu cầu:** 

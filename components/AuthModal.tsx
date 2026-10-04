@@ -290,7 +290,7 @@ export default function AuthModal({
           </div>
 
           <h3 className="font-serif text-xl font-bold text-white">
-            {mode === 'login' ? 'Đăng Nhập' : 'Chủ Quán Ăn (Gmail & Mật Khẩu)'}
+            {mode === 'login' ? 'Đăng Nhập' : 'Chủ Quán Ăn/Uống (Gmail & Mật Khẩu)'}
           </h3>
           <p className="text-xs text-white/90 mt-1">
             {mode === 'login'
@@ -323,7 +323,7 @@ export default function AuthModal({
             }`}
           >
             <Store className="w-4 h-4" />
-            <span>Chủ Quán Ăn</span>
+            <span>Chủ Quán Ăn/Uống</span>
           </button>
         </div>
 
@@ -515,12 +515,12 @@ export default function AuthModal({
                   <div className="space-y-1">
                     <label className="text-xs font-semibold text-stone-700 flex items-center gap-1.5">
                       <Store className="w-3.5 h-3.5 text-[#D9452B]" />
-                      <span>Tên Quán Ăn / Nhà Hàng *</span>
+                      <span>Tên Quán Ăn/Uống & Giải Khát *</span>
                     </label>
                     <input
                       type="text"
                       required
-                      placeholder="VD: Gà Nướng Cơm Lam Bản Đôn Ea Súp"
+                      placeholder="VD: Cà Phê Nhà Sàn hoặc Gà Nướng Cơm Lam Bản Đôn"
                       value={ownerForm.restaurantName}
                       onChange={(e) => setOwnerForm({ ...ownerForm, restaurantName: e.target.value })}
                       className="w-full text-xs p-2.5 rounded-xl border border-stone-300 focus:outline-none focus:border-[#D9452B]"
@@ -604,7 +604,7 @@ export default function AuthModal({
                     <div className="space-y-1">
                       <label className="text-xs font-semibold text-stone-700 flex items-center gap-1.5">
                         <MapPin className="w-3.5 h-3.5 text-[#D9452B]" />
-                        <span>Địa chỉ quán tại Ea Súp</span>
+                        <span>Địa chỉ quán ăn/uống tại Ea Súp</span>
                       </label>
                       <input
                         type="text"

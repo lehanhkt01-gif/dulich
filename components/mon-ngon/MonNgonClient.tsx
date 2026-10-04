@@ -460,8 +460,8 @@ export default function MonNgonClient() {
           {(
             [
               { id: 'kham-pha', label: 'Khám phá món', icon: Compass },
-              { id: 'quan-an', label: `Quán ăn Ea Súp (${restaurants.length})`, icon: Store },
-              { id: 'ban-an', label: 'Bàn ăn đang mở', icon: Utensils },
+              { id: 'quan-an', label: `Quán ăn/uống Ea Súp (${restaurants.length})`, icon: Store },
+              { id: 'ban-an', label: 'Bàn ăn/uống đang mở', icon: Utensils },
               { id: 'lich-hen', label: 'Lịch hẹn của tôi', icon: CalendarDays },
             ] as const
           ).map((t) => {
@@ -542,10 +542,10 @@ export default function MonNgonClient() {
                       </div>
                       <div>
                         <p className="text-xs sm:text-sm font-bold text-[#2B1D16]">
-                          Dành Cho Chủ Quán Ăn Ea Súp
+                          Dành Cho Chủ Quán Ăn/Uống Ea Súp
                         </p>
                         <p className="text-[11px] sm:text-xs text-[#7D6B62]">
-                          Đăng ký mở quán, quản lý món ăn và tiếp nhận đơn đặt.
+                          Đăng ký mở quán, quản lý món ăn/uống và tiếp nhận đơn đặt.
                         </p>
                       </div>
                     </div>
@@ -681,10 +681,10 @@ export default function MonNgonClient() {
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
                 <div>
                   <h2 id="mn-h-quan-an" className="text-2xl sm:text-3xl font-bold text-[#2B1D16]">
-                    Quán Ăn & Nhà Hàng Ea Súp
+                    Quán Ăn/Uống & Nhà Hàng Ea Súp
                   </h2>
                   <p className="text-sm sm:text-base text-[#7D6B62] mt-1">
-                    Các địa điểm ẩm thực uy tín đã được xác thực bởi Ban Quản Trị địa phương.
+                    Các địa điểm ẩm thực & giải khát uy tín đã được xác thực bởi Ban Quản Trị địa phương.
                   </p>
                 </div>
                 {/* Nút Đăng ký quán của bạn: Ẩn hoàn toàn khi đã đăng nhập tài khoản Khách */}
@@ -702,7 +702,7 @@ export default function MonNgonClient() {
               {restaurants.length === 0 ? (
                 <EmptyState
                   icon={Store}
-                  title="Đang cập nhật danh sách quán ăn"
+                  title="Đang cập nhật danh sách quán ăn/uống"
                   desc="Hệ thống đang đồng bộ dữ liệu quán từ máy chủ. Vui lòng quay lại sau ít phút."
                 />
               ) : (
@@ -948,7 +948,7 @@ export default function MonNgonClient() {
       <nav className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-white/95 backdrop-blur-md border-t border-[#F1E4D8] pb-[env(safe-area-inset-bottom)]" aria-label="Điều hướng Món ngon">
         <div className="grid grid-cols-5 items-end h-16 px-2">
           <BottomItem icon={Compass} label="Khám phá" active={tab === 'kham-pha'} onClick={() => goTab('kham-pha')} />
-          <BottomItem icon={Store} label="Quán ăn" active={tab === 'quan-an'} onClick={() => goTab('quan-an')} />
+          <BottomItem icon={Store} label="Quán ăn/uống" active={tab === 'quan-an'} onClick={() => goTab('quan-an')} />
           <div className="flex justify-center">
             <button
               id="mn-fab-create"

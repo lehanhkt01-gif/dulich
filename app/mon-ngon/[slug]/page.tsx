@@ -261,7 +261,7 @@ export default function RestaurantDetailPage() {
     return (
       <div className="min-h-screen bg-[#FBF9F5] flex items-center justify-center p-6 text-center">
         <div className="space-y-4">
-          <p className="text-stone-600 font-bold">Không tìm thấy thông tin quán ăn này.</p>
+          <p className="text-stone-600 font-bold">Không tìm thấy thông tin quán ăn/uống này.</p>
           <Link
             href="/mon-ngon"
             className="inline-flex py-2 px-4 rounded-xl bg-[#D9452B] text-white text-xs font-bold"
@@ -294,6 +294,16 @@ export default function RestaurantDetailPage() {
           </Link>
         </div>
 
+        {/* Nút Đổi ảnh bìa quán dành cho Chủ quán */}
+        <div className="absolute top-4 right-4 z-10 flex items-center gap-2">
+          <Link
+            href="/chu-quan/dashboard"
+            className="inline-flex items-center gap-1.5 py-1.5 px-3.5 rounded-xl bg-[#D9452B] hover:bg-[#BF3A22] backdrop-blur-md text-white text-xs font-bold transition-all shadow-md border border-white/20"
+          >
+            <span>📷 Đổi ảnh bìa quán</span>
+          </Link>
+        </div>
+
         <div className="absolute bottom-6 left-0 right-0 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-white space-y-2">
           <div className="flex flex-wrap items-center gap-2">
             <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-[#D9452B] text-white">
@@ -323,13 +333,13 @@ export default function RestaurantDetailPage() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
         <div className="flex flex-col lg:flex-row gap-8">
-          {/* CỘT TRÁI: THỰC ĐƠN MÓN ĂN */}
+          {/* CỘT TRÁI: THỰC ĐƠN MÓN ĂN/UỐNG */}
           <div className="flex-1 space-y-6">
             <div className="flex items-center justify-between">
               <div>
                 <h2 className="font-serif text-xl font-bold text-[#1C1917] flex items-center gap-2">
                   <UtensilsCrossed className="w-5 h-5 text-[#D9452B]" />
-                  <span>Thực Đơn Món Ăn</span>
+                  <span>Thực Đơn Món Ăn/Uống & Giải Khát</span>
                 </h2>
                 <p className="text-xs text-stone-500">Chọn món yêu thích để quán chuẩn bị chu đáo</p>
               </div>
@@ -419,7 +429,7 @@ export default function RestaurantDetailPage() {
               <div className="flex items-center justify-between border-b border-stone-100 pb-3">
                 <h3 className="font-serif font-bold text-base text-[#1C1917] flex items-center gap-2">
                   <ShoppingCart className="w-4 h-4 text-[#D9452B]" />
-                  <span>Đơn Đặt Món ({cartList.length})</span>
+                  <span>Đơn Đặt Món Ăn/Uống ({cartList.length})</span>
                 </h3>
                 {cartList.length > 0 && (
                   <button

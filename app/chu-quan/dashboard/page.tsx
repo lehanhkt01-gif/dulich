@@ -55,6 +55,18 @@ const PRESET_DISH_IMAGES = [
   { name: 'Cà phê Ea Súp', url: '/mon-ngon/ca-phe.jpg' },
 ];
 
+// Danh sách ảnh bìa quán đặc sắc Ea Súp có sẵn để chọn nhanh
+const PRESET_COVER_IMAGES = [
+  { name: 'Gà nướng Bản Đôn', url: '/mon-ngon/ga-nuong.jpg' },
+  { name: 'Cá lòng hồ nướng', url: '/mon-ngon/ca-nuong.jpg' },
+  { name: 'Cơm lam ống tre', url: '/mon-ngon/com-lam.jpg' },
+  { name: 'Lẩu cá hồ Ea Súp', url: '/mon-ngon/lau-ca.jpg' },
+  { name: 'Cà phê Ea Súp', url: '/mon-ngon/ca-phe.jpg' },
+  { name: 'Bò một nắng muối kiến', url: '/mon-ngon/bo-mot-nang.jpg' },
+  { name: 'Xoài cát Ea Súp', url: '/mon-ngon/xoai-cat.jpg' },
+  { name: 'Rượu cần Tây Nguyên', url: '/mon-ngon/ruou-can.jpg' },
+];
+
 export default function OwnerDashboardPage() {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<any>(null);
@@ -62,9 +74,11 @@ export default function OwnerDashboardPage() {
 
   const [activeTab, setActiveTab] = useState<'orders' | 'menu' | 'tables' | 'info'>('orders');
 
-  // Chỉnh sửa thông tin quán
+  // Chỉnh sửa thông tin quán & đổi ảnh bìa
   const [infoEditing, setInfoEditing] = useState(false);
   const [infoLoading, setInfoLoading] = useState(false);
+  const [uploadingCover, setUploadingCover] = useState(false);
+  const [showCoverGallery, setShowCoverGallery] = useState(false);
   const [infoForm, setInfoForm] = useState({
     name: '',
     village: '',
@@ -72,6 +86,7 @@ export default function OwnerDashboardPage() {
     phone: '',
     openTime: '08:00',
     closeTime: '22:00',
+    coverImage: '',
   });
 
   const handleStartEditInfo = (r: any) => {
@@ -82,6 +97,7 @@ export default function OwnerDashboardPage() {
       phone: r.phone || '',
       openTime: r.openTime || '08:00',
       closeTime: r.closeTime || '22:00',
+      coverImage: r.coverImage || '',
     });
     setInfoEditing(true);
   };
@@ -100,6 +116,97 @@ export default function OwnerDashboardPage() {
       }
     } catch (err: any) {
       toast.error(err.message || 'Không thể cập nhật thông tin quán');
+    } finally {
+      setInfoLoading(false);
+    }
+  };
+
+  // Tải ảnh bìa mới từ máy tính / điện thoại (< 3MB)
+  const handleUploadCoverImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      toast.error('Vui lòng chọn tệp hình ảnh (JPG, PNG, WebP...)');
+      return;
+    }
+
+    const MAX_SIZE = 3 * 1024 * 1024; // 3MB
+    if (file.size > MAX_SIZE) {
+      toast.error(`Ảnh quá lớn (${(file.size / (1024 * 1024)).toFixed(1)}MB). Vui lòng chọn ảnh dưới 3MB!`);
+      return;
+    }
+
+    try {
+      setUploadingCover(true);
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const resData = await res.json();
+      if (!res.ok || !resData.success) {
+        throw new Error(resData.message || 'Lỗi khi tải ảnh bìa lên');
+      }
+
+      const imageUrl = resData.url;
+      setInfoForm((prev) => ({ ...prev, coverImage: imageUrl }));
+
+      const rest = data?.restaurant;
+      if (rest) {
+        const saveRes = await updateRestaurantInfoAction({
+          name: rest.name,
+          village: rest.village,
+          address: rest.address,
+          phone: rest.phone,
+          openTime: rest.openTime,
+          closeTime: rest.closeTime,
+          coverImage: imageUrl,
+        });
+
+        if (saveRes.success) {
+          toast.success('Đã cập nhật ảnh bìa quán thành công!');
+          loadData();
+        } else {
+          toast.error(saveRes.message || 'Không thể lưu ảnh bìa');
+        }
+      }
+    } catch (err: any) {
+      toast.error(err.message || 'Không thể tải ảnh bìa lên. Vui lòng thử lại!');
+    } finally {
+      setUploadingCover(false);
+      e.target.value = '';
+    }
+  };
+
+  // Chọn ảnh bìa mẫu từ kho ảnh Ea Súp
+  const handleSelectCoverPreset = async (url: string) => {
+    setInfoForm((prev) => ({ ...prev, coverImage: url }));
+    const rest = data?.restaurant;
+    if (!rest) return;
+    try {
+      setInfoLoading(true);
+      const res = await updateRestaurantInfoAction({
+        name: rest.name,
+        village: rest.village,
+        address: rest.address,
+        phone: rest.phone,
+        openTime: rest.openTime,
+        closeTime: rest.closeTime,
+        coverImage: url,
+      });
+      if (res.success) {
+        toast.success('Đã thay đổi ảnh bìa quán!');
+        setShowCoverGallery(false);
+        loadData();
+      } else {
+        toast.error(res.message);
+      }
+    } catch (err: any) {
+      toast.error(err.message || 'Lỗi khi cập nhật ảnh bìa');
     } finally {
       setInfoLoading(false);
     }
@@ -441,7 +548,7 @@ export default function OwnerDashboardPage() {
               target="_blank"
               className="text-xs px-3 py-1 rounded-xl bg-stone-100 text-stone-700 hover:bg-[#D9452B] hover:text-white transition-colors font-semibold"
             >
-              Xem trang quán ↗
+              Xem trang quán ăn/uống ↗
             </Link>
           </div>
         </div>
@@ -486,7 +593,7 @@ export default function OwnerDashboardPage() {
             }`}
           >
             <Users className="w-4 h-4" />
-            <span>Quản Lý Bàn Ăn ({tables.length})</span>
+            <span>Quản Lý Bàn Ăn/Uống ({tables.length})</span>
           </button>
 
           <button
@@ -499,7 +606,7 @@ export default function OwnerDashboardPage() {
             }`}
           >
             <Store className="w-4 h-4" />
-            <span>Thông Tin Quán</span>
+            <span>Thông Tin Quán Ăn/Uống</span>
           </button>
         </div>
 
@@ -512,7 +619,7 @@ export default function OwnerDashboardPage() {
                 <div>
                   <h2 className="font-serif text-lg font-bold text-[#1C1917] flex items-center gap-2">
                     <UtensilsCrossed className="w-5 h-5 text-[#D9452B]" />
-                    <span>Đơn Đặt Món Ăn ({orders.length})</span>
+                    <span>Đơn Đặt Món Ăn/Uống ({orders.length})</span>
                   </h2>
                   <p className="text-xs text-stone-500">
                     Độc quyền chỉ hiển thị các đơn khách gửi tới quán của bạn
@@ -522,7 +629,7 @@ export default function OwnerDashboardPage() {
 
               {orders.length === 0 ? (
                 <div className="bg-white rounded-3xl border border-[#E7E2D7] p-8 text-center text-xs text-stone-500">
-                  Chưa có đơn đặt món nào gửi tới quán.
+                  Chưa có đơn đặt món ăn/uống nào gửi tới quán.
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -746,9 +853,9 @@ export default function OwnerDashboardPage() {
             <div className="flex items-center justify-between">
               <div>
                 <h2 className="font-serif text-lg font-bold text-[#1C1917]">
-                  Thực Đơn Món Ăn Của Quán
+                  Thực Đơn Món Ăn/Uống Của Quán
                 </h2>
-                <p className="text-xs text-stone-500">Thêm, sửa, xóa và bật/tắt trạng thái phục vụ</p>
+                <p className="text-xs text-stone-500">Thêm, sửa, xóa và bật/tắt trạng thái phục vụ món ăn & giải khát</p>
               </div>
               <button
                 type="button"
@@ -756,7 +863,7 @@ export default function OwnerDashboardPage() {
                 className="py-2.5 px-4 rounded-xl bg-[#D9452B] hover:bg-[#BF3A22] text-white text-xs font-bold transition-all shadow-xs flex items-center gap-1.5"
               >
                 <Plus className="w-4 h-4" />
-                <span>Thêm Món Ăn Mới</span>
+                <span>Thêm Món Ăn/Uống Mới</span>
               </button>
             </div>
 
@@ -799,7 +906,7 @@ export default function OwnerDashboardPage() {
                         type="button"
                         onClick={() => handleOpenEditDish(item)}
                         className="p-1.5 rounded-lg text-stone-500 hover:text-blue-600 hover:bg-blue-50 transition-colors"
-                        title="Chỉnh sửa món ăn"
+                        title="Chỉnh sửa món ăn/uống"
                       >
                         <Edit className="w-4 h-4" />
                       </button>
@@ -807,7 +914,7 @@ export default function OwnerDashboardPage() {
                         type="button"
                         onClick={() => handleDeleteDish(item.id, item.name)}
                         className="p-1.5 rounded-lg text-stone-400 hover:text-red-600 hover:bg-red-50 transition-colors"
-                        title="Xóa món ăn"
+                        title="Xóa món ăn/uống"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -819,13 +926,13 @@ export default function OwnerDashboardPage() {
           </div>
         )}
 
-        {/* TAB 3: QUẢN LÝ BÀN ĂN */}
+        {/* TAB 3: QUẢN LÝ BÀN ĂN/UỐNG */}
         {activeTab === 'tables' && (
           <div className="mt-6 space-y-4">
             <div className="flex items-center justify-between">
               <div>
                 <h2 className="font-serif text-lg font-bold text-[#1C1917]">
-                  Danh Sách Bàn Ăn Tại Quán
+                  Danh Sách Bàn Ăn/Uống Tại Quán
                 </h2>
                 <p className="text-xs text-stone-500">Quản lý sơ đồ bàn và sức chứa</p>
               </div>
@@ -835,7 +942,7 @@ export default function OwnerDashboardPage() {
                 className="py-2.5 px-4 rounded-xl bg-[#0066CC] hover:bg-[#0055AA] text-white text-xs font-bold transition-all shadow-xs flex items-center gap-1.5"
               >
                 <Plus className="w-4 h-4" />
-                <span>Thêm Bàn Ăn</span>
+                <span>Thêm Bàn Ăn/Uống</span>
               </button>
             </div>
 
@@ -857,6 +964,7 @@ export default function OwnerDashboardPage() {
                       type="button"
                       onClick={() => handleDeleteTable(table.id)}
                       className="p-1 rounded-lg text-stone-400 hover:text-red-600 transition-colors"
+                      title="Xóa bàn ăn/uống"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -869,148 +977,265 @@ export default function OwnerDashboardPage() {
 
         {/* TAB 4: THÔNG TIN QUÁN */}
         {activeTab === 'info' && (
-          <div className="mt-6 max-w-2xl bg-white rounded-3xl border border-[#E7E2D7] p-6 shadow-xs space-y-4">
-            <div className="flex items-center justify-between">
-              <h2 className="font-serif text-lg font-bold text-[#1C1917]">Hồ Sơ Quán Ăn</h2>
-              {!infoEditing && (
-                <button
-                  id="cq-info-edit-btn"
-                  type="button"
-                  onClick={() => handleStartEditInfo(restaurant)}
-                  className="py-2 px-3.5 rounded-xl bg-[#D9452B] hover:bg-[#BF3A22] text-white text-xs font-bold flex items-center gap-1.5 transition-colors"
+          <div className="mt-6 max-w-2xl bg-white rounded-3xl border border-[#E7E2D7] p-6 shadow-xs space-y-6">
+            {/* KHỐI ẢNH BÌA QUÁN ĂN/UỐNG */}
+            <div className="space-y-3 pb-6 border-b border-stone-100">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="font-serif text-base font-bold text-[#1C1917] flex items-center gap-2">
+                    <ImageIcon className="w-4 h-4 text-[#D9452B]" />
+                    <span>Ảnh Bìa Quán Ăn/Uống</span>
+                  </h3>
+                  <p className="text-xs text-stone-500">
+                    Ảnh hiển thị nổi bật ở đầu trang giới thiệu các món ăn/uống và giải khát của bạn
+                  </p>
+                </div>
+              </div>
+
+              {/* Preview Ảnh Bìa */}
+              <div className="relative aspect-[21/9] sm:aspect-[2.4/1] rounded-2xl overflow-hidden bg-stone-900 border border-stone-200 group shadow-xs">
+                <img
+                  src={infoForm.coverImage || restaurant.coverImage || '/mon-ngon/ga-nuong.jpg'}
+                  alt={restaurant.name}
+                  className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-300"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-transparent flex items-end p-4">
+                  <div className="text-white">
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#D9452B]">
+                      {restaurant.village || 'Ea Súp'}
+                    </span>
+                    <h4 className="font-serif text-lg font-bold mt-1 text-white drop-shadow-xs">{restaurant.name}</h4>
+                    <p className="text-xs text-white/90 flex items-center gap-1 mt-0.5">
+                      <Clock className="w-3 h-3 text-[#F5B82E]" />
+                      <span>{restaurant.openTime || '08:00'} – {restaurant.closeTime || '22:00'}</span>
+                    </p>
+                  </div>
+                </div>
+
+                {uploadingCover && (
+                  <div className="absolute inset-0 bg-black/70 backdrop-blur-xs flex items-center justify-center text-white text-xs font-bold gap-2">
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <span>Đang tải ảnh bìa lên hệ thống...</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Bộ nút thao tác đổi ảnh bìa */}
+              <div className="flex flex-wrap items-center gap-2 pt-1">
+                <label
+                  htmlFor="cq-cover-upload"
+                  className="py-2 px-3.5 rounded-xl bg-[#D9452B] hover:bg-[#BF3A22] text-white text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs active:scale-98"
                 >
-                  <Edit className="w-3.5 h-3.5" />
-                  <span>Chỉnh sửa thông tin</span>
+                  <Upload className="w-3.5 h-3.5" />
+                  <span>{uploadingCover ? 'Đang tải lên...' : '📷 Tải ảnh bìa mới (< 3MB)'}</span>
+                </label>
+                <input
+                  id="cq-cover-upload"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleUploadCoverImage}
+                  disabled={uploadingCover}
+                  className="hidden"
+                />
+
+                <button
+                  type="button"
+                  onClick={() => setShowCoverGallery(!showCoverGallery)}
+                  className="py-2 px-3.5 rounded-xl bg-white border border-stone-200 hover:border-[#D9452B] text-stone-700 text-xs font-bold flex items-center gap-1.5 transition-colors"
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-[#F5B82E]" />
+                  <span>Kho ảnh bìa đẹp Ea Súp</span>
+                  {showCoverGallery ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
                 </button>
+              </div>
+
+              {/* Kho ảnh bìa sổ ra */}
+              {showCoverGallery && (
+                <div className="p-3 bg-stone-50 rounded-2xl border border-stone-200 space-y-2 animate-in fade-in duration-200">
+                  <div className="flex items-center justify-between text-xs text-stone-600">
+                    <span className="font-bold flex items-center gap-1">
+                      <FolderOpen className="w-3.5 h-3.5 text-[#D9452B]" />
+                      <span>Chọn ảnh bìa quán & món ngon Ea Súp</span>
+                    </span>
+                    <span className="text-[11px] text-stone-400">Bấm ảnh để đổi ngay</span>
+                  </div>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                    {PRESET_COVER_IMAGES.map((img, idx) => {
+                      const isCurrent = (infoForm.coverImage || restaurant.coverImage) === img.url;
+                      return (
+                        <button
+                          key={idx}
+                          type="button"
+                          onClick={() => handleSelectCoverPreset(img.url)}
+                          className={`relative group rounded-xl overflow-hidden border-2 text-left transition-all ${
+                            isCurrent
+                              ? 'border-[#D9452B] ring-2 ring-[#D9452B]/30'
+                              : 'border-stone-200 hover:border-[#D9452B]'
+                          }`}
+                        >
+                          <div className="aspect-[16/10] bg-stone-200 overflow-hidden">
+                            <img src={img.url} alt={img.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+                          </div>
+                          <span className="block text-[10px] p-1.5 font-medium text-stone-700 truncate bg-white">
+                            {img.name}
+                          </span>
+                          {isCurrent && (
+                            <span className="absolute top-1 right-1 bg-[#D9452B] text-white rounded-full p-0.5 shadow-xs">
+                              <Check className="w-2.5 h-2.5" />
+                            </span>
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
               )}
             </div>
 
-            {infoEditing ? (
-              <form onSubmit={handleSaveInfo} className="space-y-3 text-xs">
-                <div>
-                  <label className="block font-bold mb-1 text-stone-700">Tên quán *</label>
-                  <input
-                    id="cq-info-name"
-                    type="text"
-                    required
-                    value={infoForm.name}
-                    onChange={(e) => setInfoForm({ ...infoForm, name: e.target.value })}
-                    className="w-full px-3 py-2 rounded-xl border border-stone-200 focus:outline-none focus:border-[#D9452B]"
-                  />
-                </div>
-                <div>
-                  <label className="block font-bold mb-1 text-stone-700">Thôn / Buôn</label>
-                  <input
-                    id="cq-info-village"
-                    type="text"
-                    placeholder="VD: Buôn A2"
-                    value={infoForm.village}
-                    onChange={(e) => setInfoForm({ ...infoForm, village: e.target.value })}
-                    className="w-full px-3 py-2 rounded-xl border border-stone-200 focus:outline-none focus:border-[#D9452B]"
-                  />
-                </div>
-                <div>
-                  <label className="block font-bold mb-1 text-stone-700">Địa chỉ *</label>
-                  <input
-                    id="cq-info-address"
-                    type="text"
-                    required
-                    value={infoForm.address}
-                    onChange={(e) => setInfoForm({ ...infoForm, address: e.target.value })}
-                    className="w-full px-3 py-2 rounded-xl border border-stone-200 focus:outline-none focus:border-[#D9452B]"
-                  />
-                </div>
-                <div>
-                  <label className="block font-bold mb-1 text-stone-700">Số điện thoại</label>
-                  <input
-                    id="cq-info-phone"
-                    type="tel"
-                    value={infoForm.phone}
-                    onChange={(e) => setInfoForm({ ...infoForm, phone: e.target.value })}
-                    className="w-full px-3 py-2 rounded-xl border border-stone-200 focus:outline-none focus:border-[#D9452B]"
-                  />
-                </div>
-                <div className="grid grid-cols-2 gap-2">
-                  <div>
-                    <label className="block font-bold mb-1 text-stone-700">Giờ mở cửa</label>
-                    <input
-                      id="cq-info-open"
-                      type="time"
-                      value={infoForm.openTime}
-                      onChange={(e) => setInfoForm({ ...infoForm, openTime: e.target.value })}
-                      className="w-full px-3 py-2 rounded-xl border border-stone-200 focus:outline-none focus:border-[#D9452B]"
-                    />
-                  </div>
-                  <div>
-                    <label className="block font-bold mb-1 text-stone-700">Giờ đóng cửa</label>
-                    <input
-                      id="cq-info-close"
-                      type="time"
-                      value={infoForm.closeTime}
-                      onChange={(e) => setInfoForm({ ...infoForm, closeTime: e.target.value })}
-                      className="w-full px-3 py-2 rounded-xl border border-stone-200 focus:outline-none focus:border-[#D9452B]"
-                    />
-                  </div>
-                </div>
-                <div className="pt-2 flex justify-end gap-2">
+            {/* THÔNG TIN CHI TIẾT */}
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h2 className="font-serif text-lg font-bold text-[#1C1917]">Hồ Sơ Quán Ăn/Uống</h2>
+                {!infoEditing && (
                   <button
+                    id="cq-info-edit-btn"
                     type="button"
-                    onClick={() => setInfoEditing(false)}
-                    className="px-4 py-2 rounded-xl border border-stone-200 text-stone-600 hover:bg-stone-50"
+                    onClick={() => handleStartEditInfo(restaurant)}
+                    className="py-2 px-3.5 rounded-xl bg-[#D9452B] hover:bg-[#BF3A22] text-white text-xs font-bold flex items-center gap-1.5 transition-colors"
                   >
-                    Hủy
+                    <Edit className="w-3.5 h-3.5" />
+                    <span>Chỉnh sửa thông tin</span>
                   </button>
-                  <button
-                    id="cq-info-save"
-                    type="submit"
-                    disabled={infoLoading}
-                    className="px-5 py-2 rounded-xl bg-[#D9452B] text-white font-bold hover:bg-[#BF3A22] transition-colors disabled:opacity-60"
-                  >
-                    {infoLoading ? 'Đang lưu...' : 'Lưu Thay Đổi'}
-                  </button>
+                )}
+              </div>
+
+              {infoEditing ? (
+                <form onSubmit={handleSaveInfo} className="space-y-3 text-xs">
+                  <div>
+                    <label className="block font-bold mb-1 text-stone-700">Tên quán ăn/uống *</label>
+                    <input
+                      id="cq-info-name"
+                      type="text"
+                      required
+                      value={infoForm.name}
+                      onChange={(e) => setInfoForm({ ...infoForm, name: e.target.value })}
+                      className="w-full px-3 py-2 rounded-xl border border-stone-200 focus:outline-none focus:border-[#D9452B]"
+                    />
+                  </div>
+                  <div>
+                    <label className="block font-bold mb-1 text-stone-700">Thôn / Buôn</label>
+                    <input
+                      id="cq-info-village"
+                      type="text"
+                      placeholder="VD: Buôn A2"
+                      value={infoForm.village}
+                      onChange={(e) => setInfoForm({ ...infoForm, village: e.target.value })}
+                      className="w-full px-3 py-2 rounded-xl border border-stone-200 focus:outline-none focus:border-[#D9452B]"
+                    />
+                  </div>
+                  <div>
+                    <label className="block font-bold mb-1 text-stone-700">Địa chỉ quán ăn/uống *</label>
+                    <input
+                      id="cq-info-address"
+                      type="text"
+                      required
+                      value={infoForm.address}
+                      onChange={(e) => setInfoForm({ ...infoForm, address: e.target.value })}
+                      className="w-full px-3 py-2 rounded-xl border border-stone-200 focus:outline-none focus:border-[#D9452B]"
+                    />
+                  </div>
+                  <div>
+                    <label className="block font-bold mb-1 text-stone-700">Số điện thoại liên hệ</label>
+                    <input
+                      id="cq-info-phone"
+                      type="tel"
+                      value={infoForm.phone}
+                      onChange={(e) => setInfoForm({ ...infoForm, phone: e.target.value })}
+                      className="w-full px-3 py-2 rounded-xl border border-stone-200 focus:outline-none focus:border-[#D9452B]"
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <label className="block font-bold mb-1 text-stone-700">Giờ mở cửa</label>
+                      <input
+                        id="cq-info-open"
+                        type="time"
+                        value={infoForm.openTime}
+                        onChange={(e) => setInfoForm({ ...infoForm, openTime: e.target.value })}
+                        className="w-full px-3 py-2 rounded-xl border border-stone-200 focus:outline-none focus:border-[#D9452B]"
+                      />
+                    </div>
+                    <div>
+                      <label className="block font-bold mb-1 text-stone-700">Giờ đóng cửa</label>
+                      <input
+                        id="cq-info-close"
+                        type="time"
+                        value={infoForm.closeTime}
+                        onChange={(e) => setInfoForm({ ...infoForm, closeTime: e.target.value })}
+                        className="w-full px-3 py-2 rounded-xl border border-stone-200 focus:outline-none focus:border-[#D9452B]"
+                      />
+                    </div>
+                  </div>
+                  <div className="pt-2 flex justify-end gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setInfoEditing(false)}
+                      className="px-4 py-2 rounded-xl border border-stone-200 text-stone-600 hover:bg-stone-50"
+                    >
+                      Hủy
+                    </button>
+                    <button
+                      id="cq-info-save"
+                      type="submit"
+                      disabled={infoLoading}
+                      className="px-5 py-2 rounded-xl bg-[#D9452B] text-white font-bold hover:bg-[#BF3A22] transition-colors disabled:opacity-60"
+                    >
+                      {infoLoading ? 'Đang lưu...' : 'Lưu Thay Đổi'}
+                    </button>
+                  </div>
+                </form>
+              ) : (
+                <div className="space-y-3 text-xs text-stone-700">
+                  <div className="flex justify-between py-2 border-b border-stone-100">
+                    <span className="text-stone-500 font-semibold">Tên quán ăn/uống:</span>
+                    <span className="font-bold text-sm text-[#1C1917]">{restaurant.name}</span>
+                  </div>
+                  <div className="flex justify-between py-2 border-b border-stone-100">
+                    <span className="text-stone-500 font-semibold">Thôn / Buôn:</span>
+                    <span>{restaurant.village || 'Ea Súp'}</span>
+                  </div>
+                  <div className="flex justify-between py-2 border-b border-stone-100">
+                    <span className="text-stone-500 font-semibold">Địa chỉ quán:</span>
+                    <span>{restaurant.address}</span>
+                  </div>
+                  <div className="flex justify-between py-2 border-b border-stone-100">
+                    <span className="text-stone-500 font-semibold">Số điện thoại:</span>
+                    <span className="font-mono text-[#D9452B] font-bold">{restaurant.phone}</span>
+                  </div>
+                  <div className="flex justify-between py-2 border-b border-stone-100">
+                    <span className="text-stone-500 font-semibold">Giờ hoạt động:</span>
+                    <span>{restaurant.openTime || '08:00'} – {restaurant.closeTime || '22:00'}</span>
+                  </div>
+                  <div className="flex justify-between py-2 border-b border-stone-100">
+                    <span className="text-stone-500 font-semibold">Trạng thái kiểm duyệt:</span>
+                    <span className="text-emerald-700 font-bold flex items-center gap-1">
+                      <ShieldCheck className="w-4 h-4" /> Đã được Ban Quản Trị phê duyệt
+                    </span>
+                  </div>
                 </div>
-              </form>
-            ) : (
-            <div className="space-y-3 text-xs text-stone-700">
-              <div className="flex justify-between py-2 border-b border-stone-100">
-                <span className="text-stone-500 font-semibold">Tên quán:</span>
-                <span className="font-bold text-sm text-[#1C1917]">{restaurant.name}</span>
-              </div>
-              <div className="flex justify-between py-2 border-b border-stone-100">
-                <span className="text-stone-500 font-semibold">Thôn / Buôn:</span>
-                <span>{restaurant.village || 'Ea Súp'}</span>
-              </div>
-              <div className="flex justify-between py-2 border-b border-stone-100">
-                <span className="text-stone-500 font-semibold">Địa chỉ:</span>
-                <span>{restaurant.address}</span>
-              </div>
-              <div className="flex justify-between py-2 border-b border-stone-100">
-                <span className="text-stone-500 font-semibold">Số điện thoại:</span>
-                <span className="font-mono text-[#D9452B] font-bold">{restaurant.phone}</span>
-              </div>
-              <div className="flex justify-between py-2 border-b border-stone-100">
-                <span className="text-stone-500 font-semibold">Giờ hoạt động:</span>
-                <span>{restaurant.openTime || '08:00'} – {restaurant.closeTime || '22:00'}</span>
-              </div>
-              <div className="flex justify-between py-2 border-b border-stone-100">
-                <span className="text-stone-500 font-semibold">Trạng thái kiểm duyệt:</span>
-                <span className="text-emerald-700 font-bold flex items-center gap-1">
-                  <ShieldCheck className="w-4 h-4" /> Đã được Ban Quản Trị phê duyệt
-                </span>
-              </div>
+              )}
             </div>
-            )}
           </div>
         )}
       </div>
 
-      {/* MODAL THÊM / CHỈNH SỬA MÓN ĂN */}
+      {/* MODAL THÊM / CHỈNH SỬA MÓN ĂN/UỐNG */}
       {dishModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-xs">
           <div className="bg-white rounded-3xl p-5 sm:p-6 max-w-lg w-full shadow-2xl space-y-4 max-h-[92vh] overflow-y-auto">
             <div className="flex justify-between items-center pb-2 border-b border-stone-100">
               <h3 className="font-serif font-bold text-lg text-[#1C1917]">
-                {editingDish ? 'Chỉnh Sửa Món Ăn' : 'Thêm Món Ăn Mới'}
+                {editingDish ? 'Chỉnh Sửa Món Ăn/Uống' : 'Thêm Món Ăn/Uống Mới'}
               </h3>
               <button
                 onClick={() => {
@@ -1026,11 +1251,11 @@ export default function OwnerDashboardPage() {
 
             <form onSubmit={handleSaveDish} className="space-y-3.5 text-xs">
               <div>
-                <label className="block font-bold mb-1 text-stone-700">Tên món ăn *</label>
+                <label className="block font-bold mb-1 text-stone-700">Tên món ăn/uống *</label>
                 <input
                   type="text"
                   required
-                  placeholder="VD: Gà Nướng Mọi Bản Đôn"
+                  placeholder="VD: Gà Nướng Mọi Bản Đôn hoặc Trà Trái Cây Ea Súp"
                   value={dishForm.name}
                   onChange={(e) => setDishForm({ ...dishForm, name: e.target.value })}
                   className="w-full px-3 py-2 rounded-xl border border-stone-200 focus:outline-none focus:border-[#D9452B]"
@@ -1057,16 +1282,16 @@ export default function OwnerDashboardPage() {
                   >
                     <option value="Món chính">Món chính</option>
                     <option value="Đặc sản Tây Nguyên">Đặc sản Tây Nguyên</option>
-                    <option value="Ăn vặt">Ăn vặt</option>
-                    <option value="Đồ uống">Đồ uống</option>
+                    <option value="Ăn vặt / Giải khát">Ăn vặt / Giải khát</option>
+                    <option value="Đồ uống & Trà cà phê">Đồ uống & Trà cà phê</option>
                   </select>
                 </div>
               </div>
 
-              {/* PHẦN CHỌN / TẢI HÌNH ẢNH MÓN ĂN (DƯỚI 3MB HOẶC CHỌN KHO) */}
+              {/* PHẦN CHỌN / TẢI HÌNH ẢNH MÓN ĂN/UỐNG (DƯỚI 3MB HOẶC CHỌN KHO) */}
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between">
-                  <label className="block font-bold text-stone-700">Hình ảnh món ăn</label>
+                  <label className="block font-bold text-stone-700">Hình ảnh món ăn/uống</label>
                   <span className="text-[11px] text-stone-400">Tối đa 3MB (JPG, PNG, WebP)</span>
                 </div>
 
@@ -1077,7 +1302,7 @@ export default function OwnerDashboardPage() {
                       {dishForm.image ? (
                         <img
                           src={dishForm.image}
-                          alt={dishForm.name || 'Ảnh món ăn'}
+                          alt={dishForm.name || 'Ảnh món ăn/uống'}
                           className="w-full h-full object-cover"
                         />
                       ) : (
@@ -1140,7 +1365,7 @@ export default function OwnerDashboardPage() {
                       <div className="flex items-center justify-between">
                         <span className="text-[11px] font-bold text-stone-700 flex items-center gap-1">
                           <Sparkles className="w-3.5 h-3.5 text-[#D9452B]" />
-                          <span>Kho ảnh món ngon Ea Súp ({PRESET_DISH_IMAGES.length + customGallery.length})</span>
+                          <span>Kho ảnh món ăn/uống ngon Ea Súp ({PRESET_DISH_IMAGES.length + customGallery.length})</span>
                         </span>
                         <span className="text-[10px] text-stone-400">Nhấp vào ảnh để chọn</span>
                       </div>
@@ -1158,7 +1383,7 @@ export default function OwnerDashboardPage() {
                               }}
                               className={`relative group rounded-xl overflow-hidden border-2 text-left transition-all ${
                                 isSelected
-                                  ? 'border-[#D9452B] ring-2 ring-[#D9452B]/30'
+                                    ? 'border-[#D9452B] ring-2 ring-[#D9452B]/30'
                                   : 'border-stone-100 hover:border-stone-300'
                               }`}
                             >
@@ -1241,7 +1466,7 @@ export default function OwnerDashboardPage() {
                   disabled={dishLoading}
                   className="px-5 py-2 rounded-xl bg-[#D9452B] text-white font-bold hover:bg-[#BF3A22] transition-colors"
                 >
-                  {dishLoading ? 'Đang lưu...' : editingDish ? 'Lưu Thay Đổi' : 'Tạo Món Ăn'}
+                  {dishLoading ? 'Đang lưu...' : editingDish ? 'Lưu Món Ăn/Uống' : 'Tạo Món Ăn/Uống'}
                 </button>
               </div>
             </form>
@@ -1249,12 +1474,12 @@ export default function OwnerDashboardPage() {
         </div>
       )}
 
-      {/* MODAL THÊM BÀN */}
+      {/* MODAL THÊM BÀN ĂN/UỐNG */}
       {tableModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs">
           <div className="bg-white rounded-3xl p-6 max-w-sm w-full shadow-2xl space-y-4">
             <div className="flex justify-between items-center pb-2 border-b border-stone-100">
-              <h3 className="font-serif font-bold text-lg text-[#1C1917]">Thêm Bàn Ăn Mới</h3>
+              <h3 className="font-serif font-bold text-lg text-[#1C1917]">Thêm Bàn Ăn/Uống Mới</h3>
               <button onClick={() => setTableModalOpen(false)} className="text-stone-400 hover:text-stone-700">
                 <X className="w-5 h-5" />
               </button>
@@ -1262,7 +1487,7 @@ export default function OwnerDashboardPage() {
 
             <form onSubmit={handleAddTable} className="space-y-3 text-xs">
               <div>
-                <label className="block font-bold mb-1 text-stone-700">Tên bàn *</label>
+                <label className="block font-bold mb-1 text-stone-700">Tên bàn ăn/uống *</label>
                 <input
                   type="text"
                   required
@@ -1298,7 +1523,7 @@ export default function OwnerDashboardPage() {
                   disabled={tableLoading}
                   className="px-5 py-2 rounded-xl bg-[#0066CC] text-white font-bold hover:bg-[#0055AA] transition-colors"
                 >
-                  {tableLoading ? 'Đang thêm...' : 'Thêm bàn'}
+                  {tableLoading ? 'Đang thêm...' : 'Thêm Bàn Ăn/Uống'}
                 </button>
               </div>
             </form>

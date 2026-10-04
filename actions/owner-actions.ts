@@ -83,6 +83,7 @@ export async function updateRestaurantInfoAction(data: {
   phone?: string;
   openTime?: string;
   closeTime?: string;
+  coverImage?: string;
 }) {
   const { user, restaurant } = await requireOwner();
 
@@ -104,11 +105,20 @@ export async function updateRestaurantInfoAction(data: {
   }
 
   const village = (data.village || '').trim();
+  const coverImage = (data.coverImage || restaurant.coverImage || '').trim();
 
   try {
     await prisma.restaurant.update({
       where: { id: restaurant.id },
-      data: { name, address, village: village || null, phone: phone || null, openTime, closeTime },
+      data: {
+        name,
+        address,
+        village: village || null,
+        phone: phone || null,
+        openTime,
+        closeTime,
+        ...(coverImage ? { coverImage } : {}),
+      },
     });
   } catch {
     upsertStoredRestaurant({
@@ -119,6 +129,7 @@ export async function updateRestaurantInfoAction(data: {
       phone,
       openTime,
       closeTime,
+      coverImage: coverImage || restaurant.coverImage,
       ownerId: restaurant.ownerId,
     } as any);
   }
@@ -134,6 +145,7 @@ export async function updateRestaurantInfoAction(data: {
       'Địa chỉ mới': address,
       'Số điện thoại': phone || 'Không có',
       'Giờ hoạt động': `${openTime} – ${closeTime}`,
+      ...(coverImage ? { 'Ảnh bìa mới': 'Đã cập nhật ảnh bìa mới' } : {}),
     },
   }).catch(console.error);
 
