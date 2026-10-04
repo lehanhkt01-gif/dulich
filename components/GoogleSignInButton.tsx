@@ -9,6 +9,7 @@ interface GoogleSignInButtonProps {
   text?: string;
   variant?: 'default' | 'outline' | 'pill';
   onSuccess?: () => void;
+  onClick?: () => void;
 }
 
 export default function GoogleSignInButton({
@@ -16,10 +17,15 @@ export default function GoogleSignInButton({
   className = '',
   text = 'Tiếp tục bằng tài khoản Google',
   variant = 'default',
+  onClick,
 }: GoogleSignInButtonProps) {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSignIn = async () => {
+    if (onClick) {
+      onClick();
+      return;
+    }
     try {
       setIsLoading(true);
       await signIn('google', { callbackUrl });

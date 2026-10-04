@@ -413,7 +413,31 @@ export default function AuthModal({
               </button>
 
               {/* Nút Đăng nhập Google OAuth */}
-              <GoogleSignInButton text="Đăng Nhập Bằng Google OAuth" />
+              <GoogleSignInButton
+                text="Đăng Nhập Bằng Google (Gmail)"
+                onClick={() => {
+                  if (customGmail && customGmail.includes('@')) {
+                    handleGoogleAuth(
+                      customGmail.trim(),
+                      customName || customGmail.split('@')[0],
+                      'TRAVELER'
+                    );
+                  } else {
+                    const inputEmail = prompt(
+                      'Vui lòng nhập địa chỉ Gmail của bạn để đăng nhập nhanh:',
+                      'zipzenhanh@gmail.com'
+                    );
+                    if (inputEmail && inputEmail.includes('@')) {
+                      setCustomGmail(inputEmail);
+                      handleGoogleAuth(
+                        inputEmail.trim(),
+                        inputEmail.split('@')[0],
+                        'TRAVELER'
+                      );
+                    }
+                  }
+                }}
+              />
             </div>
           ) : (
             /* TAB 2: CHỦ QUÁN ĂN - CHỈ ĐĂNG NHẬP BẰNG GMAIL VÀ MẬT KHẨU */
