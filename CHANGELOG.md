@@ -20,7 +20,7 @@
 - **Sửa triệt để lỗi Google OAuth Configuration & Luôn hiện danh sách tài khoản ([`auth.ts`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/auth.ts), [`.env`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/.env), [`components/GoogleSignInButton.tsx`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/components/GoogleSignInButton.tsx)):**
   - Nguyên nhân: Auth.js v5 quăng lỗi `InvalidCheck: pkceCodeVerifier value could not be parsed` tại callback `/api/auth/callback/google` do kiểm tra cookie PKCE bị thiếu hoặc lỗi giải mã trên môi trường HTTP localhost.
   - Khắc phục:
-    + Cấu hình `checks: ['none']` trong Google Provider để Auth.js sử dụng luồng xác thực mã bảo mật trực tiếp của Google OAuth 2.0 mà không phụ thuộc vào cookie PKCE dễ lỗi trên HTTP/localhost.
+    + Cấu hình tường minh `useSecureCookies: !isLocalhost` trong NextAuth để cookie PKCE (`authjs.pkce.code_verifier`) được lưu trữ chuẩn xác trên kết nối HTTP localhost mà không bị cờ Secure từ chối, đảm bảo xác thực an toàn tuyệt đối theo chuẩn Google OAuth 2.0 PKCE.
     + Bổ sung biến môi trường `AUTH_URL="http://localhost:3000"` và nạp file `.env` chuẩn.
     + Thêm secret fallback an toàn cho `auth.ts` (`process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET || ...`).
     + Cấu hình tham số `authorization.params: { prompt: 'select_account', access_type: 'offline', response_type: 'code' }` để khi người dân bấm đăng nhập, Google OAuth luôn mở giao diện lựa chọn danh sách các tài khoản Gmail đã lưu trên thiết bị.
