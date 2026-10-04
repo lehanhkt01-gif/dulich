@@ -10,6 +10,19 @@
 > **Lưu ý / việc còn dở:** …
 > ```
 
+## [2026-10-04] Nâng Cấp Giao Diện Mở Bàn Mới: Tên Quán Nằm Trên Nền Đỏ, Chọn Nhiều Món & Cảnh Báo Chọn 2 Quán
+
+**Yêu cầu:** 
+Tại giao diện "mở bàn mới": Tên quán ăn nằm phía trên, phía dưới là các món ăn. Có thể chọn nhiều món ăn, món ăn nào được chọn thì tên quán ăn đó được đánh dấu nền màu đỏ, hiện số lượng món ăn được chọn. Nhắc nhở khách hàng khi chọn món ở 2 quán ăn trở lên để tránh chọn nhầm.
+
+**Đã làm:**
+- **Bố cục giao diện Tên Quán ở trên - Món ăn ở dưới ([`components/mon-ngon/MonNgonClient.tsx`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/components/mon-ngon/MonNgonClient.tsx)):**
+  - **Khối Quán ăn nằm phía trên:** Hiển thị danh sách các quán ăn đặc sản Ea Súp dưới dạng lưới các thẻ quán sang trọng (Tên quán, địa chỉ, chủ quán, hotline).
+  - **Đánh dấu nền màu đỏ & Đếm số lượng món:** Quán nào có món đang được chọn thì thẻ quán đó lập tức chuyển sang **nền màu đỏ bazan `#D9452B`**, chữ trắng nổi bật, kèm badge hiển thị số lượng món ăn đã chọn của quán đó (ví dụ: `[ 2 món ]`).
+  - **Chọn nhiều món ăn:** Cho phép du khách click chọn/bỏ chọn linh hoạt nhiều món ăn (`selectedDishIds`). Thẻ món được chọn có viền đỏ cam, vòng sáng ring và icon check góc trên.
+  - **Cảnh báo nhắc nhở khi chọn món ở 2 quán trở lên:** Khi du khách vô tình chọn món từ 2 quán khác nhau, khối thông báo màu vàng cam lập tức xuất hiện: `⚠️ Nhắc nhở: Bạn đang chọn món ở 2 quán ăn khác nhau!`, kèm theo các nút xử lý nhanh (ví dụ: *"Chỉ đặt món tại Quán Gà nướng Bản Đôn"*) giúp du khách gỡ nhanh món thừa chỉ với 1 cú click.
+  - **Tổng kết món & thông tin quán:** Hiển thị tóm tắt danh sách món đã chọn và thông tin quán ăn phục vụ, tự động đồng bộ khi tạo bàn.
+
 ## [2026-10-04] Tối Ưu Lắc Món & Mở Bàn Độc Quyền Quán Ăn (Chỉ Mở Bàn Tại 1 Quán Duy Nhất)
 
 **Yêu cầu:** 

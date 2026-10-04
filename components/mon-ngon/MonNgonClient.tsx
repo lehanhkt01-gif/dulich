@@ -34,6 +34,7 @@ import {
   ShoppingBag,
   ExternalLink,
   ShieldCheck,
+  AlertTriangle,
 } from 'lucide-react';
 import {
   CATEGORIES,
@@ -1587,43 +1588,7 @@ function CreateTableModal({
     [resolveRestaurant, restaurants]
   );
 
-  // Món ban đầu được chọn (từ Lắc món hoặc Thẻ món)
-  const initDishObj = useMemo(
-    () => (initialDish ? allDishes.find((d) => d.id === initialDish) || DISHES.find((d) => d.id === initialDish) : null),
-    [initialDish, allDishes]
-  );
-
-  const initRes = useMemo(() => (initDishObj ? getDishRes(initDishObj) : null), [initDishObj, getDishRes]);
-
-  const [selectedRestaurant, setSelectedRestaurant] = useState<DishRestaurant | null>(initRes);
-  const [dishId, setDishId] = useState(initialDish);
-  const [restaurant, setRestaurant] = useState(initRes?.name || '');
-  const [address, setAddress] = useState(initRes?.address || '');
-  const [showPickRestaurant, setShowPickRestaurant] = useState(!initRes);
-
-  const [date, setDate] = useState(defaults.date);
-  const [time, setTime] = useState(defaults.time);
-  const [duration, setDuration] = useState(90);
-  const [capacity, setCapacity] = useState(4);
-  const [host, setHost] = useState(nickname);
-  const [note, setNote] = useState('');
-  const [error, setError] = useState<string | null>(null);
-
-  // Chỉ hiển thị các món ăn thuộc về quán ăn đã chọn (hoặc tất cả nếu chưa chọn quán)
-  const availableDishes = useMemo(() => {
-    if (!selectedRestaurant) return allDishes;
-    const list = allDishes.filter((d) => {
-      const r = getDishRes(d);
-      return r && (r.id === selectedRestaurant.id || r.name.toLowerCase() === selectedRestaurant.name.toLowerCase());
-    });
-    if (list.length === 0 && dishId) {
-      const cur = allDishes.find((d) => d.id === dishId) || DISHES.find((d) => d.id === dishId);
-      if (cur) return [cur];
-    }
-    return list.length > 0 ? list : allDishes;
-  }, [allDishes, selectedRestaurant, getDishRes, dishId]);
-
-  // Danh sách các quán ẩm thực tại Ea Súp để chọn
+  // Danh sách các quán ẩm thực tại Ea Súp để hiển thị phía trên
   const approvedRestaurantsList = useMemo(() => {
     const list: DishRestaurant[] = [];
     const seen = new Set<string>();
@@ -1656,40 +1621,118 @@ function CreateTableModal({
     return list;
   }, [restaurants]);
 
-  // Xử lý đổi quán: cập nhật thông tin quán và chuyển sang món của quán mới
-  const handleSelectRestaurant = (r: DishRestaurant) => {
-    setSelectedRestaurant(r);
-    setRestaurant(r.name);
-    setAddress(r.address);
-    setShowPickRestaurant(false);
+  // Cho phép chọn nhiều món ăn (mặc định chọn món ban đầu nếu có)
+  const [selectedDishIds, setSelectedDishIds] = useState<string[]>(() => {
+    return initialDish ? [initialDish] : [];
+  });
 
+  const [date, setDate] = useState(defaults.date);
+  const [time, setTime] = useState(defaults.time);
+  const [duration, setDuration] = useState(90);
+  const [capacity, setCapacity] = useState(4);
+  const [host, setHost] = useState(nickname);
+  const [note, setNote] = useState('');
+  const [error, setError] = useState<string | null>(null);
+
+  // Đếm số lượng món của quán đang được chọn
+  const getSelectedCountForRestaurant = useCallback(
+    (resId: string, resName: string) => {
+      return selectedDishIds.filter((id) => {
+        const dish = allDishes.find((x) => x.id === id) || DISHES.find((x) => x.id === id);
+        const r = getDishRes(dish);
+        return r && (r.id === resId || r.name.toLowerCase() === resName.toLowerCase());
+      }).length;
+    },
+    [selectedDishIds, allDishes, getDishRes]
+  );
+
+  // Danh sách các quán có món được chọn
+  const activeRestaurants = useMemo(() => {
+    return approvedRestaurantsList.filter((r) => getSelectedCountForRestaurant(r.id, r.name) > 0);
+  }, [approvedRestaurantsList, getSelectedCountForRestaurant]);
+
+  // Cảnh báo nếu chọn món ở 2 quán ăn trở lên
+  const isMultiRestaurantWarning = activeRestaurants.length >= 2;
+
+  // Quán ăn chính đại diện cho bàn (quán có nhiều món nhất hoặc quán đầu tiên)
+  const primaryRestaurant = useMemo(() => {
+    if (activeRestaurants.length === 0) return approvedRestaurantsList[0] || null;
+    let best = activeRestaurants[0];
+    let maxCount = getSelectedCountForRestaurant(best.id, best.name);
+    for (const r of activeRestaurants) {
+      const c = getSelectedCountForRestaurant(r.id, r.name);
+      if (c > maxCount) {
+        best = r;
+        maxCount = c;
+      }
+    }
+    return best;
+  }, [activeRestaurants, approvedRestaurantsList, getSelectedCountForRestaurant]);
+
+  // Toggle chọn hoặc bỏ chọn một món ăn
+  const toggleDish = (dish: Dish) => {
+    setError(null);
+    setSelectedDishIds((prev) => {
+      if (prev.includes(dish.id)) {
+        return prev.filter((id) => id !== dish.id);
+      } else {
+        return [...prev, dish.id];
+      }
+    });
+  };
+
+  // Nút khắc phục nhanh: chỉ giữ lại các món của 1 quán duy nhất
+  const keepOnlyDishesForRestaurant = (resId: string, resName: string) => {
+    setError(null);
+    setSelectedDishIds((prev) => {
+      return prev.filter((id) => {
+        const dish = allDishes.find((x) => x.id === id) || DISHES.find((x) => x.id === id);
+        const r = getDishRes(dish);
+        return r && (r.id === resId || r.name.toLowerCase() === resName.toLowerCase());
+      });
+    });
+  };
+
+  // Chọn toàn bộ món của một quán khi bấm vào quán
+  const selectAllDishesOfRestaurant = (resId: string, resName: string) => {
+    setError(null);
     const dishesOfRes = allDishes.filter((d) => {
-      const res = getDishRes(d);
-      return res && (res.id === r.id || res.name.toLowerCase() === r.name.toLowerCase());
+      const r = getDishRes(d);
+      return r && (r.id === resId || r.name.toLowerCase() === resName.toLowerCase());
     });
     if (dishesOfRes.length > 0) {
-      setDishId(dishesOfRes[0].id);
+      // Nếu đã có món của quán này thì toggle hoặc giữ nguyên, nếu chưa có thì chọn món đầu tiên
+      const alreadyHas = dishesOfRes.some((d) => selectedDishIds.includes(d.id));
+      if (!alreadyHas) {
+        setSelectedDishIds((prev) => [...prev, dishesOfRes[0].id]);
+      }
     }
-    setError(null);
   };
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!dishId) return setError('Hãy chọn món bạn muốn ăn.');
-    if (!restaurant.trim()) return setError('Hãy chọn quán ăn.');
+    if (selectedDishIds.length === 0) return setError('Hãy chọn ít nhất một món ăn bạn muốn đặt.');
     if (!host.trim()) return setError('Hãy nhập họ tên của bạn để chủ bàn tiếp đón.');
     const start = new Date(`${date}T${time}`);
     if (isNaN(start.getTime())) return setError('Thời gian không hợp lệ.');
     if (start.getTime() < Date.now() - 5 * 60000) return setError('Thời gian hẹn phải ở tương lai.');
+
+    const targetRes = primaryRestaurant || approvedRestaurantsList[0];
+    const targetDishId = selectedDishIds[0];
+
     onSubmit({
-      dishId,
-      restaurant: restaurant.trim(),
-      address: address.trim() || 'Xã Ea Súp, Đắk Lắk',
+      dishId: targetDishId,
+      restaurant: targetRes?.name || 'Quán ăn Ea Súp',
+      address: targetRes?.address || 'Xã Ea Súp, Đắk Lắk',
       startAt: start.toISOString(),
       durationMin: duration,
       capacity,
       host: host.trim(),
-      note: note.trim() || undefined,
+      note: note.trim()
+        ? `${note.trim()} (Món đã chọn: ${selectedDishIds.map((id) => allDishes.find((d) => d.id === id)?.name || id).join(', ')})`
+        : selectedDishIds.length > 1
+        ? `Món đã chọn: ${selectedDishIds.map((id) => allDishes.find((d) => d.id === id)?.name || id).join(', ')}`
+        : undefined,
     });
   };
 
@@ -1704,76 +1747,179 @@ function CreateTableModal({
             <Users className="w-3.5 h-3.5" /> Rủ nhau đi ăn
           </span>
           <span className="text-[11px] font-semibold text-[#7A4B00] bg-[#FFF1C9] px-2.5 py-0.5 rounded-full flex items-center gap-1">
-            <UtensilsCrossed className="w-3 h-3 text-[#D9452B]" /> Mở bàn tại 1 quán duy nhất
+            <UtensilsCrossed className="w-3 h-3 text-[#D9452B]" /> Mở bàn tại quán
           </span>
         </div>
         <h2 id="mn-create-title" className="mt-2 text-2xl sm:text-3xl font-bold text-[#2B1D16]">Mở bàn mới</h2>
 
-        {/* 1. Chọn món (Chỉ hiển thị các món của quán đã lắc trúng / đã chọn) */}
+        {/* ================= 1. TÊN QUÁN ĂN NẰM PHÍA TRÊN ================= */}
         <fieldset className="mt-5">
           <div className="flex items-center justify-between gap-2 mb-2 flex-wrap">
             <legend className="text-sm font-bold text-[#2B1D16] flex items-center gap-1.5">
-              <span>1. Chọn món</span>
-              {selectedRestaurant && (
-                <span className="text-xs font-bold text-[#D9452B] bg-[#FDEDE8] px-2.5 py-0.5 rounded-full truncate max-w-[260px] sm:max-w-none">
-                  Thực đơn: {selectedRestaurant.name}
+              <Store className="w-4 h-4 text-[#D9452B]" />
+              <span>Quán ăn tại Ea Súp (Tên quán nằm phía trên)</span>
+            </legend>
+            <span className="text-xs text-[#7D6B62]">
+              Quán có món chọn được <strong>đánh dấu nền màu đỏ</strong>
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
+            {approvedRestaurantsList.map((r) => {
+              const count = getSelectedCountForRestaurant(r.id, r.name);
+              const isSelected = count > 0;
+              return (
+                <div
+                  key={r.id}
+                  onClick={() => selectAllDishesOfRestaurant(r.id, r.name)}
+                  className={`rounded-2xl p-3 border-2 transition-all text-left relative cursor-pointer ${
+                    isSelected
+                      ? 'bg-[#D9452B] text-white border-[#BF3A22] shadow-md shadow-[#D9452B]/25 ring-2 ring-[#D9452B]/20'
+                      : 'bg-[#FFF8F3] text-[#2B1D16] border-[#F1E4D8] hover:border-[#D9452B]/40 hover:bg-[#FFFDFB]'
+                  }`}
+                >
+                  <div className="flex items-start justify-between gap-1.5">
+                    <p className="text-xs font-bold flex items-center gap-1.5 truncate">
+                      <Store className={`w-3.5 h-3.5 shrink-0 ${isSelected ? 'text-white' : 'text-[#D9452B]'}`} />
+                      <span className="truncate">{r.name}</span>
+                    </p>
+                    {isSelected ? (
+                      <span className="shrink-0 text-[10px] font-black px-2 py-0.5 rounded-full bg-white text-[#D9452B] shadow-xs animate-in zoom-in-50">
+                        {count} món
+                      </span>
+                    ) : (
+                      <span className="shrink-0 text-[10px] font-medium text-stone-400">
+                        0 món
+                      </span>
+                    )}
+                  </div>
+
+                  <p className={`text-[11px] truncate mt-1 ${isSelected ? 'text-white/90' : 'text-stone-500'}`}>
+                    <MapPin className={`w-3 h-3 inline mr-1 ${isSelected ? 'text-white/80' : 'text-stone-400'}`} />
+                    {r.address}
+                  </p>
+
+                  <div className={`mt-1.5 pt-1.5 border-t flex items-center justify-between text-[10px] ${isSelected ? 'border-white/20 text-white/90' : 'border-[#F1E4D8] text-stone-500'}`}>
+                    <span>{r.ownerName ? `Chủ: ${r.ownerName}` : 'Quán Ea Súp'}</span>
+                    {r.phone && <span>{r.phone}</span>}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </fieldset>
+
+        {/* ================= NHẮC NHỞ KHI CHỌN MÓN Ở 2 QUÁN ĂN TRỞ LÊN ================= */}
+        {isMultiRestaurantWarning && (
+          <div className="mt-3.5 rounded-2xl bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-amber-400 p-3.5 sm:p-4 text-amber-950 shadow-sm animate-in fade-in">
+            <div className="flex items-start gap-3">
+              <AlertTriangle className="w-5 h-5 text-[#D9452B] shrink-0 mt-0.5 animate-bounce" />
+              <div className="flex-1 text-left">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <h4 className="text-sm font-bold text-[#D9452B]">
+                    ⚠️ Nhắc nhở: Bạn đang chọn món ở {activeRestaurants.length} quán ăn khác nhau!
+                  </h4>
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-200 text-amber-900">
+                    Tránh chọn nhầm
+                  </span>
+                </div>
+                <p className="text-xs text-stone-700 mt-1 leading-relaxed">
+                  Bàn ăn của bạn đang chọn món của: <strong>{activeRestaurants.map((r) => r.name).join('</strong> và <strong>')}</strong>.
+                  Mỗi bàn ăn nên mở tại <strong>1 quán duy nhất</strong> để quán chuẩn bị phục vụ chu đáo nhất và bạn không phải di chuyển giữa các nơi.
+                </p>
+                <div className="mt-2.5 flex items-center gap-2 flex-wrap">
+                  <span className="text-xs font-semibold text-stone-800">Khắc phục nhanh:</span>
+                  {activeRestaurants.map((res) => (
+                    <button
+                      key={res.id}
+                      type="button"
+                      onClick={() => keepOnlyDishesForRestaurant(res.id, res.name)}
+                      className="text-xs font-bold px-3 py-1 rounded-full bg-white border border-[#D9452B] text-[#D9452B] hover:bg-[#FDEDE8] transition-colors shadow-2xs inline-flex items-center gap-1"
+                    >
+                      <Check className="w-3 h-3" />
+                      <span>Chỉ đặt món tại {res.name}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ================= 2. PHÍA DƯỚI LÀ CÁC MÓN ĂN (CHỌN NHIỀU MÓN) ================= */}
+        <fieldset className="mt-5">
+          <div className="flex items-center justify-between gap-2 mb-2 flex-wrap">
+            <legend className="text-sm font-bold text-[#2B1D16] flex items-center gap-2">
+              <Utensils className="w-4 h-4 text-[#D9452B]" />
+              <span>Phía dưới là các món ăn</span>
+              {selectedDishIds.length > 0 && (
+                <span className="text-xs font-bold text-[#D9452B] bg-[#FDEDE8] px-2.5 py-0.5 rounded-full">
+                  Đã chọn {selectedDishIds.length} món
                 </span>
               )}
             </legend>
+            <span className="text-xs text-[#7D6B62]">
+              (Có thể bấm chọn nhiều món ăn cho bàn)
+            </span>
           </div>
 
-          {selectedRestaurant && (
-            <p className="text-xs text-[#7D6B62] mb-3">
-              Chỉ hiển thị các món do <strong>{selectedRestaurant.name}</strong> phục vụ. Bạn chỉ mở bàn tại quán này, không thể chọn món của quán khác trên cùng một bàn.
-            </p>
-          )}
-
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-            {availableDishes.map((d) => {
-              const active = dishId === d.id;
+            {allDishes.map((d) => {
+              const active = selectedDishIds.includes(d.id);
+              const r = getDishRes(d);
               return (
                 <button
                   type="button"
                   key={d.id}
-                  onClick={() => {
-                    setDishId(d.id);
-                    if (!selectedRestaurant) {
-                      const r = getDishRes(d);
-                      if (r) {
-                        setSelectedRestaurant(r);
-                        setRestaurant(r.name);
-                        setAddress(r.address);
-                      }
-                    }
-                  }}
-                  className={`relative rounded-2xl overflow-hidden border-2 transition-all text-left bg-white shadow-xs ${
-                    active ? 'border-[#D9452B] ring-4 ring-[#D9452B]/15' : 'border-[#F1E4D8] hover:border-[#D9452B]/60'
+                  onClick={() => toggleDish(d)}
+                  className={`relative rounded-2xl overflow-hidden border-2 transition-all text-left bg-white shadow-xs group ${
+                    active
+                      ? 'border-[#D9452B] ring-4 ring-[#D9452B]/15'
+                      : 'border-[#F1E4D8] hover:border-[#D9452B]/60'
                   }`}
                 >
-                  <div className="aspect-[4/3] w-full overflow-hidden bg-stone-100">
-                    <img src={d.image} alt={d.name} className="w-full h-full object-cover" />
+                  <div className="aspect-[4/3] w-full overflow-hidden bg-stone-100 relative">
+                    <img
+                      src={d.image}
+                      alt={d.name}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                    {active && (
+                      <span className="absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-[#D9452B] text-white text-xs font-bold grid place-items-center shadow-md animate-in zoom-in-50">
+                        <Check className="w-3.5 h-3.5" />
+                      </span>
+                    )}
+                    {r && (
+                      <span
+                        className={`absolute bottom-1 left-1 max-w-[90%] truncate rounded-md text-[9px] font-semibold px-1.5 py-0.5 ${
+                          active ? 'bg-[#D9452B] text-white' : 'bg-black/65 text-white backdrop-blur-xs'
+                        }`}
+                      >
+                        {r.name}
+                      </span>
+                    )}
                   </div>
                   <div className="p-2">
                     <p className="text-xs font-bold text-[#2B1D16] line-clamp-1">{d.name}</p>
-                    <p className="text-[10px] text-[#D9452B] font-semibold mt-0.5">{d.priceRange}</p>
+                    <div className="flex items-center justify-between gap-1 mt-0.5">
+                      <p className="text-[10px] text-[#D9452B] font-semibold">{d.priceRange}</p>
+                      {active && (
+                        <span className="text-[10px] font-bold text-[#D9452B]">✓ Đã chọn</span>
+                      )}
+                    </div>
                   </div>
-                  {active && (
-                    <span className="absolute top-1.5 right-1.5 w-5 h-5 rounded-full bg-[#D9452B] grid place-items-center shadow-sm">
-                      <Check className="w-3 h-3 text-white" />
-                    </span>
-                  )}
                 </button>
               );
             })}
           </div>
         </fieldset>
 
-        {/* 2. Quán & thời gian (Hiển thị đầy đủ thông tin quán ăn) */}
+        {/* ================= 3. THÔNG TIN QUÁN & THỜI GIAN HẸN ================= */}
         <fieldset className="mt-5 grid sm:grid-cols-2 gap-3">
-          <legend className="text-sm font-bold text-[#2B1D16] mb-2 sm:col-span-2">2. Quán & thời gian</legend>
+          <legend className="text-sm font-bold text-[#2B1D16] mb-2 sm:col-span-2">Thông tin quán & thời gian hẹn</legend>
 
-          {/* Khối thông tin quán ăn đã chọn */}
-          {selectedRestaurant && !showPickRestaurant ? (
+          {/* Khối thông tin quán ăn phục vụ */}
+          {primaryRestaurant && (
             <div className="sm:col-span-2 rounded-2xl bg-gradient-to-br from-[#FFF8F3] to-[#FFF1E8] border-2 border-[#F1D5C4] p-3.5 sm:p-4 shadow-xs">
               <div className="flex items-start justify-between gap-2">
                 <div className="flex items-start gap-3">
@@ -1782,97 +1928,44 @@ function CreateTableModal({
                   </div>
                   <div>
                     <div className="flex items-center gap-2 flex-wrap">
-                      <h3 className="text-base font-bold text-[#2B1D16]">{selectedRestaurant.name}</h3>
+                      <h3 className="text-base font-bold text-[#2B1D16]">{primaryRestaurant.name}</h3>
                       <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
                         <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" /> Đã xác thực
                       </span>
                     </div>
-                    {selectedRestaurant.ownerName && (
+                    {primaryRestaurant.ownerName && (
                       <p className="text-xs text-stone-600 mt-1">
-                        <span className="font-semibold text-stone-700">Chủ quán:</span> {selectedRestaurant.ownerName}
+                        <span className="font-semibold text-stone-700">Chủ quán:</span> {primaryRestaurant.ownerName}
                       </p>
                     )}
                     <p className="text-xs text-stone-600 mt-1 flex items-start gap-1">
                       <MapPin className="w-3.5 h-3.5 text-[#D9452B] shrink-0 mt-0.5" />
-                      <span>{selectedRestaurant.address}</span>
+                      <span>{primaryRestaurant.address}</span>
                     </p>
                     <div className="mt-1.5 flex items-center gap-3.5 flex-wrap text-xs text-stone-600">
-                      {selectedRestaurant.phone && (
+                      {primaryRestaurant.phone && (
                         <a
-                          href={`tel:${selectedRestaurant.phone}`}
+                          href={`tel:${primaryRestaurant.phone}`}
                           className="flex items-center gap-1 font-bold text-emerald-700 hover:underline"
                         >
                           <Phone className="w-3.5 h-3.5 text-emerald-600" />
-                          <span>Hotline: {selectedRestaurant.phone}</span>
+                          <span>Hotline: {primaryRestaurant.phone}</span>
                         </a>
                       )}
-                      {(selectedRestaurant.openTime || selectedRestaurant.closeTime) && (
+                      {(primaryRestaurant.openTime || primaryRestaurant.closeTime) && (
                         <span className="flex items-center gap-1 text-amber-700 font-medium">
                           <Clock className="w-3.5 h-3.5" />
-                          <span>Mở cửa: {selectedRestaurant.openTime || '07:30'} – {selectedRestaurant.closeTime || '22:00'}</span>
+                          <span>Mở cửa: {primaryRestaurant.openTime || '07:30'} – {primaryRestaurant.closeTime || '22:00'}</span>
                         </span>
                       )}
                     </div>
                   </div>
                 </div>
-
-                <button
-                  type="button"
-                  onClick={() => setShowPickRestaurant(true)}
-                  className="text-xs font-semibold text-[#D9452B] hover:text-[#BF3A22] bg-white border border-[#EADBD0] hover:border-[#D9452B] px-3 py-1 rounded-full shrink-0 transition-colors shadow-xs"
-                >
-                  Đổi quán khác
-                </button>
               </div>
 
               <div className="mt-3 pt-2.5 border-t border-[#F1E4D8] text-[11px] text-[#7D6B62] flex items-center gap-1.5">
                 <UtensilsCrossed className="w-3.5 h-3.5 text-[#D9452B] shrink-0" />
-                <span>Bàn ăn này được đặt độc quyền tại <strong>{selectedRestaurant.name}</strong>. Chỉ mở bàn tại 1 địa điểm duy nhất.</span>
-              </div>
-            </div>
-          ) : (
-            /* Danh sách chọn quán nếu muốn đổi hoặc chưa chọn */
-            <div className="sm:col-span-2 bg-[#FFF8F3] border border-[#F1E4D8] rounded-2xl p-3.5">
-              <div className="flex items-center justify-between mb-2">
-                <span className="block text-xs font-bold text-[#7D6B62] uppercase tracking-wide">
-                  Chọn quán ẩm thực đặc sản tại Ea Súp:
-                </span>
-                {selectedRestaurant && (
-                  <button
-                    type="button"
-                    onClick={() => setShowPickRestaurant(false)}
-                    className="text-xs text-stone-500 hover:underline"
-                  >
-                    Đóng
-                  </button>
-                )}
-              </div>
-              <div className="grid sm:grid-cols-2 gap-2">
-                {approvedRestaurantsList.map((r) => {
-                  const isSel = selectedRestaurant?.id === r.id;
-                  return (
-                    <button
-                      type="button"
-                      key={r.id}
-                      onClick={() => handleSelectRestaurant(r)}
-                      className={`text-left rounded-xl p-2.5 border transition-all ${
-                        isSel
-                          ? 'bg-[#FDEDE8] border-[#D9452B] ring-2 ring-[#D9452B]/20'
-                          : 'bg-white border-[#EADBD0] hover:border-[#D9452B] hover:bg-[#FFFDFB]'
-                      }`}
-                    >
-                      <p className="text-xs font-bold text-[#2B1D16] flex items-center gap-1">
-                        <Store className="w-3.5 h-3.5 text-[#D9452B] shrink-0" />
-                        <span className="truncate">{r.name}</span>
-                      </p>
-                      <p className="text-[11px] text-stone-500 truncate mt-0.5">{r.address}</p>
-                      <div className="flex items-center gap-2 mt-1 text-[10px] text-stone-600">
-                        {r.phone && <span>SĐT: {r.phone}</span>}
-                        {r.openTime && <span>· {r.openTime}–{r.closeTime}</span>}
-                      </div>
-                    </button>
-                  );
-                })}
+                <span>Bàn ăn này được đặt tại <strong>{primaryRestaurant.name}</strong>. Quý khách và bạn bè đến thưởng thức đúng giờ đã hẹn.</span>
               </div>
             </div>
           )}
@@ -1911,9 +2004,9 @@ function CreateTableModal({
           </div>
         </fieldset>
 
-        {/* 3. Thông tin bàn */}
+        {/* ================= 4. THÔNG TIN BÀN & TỔNG KẾT MÓN ================= */}
         <fieldset className="mt-5 grid sm:grid-cols-2 gap-3">
-          <legend className="text-sm font-bold text-[#2B1D16] mb-2 sm:col-span-2">3. Thông tin bàn</legend>
+          <legend className="text-sm font-bold text-[#2B1D16] mb-2 sm:col-span-2">Thông tin người đặt & số chỗ</legend>
           <div className="flex items-center justify-between rounded-2xl bg-[#FFFBF8] border border-[#EADBD0] px-4 py-2">
             <span className="text-[15px] text-[#5A4A42]">Số chỗ</span>
             <div className="flex items-center gap-3">
@@ -1947,14 +2040,24 @@ function CreateTableModal({
             id="mn-in-note"
             className={`${inputCls} sm:col-span-2 resize-none`}
             rows={2}
-            placeholder="Lời nhắn (vd: chia tiền đều, có chỗ đậu xe, chọn vị trí ngồi gần cửa sổ…)"
+            placeholder="Lời nhắn (vd: chia tiền đều, có chỗ đậu xe, phòng lạnh…)"
             value={note}
             onChange={(e) => setNote(e.target.value)}
           />
+
+          {/* Tóm tắt các món đã chọn */}
+          {selectedDishIds.length > 0 && (
+            <div className="sm:col-span-2 rounded-xl bg-[#FFF8F3] border border-[#F1E4D8] p-3 text-xs text-left">
+              <span className="font-bold text-[#2B1D16]">Món đã chọn ({selectedDishIds.length}): </span>
+              <span className="text-[#D9452B] font-semibold">
+                {selectedDishIds.map((id) => allDishes.find((d) => d.id === id)?.name || id).join(', ')}
+              </span>
+            </div>
+          )}
         </fieldset>
 
         {error && (
-          <p role="alert" className="mt-4 rounded-2xl bg-[#FDEDE8] text-[#C0392B] text-sm font-medium px-4 py-3">
+          <p role="alert" className="mt-4 rounded-2xl bg-[#FDEDE8] text-[#C0392B] text-sm font-medium px-4 py-3 text-left">
             {error}
           </p>
         )}
@@ -1979,3 +2082,4 @@ function CreateTableModal({
     </ModalShell>
   );
 }
+
