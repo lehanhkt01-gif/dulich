@@ -47,6 +47,7 @@ import {
   deleteUserAction,
   getAdminDashboardDataAction,
 } from '@/actions/admin-actions';
+import { computeCounts, type AdminCounts } from '@/lib/account-sync';
 
 export type AdminTab = 'list' | 'create' | 'food-tables' | 'customers' | 'owners' | 'cadres' | 'users';
 
@@ -71,6 +72,9 @@ export default function AdminPage() {
   const [loadingUsers, setLoadingUsers] = useState(false);
   const [restaurants, setRestaurants] = useState<any[]>([]);
   const [pendingApprovals, setPendingApprovals] = useState<any[]>([]);
+  const [adminCounts, setAdminCounts] = useState<AdminCounts | null>(null);
+  // Số liệu dùng chung: ưu tiên bộ đếm từ máy chủ, dự phòng tính từ dữ liệu đang hiển thị
+  const counts = adminCounts || computeCounts(users, restaurants);
   const [newUser, setNewUser] = useState({
     name: '',
     email: '',
@@ -309,6 +313,7 @@ export default function AdminPage() {
         setUsers(res.users || []);
         setRestaurants(res.restaurants || []);
         setPendingApprovals(res.pendingApprovals || []);
+        setAdminCounts((res as any).counts || null);
       }
     } catch {
       fetchUsers();
@@ -888,7 +893,7 @@ export default function AdminPage() {
                   : 'bg-purple-200/80 text-purple-900'
               }`}
             >
-              {users.filter((u) => u.role === 'USER' || u.role === 'TRAVELER').length}
+              {counts.customers}
             </span>
           </button>
 
@@ -916,7 +921,7 @@ export default function AdminPage() {
                     : 'bg-orange-200/80 text-orange-900'
                 }`}
               >
-                {users.filter((u) => u.role === 'OWNER').length}
+                {counts.owners}
               </span>
             )}
           </button>
@@ -1446,6 +1451,7 @@ export default function AdminPage() {
           {/* KPI Khách hàng */}
           {(() => {
             const customerList = users.filter((u) => u.role === 'USER' || u.role === 'TRAVELER');
+            // customerList.length luôn bằng counts.customers (cùng một nguồn dữ liệu)
             const activeCount = customerList.filter((u) => u.status !== 'BLOCKED').length;
             const blockedCount = customerList.filter((u) => u.status === 'BLOCKED').length;
 
@@ -1710,7 +1716,7 @@ export default function AdminPage() {
                 <h3 className="font-bold text-[#1C1917] text-sm">Danh Sách Quán Ăn & Chủ Quán Đang Hoạt Động</h3>
               </div>
               <span className="text-xs text-stone-500 font-medium">
-                {restaurants.filter((r) => r.isApproved).length} quán hoạt động
+                {counts.restaurantsApproved}/{counts.restaurants} quán hoạt động · {counts.owners} chủ quán
               </span>
             </div>
 
@@ -1923,7 +1929,7 @@ export default function AdminPage() {
                   <h3 className="font-bold text-[#1C1917] text-sm">Danh Sách Cán Bộ Phụ Trách</h3>
                 </div>
                 <span className="text-xs text-stone-500 font-medium">
-                  {users.filter((u) => u.role === 'CADRE' || u.role === 'ADMIN' || u.role === 'EDITOR').length} cán bộ
+                  {counts.cadres} cán bộ
                 </span>
               </div>
 

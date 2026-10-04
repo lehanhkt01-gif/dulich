@@ -1,6 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthUser, requireRole, isAdmin, canManageEntity } from '@/lib/auth';
-import { getStoredDishes, upsertStoredDish, getStoredUserById } from '@/lib/storage';
+import {
+  getStoredDishes,
+  upsertStoredDish,
+  getStoredUserById,
+  getStoredUsers,
+  getStoredRestaurants,
+} from '@/lib/storage';
+import { attachRestaurantToDishes } from '@/lib/account-sync';
 
 export async function GET(req: NextRequest) {
   try {
@@ -27,6 +34,9 @@ export async function GET(req: NextRequest) {
           (d.restaurantName && d.restaurantName.toLowerCase().includes(search))
       );
     }
+
+    // Gắn thông tin quán / chủ quán tương ứng vào từng món
+    dishes = attachRestaurantToDishes(dishes, getStoredUsers(), getStoredRestaurants());
 
     return NextResponse.json({
       success: true,

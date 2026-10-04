@@ -17,6 +17,12 @@ import {
 import { Role, UserStatus } from '@/lib/types';
 import { sendOwnerApprovedEmail } from '@/lib/email';
 import { revalidatePath } from 'next/cache';
+import {
+  mergeByKey,
+  reconcileAccounts,
+  stripRestaurantRelations,
+} from '@/lib/account-sync';
+import { saveStoredUsers, saveStoredRestaurants } from '@/lib/storage';
 
 /**
  * Lấy dữ liệu quản trị ẩm thực và tài khoản cho Admin
@@ -24,57 +30,81 @@ import { revalidatePath } from 'next/cache';
 export async function getAdminDashboardDataAction() {
   await requireAdmin();
 
-  let users: any[] = [];
-  let restaurants: any[] = [];
+  let dbUsers: any[] = [];
+  let dbRestaurants: any[] = [];
   let menuItems: any[] = [];
   let orders: any[] = [];
   let bookings: any[] = [];
 
+  // Dữ liệu từ PostgreSQL (nếu có) – từng bảng độc lập để một bảng lỗi không làm mất bảng khác
   try {
-    users = await prisma.user.findMany({ orderBy: { createdAt: 'desc' } });
-    restaurants = await prisma.restaurant.findMany({
-      include: { owner: true },
-      orderBy: { createdAt: 'desc' },
-    });
+    dbUsers = await prisma.user.findMany({ orderBy: { createdAt: 'desc' } });
+  } catch {}
+  try {
+    dbRestaurants = await prisma.restaurant.findMany({ orderBy: { createdAt: 'desc' } });
+  } catch {}
+  try {
     menuItems = await prisma.menuItem.findMany();
     orders = await prisma.order.findMany();
     bookings = await prisma.booking.findMany();
   } catch {
-    users = getStoredUsers();
-    restaurants = getStoredRestaurants();
     menuItems = getStoredMenuItems();
     orders = getStoredOrders();
     bookings = getStoredBookings();
   }
 
-  // Kết hợp thông tin owner cho restaurants nếu chưa có
-  restaurants = restaurants.map((r) => {
-    if (!r.owner) {
-      r.owner = users.find((u) => u.id === r.ownerId);
+  // Gộp với kho JSON bền vững (kho mà mọi thao tác đăng ký / duyệt đều ghi vào)
+  const mergedUsers = mergeByKey<any>(dbUsers, getStoredUsers(), (u) => u.email?.toLowerCase());
+  const mergedRestaurants = mergeByKey<any>(
+    dbRestaurants.map(stripRestaurantRelations),
+    getStoredRestaurants().map(stripRestaurantRelations),
+    (r) => r.id
+  );
+
+  // Đối soát: mỗi quán có đúng 1 chủ quán, mỗi chủ quán có 1 hồ sơ quán
+  const synced = reconcileAccounts(mergedUsers, mergedRestaurants);
+  const users = synced.users;
+  const restaurants = synced.restaurants;
+
+  // Lưu lại kết quả đồng bộ để các trang khác (Món ngon, Chủ quán) thấy cùng số liệu
+  try {
+    const cleanRestaurants = restaurants.map(stripRestaurantRelations);
+    if (JSON.stringify(users) !== JSON.stringify(getStoredUsers())) saveStoredUsers(users);
+    if (JSON.stringify(cleanRestaurants) !== JSON.stringify(getStoredRestaurants())) {
+      saveStoredRestaurants(cleanRestaurants);
     }
-    return r;
-  });
+  } catch (err) {
+    console.error('Không thể lưu kết quả đồng bộ tài khoản:', err);
+  }
 
   // Lọc danh sách chủ quán chờ duyệt
   const pendingApprovals = restaurants.filter((r) => !r.isApproved || r.owner?.status === 'PENDING');
 
-  // Thống kê tổng quan
+  // Thống kê tổng quan – tính từ cùng một bộ dữ liệu đã đồng bộ
+  const counts = synced.counts;
   const stats = {
-    totalRestaurants: restaurants.length,
-    approvedRestaurants: restaurants.filter((r) => r.isApproved).length,
+    totalRestaurants: counts.restaurants,
+    approvedRestaurants: counts.restaurantsApproved,
     pendingRestaurants: pendingApprovals.length,
     totalMenuItems: menuItems.length,
     totalOrders: orders.length,
     totalBookings: bookings.length,
-    totalUsers: users.length,
+    totalUsers: counts.totalUsers,
+  };
+
+  const safeUser = (u: any) => {
+    if (!u) return u;
+    const { password, ...rest } = u;
+    return rest;
   };
 
   return {
     success: true,
     stats,
-    pendingApprovals,
-    restaurants,
-    users,
+    counts,
+    pendingApprovals: pendingApprovals.map((r) => ({ ...r, owner: safeUser(r.owner) })),
+    restaurants: restaurants.map((r) => ({ ...r, owner: safeUser(r.owner) })),
+    users: users.map(safeUser),
   };
 }
 

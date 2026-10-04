@@ -221,6 +221,23 @@ export interface DishItem {
   ownerId?: string | null;
   restaurantName?: string | null;
   restaurantAddress?: string | null;
+  restaurantId?: string | null;
+  restaurant?: DishRestaurantInfo | null;
   createdAt?: string;
   updatedAt?: string;
+}
+
+/** Thông tin quán ăn phục vụ món (hiển thị trên thẻ món & chi tiết món) */
+export interface DishRestaurantInfo {
+  id: string;
+  name: string;
+  slug?: string | null;
+  address: string;
+  village?: string | null;
+  phone?: string | null;
+  openTime?: string | null;
+  closeTime?: string | null;
+  coverImage?: string | null;
+  isApproved?: boolean;
+  ownerName?: string | null;
 }

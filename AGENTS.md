@@ -91,6 +91,7 @@ docker compose up -d --build   # trên VPS
 - [x] Quản lý món ăn cho Chủ Quán: Cho phép tải ảnh trực tiếp từ máy tính/điện thoại (< 3MB) hoặc chọn từ kho lưu trữ ảnh món ngon đặc sản Ea Súp sổ ra.
 - [x] Tự động điền Họ tên và Số điện thoại của Khách hàng khi mở form Đặt Món và Đặt Bàn tại quán.
 - [x] Tích hợp hệ thống Email thông báo tự động ngay lập tức qua Nodemailer cho Khách hàng, Chủ quán và Admin (`Lehanhkt01@gmail.com`).
+- [x] Đồng bộ số liệu Admin (Khách hàng, Chủ quán, Cán bộ khớp 100% với danh sách quán) & Bổ sung thông tin Quán ăn/Chủ quán chi tiết kèm hotline trên từng món ăn.
 - [ ] Mở rộng tính năng bình luận và đánh giá món ăn/quán ăn cho du khách.
 
 ## 8. Lưu ý quan trọng

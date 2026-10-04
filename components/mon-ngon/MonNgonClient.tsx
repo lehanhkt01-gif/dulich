@@ -47,9 +47,11 @@ import {
   relativeDayLabel,
   type Dish,
   type DishCategory,
+  type DishRestaurant,
   type FoodTable,
   type TimeSlot,
 } from '@/lib/data/mon-ngon';
+import { SEED_DISH_RESTAURANT } from '@/lib/account-sync';
 
 type Tab = 'kham-pha' | 'quan-an' | 'ban-an' | 'lich-hen';
 
@@ -105,17 +107,43 @@ export default function MonNgonClient() {
 
   const dishById = useCallback((id: string) => allDishes.find((d) => d.id === id) || DISHES.find((d) => d.id === id), [allDishes]);
 
+  // Dữ liệu & Quán ăn
+  const [restaurants, setRestaurants] = useState<any[]>([]);
+  const [openRestaurantFor, setOpenRestaurantFor] = useState<string | null>(null);
+
+  // Thông tin quán ăn phục vụ từng món (ưu tiên dữ liệu máy chủ gắn sẵn, dự phòng tra theo danh sách quán)
+  const resolveRestaurant = useCallback(
+    (d: Dish): DishRestaurant | null => {
+      if (d.restaurant) return d.restaurant;
+      const rid = d.restaurantId || SEED_DISH_RESTAURANT[d.id];
+      const r = restaurants.find((x) => x.id === rid);
+      if (!r) return null;
+      return {
+        id: r.id,
+        name: r.name,
+        slug: r.slug,
+        address: r.address,
+        village: r.village,
+        phone: r.phone,
+        openTime: r.openTime,
+        closeTime: r.closeTime,
+        coverImage: r.coverImage,
+        ownerName: r.owner?.name || r.ownerName || null,
+      };
+    },
+    [restaurants]
+  );
+
   // Bàn ăn
   const [dishFilter, setDishFilter] = useState<string>('all');
   const [slotFilter, setSlotFilter] = useState<TimeSlot>('all');
 
-  // Dữ liệu
+  // Dữ liệu bàn ăn
   const [sampleTables, setSampleTables] = useState<FoodTable[]>([]);
   const [myTables, setMyTables] = useState<FoodTable[]>([]);
   const [joined, setJoined] = useState<string[]>([]);
   const [cancelled, setCancelled] = useState<string[]>([]);
   const [nickname, setNickname] = useState('');
-  const [restaurants, setRestaurants] = useState<any[]>([]);
 
   // Modal & thông báo
   const [shakeOpen, setShakeOpen] = useState(false);
@@ -585,6 +613,18 @@ export default function MonNgonClient() {
                         <div className="flex flex-col flex-1 p-3 sm:p-4">
                           <h3 className="font-sans text-base sm:text-lg font-bold text-[#2B1D16] leading-snug">{d.name}</h3>
                           <p className="mt-1 text-xs sm:text-sm text-[#7D6B62] line-clamp-2">{d.shortDesc}</p>
+                          {(() => {
+                            const rest = resolveRestaurant(d);
+                            if (!rest) return null;
+                            return (
+                              <RestaurantInfo
+                                restaurant={rest}
+                                expanded={openRestaurantFor === d.id}
+                                onToggle={() => setOpenRestaurantFor(openRestaurantFor === d.id ? null : d.id)}
+                                idPrefix={`mn-rest-${d.id}`}
+                              />
+                            );
+                          })()}
                           <div className="mt-auto pt-3 flex items-end justify-between gap-2">
                             <span className={`text-xs sm:text-sm font-medium ${n ? 'text-[#2F9E44]' : 'text-[#A8968C]'}`}>
                               {mounted ? (n ? `${n} bàn đang mở` : 'Chưa có bàn') : '\u00A0'}
@@ -895,6 +935,7 @@ export default function MonNgonClient() {
       {detail && (
         <DishModal
           dish={detail}
+          restaurant={resolveRestaurant(detail)}
           tables={activeTablesByDish[detail.id] || 0}
           onClose={() => setDetail(null)}
           onFind={() => findTablesFor(detail.id)}
@@ -1200,8 +1241,102 @@ function ShakeModal({ onClose, onFind, onCreate, hasTables }: { onClose: () => v
   );
 }
 
+/* ---------- Khối thông tin quán ăn phục vụ món (Hiển thị trên thẻ món) ---------- */
+function RestaurantInfo({
+  restaurant,
+  expanded,
+  onToggle,
+  idPrefix,
+}: {
+  restaurant: DishRestaurant;
+  expanded: boolean;
+  onToggle: () => void;
+  idPrefix: string;
+}) {
+  return (
+    <div className="mt-2.5 rounded-2xl bg-[#FFF8F3] border border-[#F3E6DB] p-2.5 sm:p-3 text-left">
+      <div className="flex items-start justify-between gap-1.5">
+        <div className="min-w-0 flex-1">
+          <p className="text-[11px] font-bold text-[#D9452B] flex items-center gap-1 truncate">
+            <Store className="w-3.5 h-3.5 shrink-0 text-[#D9452B]" />
+            <span className="truncate">{restaurant.name}</span>
+          </p>
+          <p className="text-[10px] text-[#7D6B62] flex items-center gap-1 mt-0.5 truncate">
+            <MapPin className="w-3 h-3 shrink-0 text-stone-400" />
+            <span className="truncate">{restaurant.address}</span>
+          </p>
+        </div>
+        <button
+          type="button"
+          id={`${idPrefix}-toggle`}
+          onClick={(e) => {
+            e.stopPropagation();
+            onToggle();
+          }}
+          className="shrink-0 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-white border border-[#EADBD0] text-[#D9452B] hover:bg-[#FDEDE8] transition-colors"
+        >
+          {expanded ? 'Thu gọn' : 'Xem quán'}
+        </button>
+      </div>
+
+      {expanded && (
+        <div className="mt-2 pt-2 border-t border-[#F1E4D8] space-y-1.5 text-[11px] text-[#4A3B34] animate-in fade-in duration-200">
+          {restaurant.ownerName && (
+            <p className="flex items-center gap-1.5">
+              <span className="text-[#A8968C]">Chủ quán:</span>
+              <span className="font-semibold text-[#2B1D16]">{restaurant.ownerName}</span>
+            </p>
+          )}
+          {restaurant.phone && (
+            <p className="flex items-center gap-1.5">
+              <Phone className="w-3 h-3 text-[#D9452B]" />
+              <a
+                href={`tel:${restaurant.phone}`}
+                className="font-bold text-[#0066CC] hover:underline"
+                onClick={(e) => e.stopPropagation()}
+              >
+                {restaurant.phone}
+              </a>
+            </p>
+          )}
+          {(restaurant.openTime || restaurant.closeTime) && (
+            <p className="flex items-center gap-1.5 text-stone-600">
+              <Clock className="w-3 h-3 text-[#F5B82E]" />
+              <span>Phục vụ: {restaurant.openTime || '07:30'} – {restaurant.closeTime || '22:00'}</span>
+            </p>
+          )}
+          <div className="pt-1 flex items-center justify-end">
+            <Link
+              href={`/mon-ngon/${restaurant.slug || restaurant.id}`}
+              className="inline-flex items-center gap-1 text-[11px] font-bold text-[#D9452B] hover:underline"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <span>Xem trang quán & thực đơn</span>
+              <ExternalLink className="w-3 h-3" />
+            </Link>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 /* ---------- Chi tiết món ---------- */
-function DishModal({ dish, tables, onClose, onFind, onCreate }: { dish: Dish; tables: number; onClose: () => void; onFind: () => void; onCreate: () => void }) {
+function DishModal({
+  dish,
+  restaurant,
+  tables,
+  onClose,
+  onFind,
+  onCreate,
+}: {
+  dish: Dish;
+  restaurant?: DishRestaurant | null;
+  tables: number;
+  onClose: () => void;
+  onFind: () => void;
+  onCreate: () => void;
+}) {
   return (
     <ModalShell onClose={onClose} labelledBy="mn-dish-title">
       <div className="aspect-[16/10] overflow-hidden">
@@ -1220,6 +1355,59 @@ function DishModal({ dish, tables, onClose, onFind, onCreate }: { dish: Dish; ta
           <span className="text-[#7D6B62]">Giá tham khảo: </span>
           <b className="text-[#2B1D16]">{dish.priceRange}</b>
         </div>
+
+        {/* Thông tin Quán ăn & Chủ quán phục vụ món */}
+        {restaurant && (
+          <div className="mt-4 rounded-2xl bg-[#FFF8F3] border-2 border-[#F3E6DB] p-4 text-left">
+            <div className="flex items-center justify-between pb-2 border-b border-[#F1E4D8]">
+              <span className="text-xs font-bold text-[#D9452B] flex items-center gap-1.5 uppercase tracking-wide">
+                <Store className="w-4 h-4 text-[#D9452B]" />
+                <span>Quán ăn phục vụ món này</span>
+              </span>
+              <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
+                <ShieldCheck className="w-3 h-3 text-emerald-600" /> Đã xác thực
+              </span>
+            </div>
+
+            <div className="mt-2.5 space-y-1.5 text-xs text-[#2B1D16]">
+              <p className="text-base font-bold text-[#2B1D16]">{restaurant.name}</p>
+              {restaurant.ownerName && (
+                <p className="text-stone-600">
+                  <span className="font-semibold text-stone-700">Chủ quán:</span> {restaurant.ownerName}
+                </p>
+              )}
+              <p className="flex items-start gap-1.5 text-stone-600">
+                <MapPin className="w-3.5 h-3.5 text-[#D9452B] shrink-0 mt-0.5" />
+                <span>{restaurant.address}</span>
+              </p>
+              {(restaurant.openTime || restaurant.closeTime) && (
+                <p className="flex items-center gap-1.5 text-stone-600">
+                  <Clock className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+                  <span>Giờ mở cửa: <strong>{restaurant.openTime || '07:30'} – {restaurant.closeTime || '22:00'}</strong></span>
+                </p>
+              )}
+              {restaurant.phone && (
+                <div className="pt-2 flex items-center justify-between gap-2">
+                  <a
+                    href={`tel:${restaurant.phone}`}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-xs transition-colors"
+                  >
+                    <Phone className="w-3.5 h-3.5" />
+                    <span>Gọi {restaurant.phone}</span>
+                  </a>
+                  <Link
+                    href={`/mon-ngon/${restaurant.slug || restaurant.id}`}
+                    className="inline-flex items-center gap-1 text-xs font-bold text-[#D9452B] hover:underline"
+                  >
+                    <span>Xem thực đơn quán</span>
+                    <ExternalLink className="w-3.5 h-3.5" />
+                  </Link>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
         <div className="mt-5 grid grid-cols-2 gap-3">
           <button onClick={onCreate} className="mn-press inline-flex items-center justify-center gap-2 rounded-full border-2 border-[#EADBD0] hover:border-[#D9452B] font-bold py-3 transition-colors">
             <Plus className="w-4 h-4" /> Mở bàn

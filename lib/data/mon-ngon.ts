@@ -9,6 +9,19 @@
 
 export type DishCategory = 'nuong' | 'canh-lau' | 'com-xoi' | 'dac-san' | 'do-uong';
 
+export interface DishRestaurant {
+  id: string;
+  name: string;
+  slug?: string | null;
+  address: string;
+  village?: string | null;
+  phone?: string | null;
+  openTime?: string | null;
+  closeTime?: string | null;
+  coverImage?: string | null;
+  ownerName?: string | null;
+}
+
 export interface Dish {
   id: string;
   name: string;
@@ -18,6 +31,11 @@ export interface Dish {
   image: string;
   priceRange: string;
   tags: string[];
+  /** Quán/chủ quán phục vụ món (được máy chủ gắn vào) */
+  restaurantId?: string | null;
+  restaurantName?: string | null;
+  restaurantAddress?: string | null;
+  restaurant?: DishRestaurant | null;
 }
 
 export interface FoodTable {

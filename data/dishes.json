@@ -7,15 +7,13 @@
     "story": "Gà đồi thả vườn được ướp sả, mắc khén rồi nướng chậm trên than củi cho da vàng giòn, thịt chắc ngọt. Ăn kèm muối ớt lá é và rau rừng – món không thể thiếu trong những buổi họp mặt ở Ea Súp.",
     "image": "/mon-ngon/ga-nuong.jpg",
     "priceRange": "180.000 – 300.000đ/con",
-    "tags": [
-      "Món nhóm",
-      "Đậm vị"
-    ],
-    "ownerId": null,
-    "restaurantName": "Ẩm thực truyền thống Ea Súp",
-    "restaurantAddress": "Xã Ea Súp, Tỉnh Đắk Lắk",
+    "tags": ["Món nhóm", "Đậm vị"],
+    "ownerId": "user-owner-ga-nuong",
+    "restaurantId": "res-ga-nuong",
+    "restaurantName": "Gà Nướng Cơm Lam Bản Đôn Ea Súp",
+    "restaurantAddress": "Buôn A2, Xã Ea Súp, Huyện Ea Súp, Tỉnh Đắk Lắk",
     "createdAt": "2026-10-03T14:54:39.795Z",
-    "updatedAt": "2026-10-03T14:54:39.795Z"
+    "updatedAt": "2026-10-04T08:00:00.000Z"
   },
   {
     "id": "com-lam",
@@ -25,15 +23,13 @@
     "story": "Gạo nếp nương được ngâm nước suối, nhồi vào ống lồ ô non rồi nướng trên bếp lửa. Khi chẻ ống, lớp màng tre mỏng ôm lấy cơm dẻo thơm, ăn cùng muối vừng hoặc thịt nướng xiên.",
     "image": "/mon-ngon/com-lam.jpg",
     "priceRange": "20.000 – 40.000đ/ống",
-    "tags": [
-      "Truyền thống",
-      "Dễ mang theo"
-    ],
-    "ownerId": null,
-    "restaurantName": "Ẩm thực truyền thống Ea Súp",
-    "restaurantAddress": "Xã Ea Súp, Tỉnh Đắk Lắk",
+    "tags": ["Truyền thống", "Dễ mang theo"],
+    "ownerId": "user-owner-ga-nuong",
+    "restaurantId": "res-ga-nuong",
+    "restaurantName": "Gà Nướng Cơm Lam Bản Đôn Ea Súp",
+    "restaurantAddress": "Buôn A2, Xã Ea Súp, Huyện Ea Súp, Tỉnh Đắk Lắk",
     "createdAt": "2026-10-03T14:54:39.795Z",
-    "updatedAt": "2026-10-03T14:54:39.795Z"
+    "updatedAt": "2026-10-04T08:00:00.000Z"
   },
   {
     "id": "canh-thut",
@@ -43,15 +39,13 @@
     "story": "Món canh đặc trưng của đồng bào Ê Đê: cà đắng, lá bép, đọt mây, cá khô được cho vào ống tre, nướng chín rồi dùng que tre thụt nhuyễn. Vị đắng nhẹ, cay nồng, hậu ngọt rất khó quên.",
     "image": "/mon-ngon/canh-thut.jpg",
     "priceRange": "60.000 – 120.000đ/phần",
-    "tags": [
-      "Đồng bào Ê Đê",
-      "Rau rừng"
-    ],
-    "ownerId": null,
-    "restaurantName": "Ẩm thực truyền thống Ea Súp",
-    "restaurantAddress": "Xã Ea Súp, Tỉnh Đắk Lắk",
+    "tags": ["Đồng bào Ê Đê", "Rau rừng"],
+    "ownerId": "user-owner-ga-nuong",
+    "restaurantId": "res-ga-nuong",
+    "restaurantName": "Gà Nướng Cơm Lam Bản Đôn Ea Súp",
+    "restaurantAddress": "Buôn A2, Xã Ea Súp, Huyện Ea Súp, Tỉnh Đắk Lắk",
     "createdAt": "2026-10-03T14:54:39.795Z",
-    "updatedAt": "2026-10-03T14:54:39.795Z"
+    "updatedAt": "2026-10-04T08:00:00.000Z"
   },
   {
     "id": "ca-nuong",
@@ -61,15 +55,13 @@
     "story": "Cá đánh bắt từ lòng hồ Ea Súp Thượng, thịt chắc và ngọt tự nhiên. Nướng than rồi rưới mỡ hành, đậu phộng; cuốn bánh tráng cùng xoài xanh, rau thơm và chấm nước mắm me.",
     "image": "/mon-ngon/ca-nuong.jpg",
     "priceRange": "150.000 – 250.000đ/con",
-    "tags": [
-      "Đặc sản hồ",
-      "Món nhóm"
-    ],
-    "ownerId": null,
-    "restaurantName": "Ẩm thực truyền thống Ea Súp",
-    "restaurantAddress": "Xã Ea Súp, Tỉnh Đắk Lắk",
+    "tags": ["Đặc sản hồ", "Món nhóm"],
+    "ownerId": "user-owner-ho-ea-sup",
+    "restaurantId": "res-ho-ea-sup",
+    "restaurantName": "Ẩm Thực Sinh Thái Lòng Hồ Ea Súp Thượng",
+    "restaurantAddress": "Khu du lịch sinh thái Hồ Ea Súp Thượng, Xã Ea Súp",
     "createdAt": "2026-10-03T14:54:39.795Z",
-    "updatedAt": "2026-10-03T14:54:39.795Z"
+    "updatedAt": "2026-10-04T08:00:00.000Z"
   },
   {
     "id": "lau-ca",
@@ -79,15 +71,13 @@
     "story": "Nước lẩu nấu từ xương cá, thơm (dứa) và cà chua cho vị chua thanh. Nhúng cá tươi, đậu bắp, giá và rau muống – món lý tưởng cho buổi tối mát trời bên hồ.",
     "image": "/mon-ngon/lau-ca.jpg",
     "priceRange": "250.000 – 400.000đ/nồi",
-    "tags": [
-      "Món nhóm",
-      "Buổi tối"
-    ],
-    "ownerId": null,
-    "restaurantName": "Ẩm thực truyền thống Ea Súp",
-    "restaurantAddress": "Xã Ea Súp, Tỉnh Đắk Lắk",
+    "tags": ["Món nhóm", "Buổi tối"],
+    "ownerId": "user-owner-ho-ea-sup",
+    "restaurantId": "res-ho-ea-sup",
+    "restaurantName": "Ẩm Thực Sinh Thái Lòng Hồ Ea Súp Thượng",
+    "restaurantAddress": "Khu du lịch sinh thái Hồ Ea Súp Thượng, Xã Ea Súp",
     "createdAt": "2026-10-03T14:54:39.795Z",
-    "updatedAt": "2026-10-03T14:54:39.795Z"
+    "updatedAt": "2026-10-04T08:00:00.000Z"
   },
   {
     "id": "bo-mot-nang",
@@ -97,15 +87,13 @@
     "story": "Thịt bò thái miếng, tẩm gia vị rồi phơi đúng một nắng cho se mặt. Khi ăn nướng sơ trên than, xé nhỏ và chấm muối kiến vàng – vị chua cay rất riêng của núi rừng Tây Nguyên.",
     "image": "/mon-ngon/bo-mot-nang.jpg",
     "priceRange": "350.000 – 450.000đ/kg",
-    "tags": [
-      "Quà mang về",
-      "Muối kiến vàng"
-    ],
-    "ownerId": null,
-    "restaurantName": "Ẩm thực truyền thống Ea Súp",
-    "restaurantAddress": "Xã Ea Súp, Tỉnh Đắk Lắk",
+    "tags": ["Quà mang về", "Muối kiến vàng"],
+    "ownerId": "user-owner-bo-mot-nang",
+    "restaurantId": "res-bo-mot-nang",
+    "restaurantName": "Bò Một Nắng & Ẩm Thực Tây Nguyên Thôn 1",
+    "restaurantAddress": "Thôn 1, Xã Ea Súp, Huyện Ea Súp, Tỉnh Đắk Lắk",
     "createdAt": "2026-10-03T14:54:39.795Z",
-    "updatedAt": "2026-10-03T14:54:39.795Z"
+    "updatedAt": "2026-10-04T08:00:00.000Z"
   },
   {
     "id": "xoai-cat",
@@ -115,15 +103,13 @@
     "story": "Vùng chuyên canh hơn 3.000 ha xoài cát của Ea Súp cho trái thơm ngọt nhờ nắng gió và đất bazan. Có thể ăn tươi, làm sinh tố, hoặc chấm muối ớt khi còn xanh giòn.",
     "image": "/mon-ngon/xoai-cat.jpg",
     "priceRange": "25.000 – 45.000đ/kg",
-    "tags": [
-      "OCOP 4 sao",
-      "Theo mùa"
-    ],
-    "ownerId": null,
-    "restaurantName": "Ẩm thực truyền thống Ea Súp",
-    "restaurantAddress": "Xã Ea Súp, Tỉnh Đắk Lắk",
+    "tags": ["OCOP 4 sao", "Theo mùa"],
+    "ownerId": "user-owner-ca-phe-gio-ho",
+    "restaurantId": "res-ca-phe-gio-ho",
+    "restaurantName": "Cà Phê Gió Hồ & Điểm Hẹn Đại Ngàn",
+    "restaurantAddress": "Đường ven hồ sinh thái, Xã Ea Súp, Huyện Ea Súp",
     "createdAt": "2026-10-03T14:54:39.795Z",
-    "updatedAt": "2026-10-03T14:54:39.795Z"
+    "updatedAt": "2026-10-04T08:00:00.000Z"
   },
   {
     "id": "ca-phe",
@@ -133,14 +119,12 @@
     "story": "Hạt robusta Đắk Lắk rang mộc, pha phin chậm rãi. Uống đen đá hay sữa đá đều đậm vị – khởi đầu hoàn hảo trước chuyến tham quan Tháp Chăm Yang Prông.",
     "image": "/mon-ngon/ca-phe.jpg",
     "priceRange": "15.000 – 30.000đ/ly",
-    "tags": [
-      "Buổi sáng",
-      "Gặp gỡ"
-    ],
-    "ownerId": null,
-    "restaurantName": "Ẩm thực truyền thống Ea Súp",
-    "restaurantAddress": "Xã Ea Súp, Tỉnh Đắk Lắk",
+    "tags": ["Buổi sáng", "Gặp gỡ"],
+    "ownerId": "user-owner-ca-phe-gio-ho",
+    "restaurantId": "res-ca-phe-gio-ho",
+    "restaurantName": "Cà Phê Gió Hồ & Điểm Hẹn Đại Ngàn",
+    "restaurantAddress": "Đường ven hồ sinh thái, Xã Ea Súp, Huyện Ea Súp",
     "createdAt": "2026-10-03T14:54:39.795Z",
-    "updatedAt": "2026-10-03T14:54:39.795Z"
+    "updatedAt": "2026-10-04T08:00:00.000Z"
   }
 ]

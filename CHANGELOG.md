@@ -10,6 +10,29 @@
 > **Lưu ý / việc còn dở:** …
 > ```
 
+## [2026-10-04] Đồng Bộ Chuẩn Hoá Số Liệu Admin & Bổ Sung Thông Tin Quán Ăn Kèm Hotline Cho Từng Món Ăn
+
+**Yêu cầu:** 
+1. Khắc phục sự lệch số liệu giữa 3 nút header quản trị (Khách Hàng, Chủ Quán, Cán Bộ) và bảng "Danh Sách Quán Ăn & Chủ Quán Đang Hoạt Động" trong trang `/admin` (trước đó nút Chủ Quán hiển thị số 0 trong khi bảng có 4 quán).
+2. Tại trang "Khám phá món" (Món ngon Ea Súp), trên mỗi món ăn cần hiển thị tên "chủ quán/quán ăn" kèm địa chỉ, thông tin quán tương ứng, khi bấm vào sẽ mở rộng xem chi tiết hoặc mở modal đầy đủ thông tin quán (tên chủ quán, hotline gọi ngay, giờ mở cửa, menu quán).
+
+**Đã làm:**
+- **Module chuẩn hoá và đối soát dữ liệu ([`lib/account-sync.ts`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/lib/account-sync.ts)):**
+  - Xây dựng `reconcileAccounts(users, restaurants)` đối soát tự động giữa tài khoản `OWNER` và hồ sơ quán ăn, tự động tạo tài khoản chủ quán chuẩn tương ứng nếu quán chưa có user liên kết, loại bỏ triệt để tình trạng lệch dữ liệu.
+  - Xây dựng `computeCounts(users, restaurants)` làm nguồn chân lý duy nhất (Single Source of Truth) để tính toán thống kê số lượng: Khách hàng, Chủ quán (tổng số, đang hoạt động, chờ duyệt), Cán bộ, và Quán ăn đã duyệt.
+  - Xây dựng `attachRestaurantToDishes(dishes, users, restaurants)` tự động gắn thông tin quán ăn chi tiết (tên quán, chủ quán, địa chỉ, SĐT, giờ mở cửa, slug) vào danh sách món ăn.
+- **Cập nhật Server Action & API ([`actions/admin-actions.ts`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/actions/admin-actions.ts), [`app/api/dishes/route.ts`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/app/api/dishes/route.ts), [`app/api/users/route.ts`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/app/api/users/route.ts)):**
+  - Cập nhật `getAdminDashboardDataAction()` trả về `counts` chuẩn hoá và danh sách người dùng đã loại bỏ mật khẩu bảo mật.
+  - API `/api/dishes` tự động gắn `restaurantInfo` vào từng món phục vụ du khách.
+- **Đồng bộ cơ sở dữ liệu JSON ([`data/users.json`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/data/users.json), [`data/restaurants.json`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/data/restaurants.json), [`data/dishes.json`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/data/dishes.json)):**
+  - Tạo và đồng bộ các tài khoản Chủ quán chuẩn ứng với các quán thực tế ở Ea Súp (Quán Gà nướng Bản Đôn, Lòng hồ Ea Súp, Bò một nắng Krông Ana, Cà phê Gió Hồ).
+  - Gắn `ownerId` chính xác 100% cho tất cả quán ăn.
+- **Nâng cấp Giao diện Quản trị ([`app/admin/page.tsx`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/app/admin/page.tsx)):**
+  - Các nút Khách Hàng, Chủ Quán, Cán Bộ hiển thị số liệu đồng bộ chính xác tuyệt đối với bảng danh sách quán đang hoạt động và số lượng chờ duyệt.
+- **Nâng cấp Thẻ Món Ăn & Modal Chi Tiết Món ([`components/mon-ngon/MonNgonClient.tsx`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/components/mon-ngon/MonNgonClient.tsx)):**
+  - Trên mỗi thẻ món ăn: Bổ sung thanh thông tin quán ăn với biểu tượng nhà hàng, tên quán, địa chỉ ngắn gọn và nút "Xem quán" / "Thu gọn". Khi mở ra sẽ xem được tên chủ quán, số điện thoại hotline, giờ phục vụ và liên kết đến thực đơn riêng của quán.
+  - Trong Modal xem chi tiết món: Bổ sung khung card nổi bật "Quán ăn phục vụ món này" với huy hiệu "Đã xác thực", địa chỉ đầy đủ, giờ mở cửa, nút "Gọi hotline ngay" dạng `tel:...` và nút "Xem trang quán".
+
 ## [2026-10-04] Cập Nhật Ẩn Banner Chưa Đăng Nhập & Tối Ưu Đăng Nhập Khách Du Lịch
 
 **Yêu cầu:** 
