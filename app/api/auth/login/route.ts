@@ -55,25 +55,25 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Kiểm tra trạng thái nếu là CHỦ QUÁN (OWNER)
+    // Kiểm tra trạng thái nếu là CHỦ QUÁN (OWNER): BẮT BUỘC PHẢI ĐƯỢC ADMIN DUYỆT (ACTIVE) MỚI ĐƯỢC ĐĂNG NHẬP
     if (user.role === 'OWNER') {
-      if (user.status === 'PENDING') {
-        return NextResponse.json(
-          {
-            success: false,
-            status: 'PENDING',
-            message:
-              'Tài khoản Chủ Quán của bạn đang chờ Ban Quản Trị phê duyệt. Vui lòng quay lại sau.',
-          },
-          { status: 403 }
-        );
-      }
       if (user.status === 'BLOCKED') {
         return NextResponse.json(
           {
             success: false,
             status: 'BLOCKED',
-            message: 'Tài khoản của bạn đã bị tạm khóa bởi Ban Quản Trị.',
+            message: 'Tài khoản quán của bạn đã bị tạm khóa bởi Ban Quản Trị.',
+          },
+          { status: 403 }
+        );
+      }
+      if (user.status !== 'ACTIVE') {
+        return NextResponse.json(
+          {
+            success: false,
+            status: user.status || 'PENDING',
+            message:
+              'Tài khoản Quán của bạn đang chờ Ban Quản Trị phê duyệt. Vui lòng liên hệ Admin để được kích hoạt trước khi đăng nhập.',
           },
           { status: 403 }
         );

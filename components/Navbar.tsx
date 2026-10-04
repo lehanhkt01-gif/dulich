@@ -57,13 +57,27 @@ export default function Navbar() {
             } catch (e) {}
           }
         }
+        // Kiểm tra nếu là Chủ quán mà chưa ACTIVE thì không cho duy trì đăng nhập
+        if (userDetail.role === 'OWNER' && userDetail.status !== 'ACTIVE') {
+          if (typeof window !== 'undefined') {
+            localStorage.removeItem('easup_auth_user');
+          }
+          setCurrentUser(null);
+          return;
+        }
         setCurrentUser(userDetail);
       } else {
         if (typeof window !== 'undefined') {
           const cached = localStorage.getItem('easup_auth_user');
           if (cached) {
             try {
-              setCurrentUser(JSON.parse(cached));
+              const parsed = JSON.parse(cached);
+              if (parsed.role === 'OWNER' && parsed.status !== 'ACTIVE') {
+                localStorage.removeItem('easup_auth_user');
+                setCurrentUser(null);
+                return;
+              }
+              setCurrentUser(parsed);
             } catch (e) {
               setCurrentUser(null);
             }
@@ -88,8 +102,6 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [pathname]);
 
-
-
   const { data: session } = useSession();
 
   useEffect(() => {
@@ -100,8 +112,16 @@ export default function Navbar() {
         email: session.user.email || '',
         avatar: session.user.image,
         role: (session.user as any).role || 'TRAVELER',
+        status: (session.user as any).status || 'ACTIVE',
         restaurantName: (session.user as any).restaurantName,
       };
+      if (u.role === 'OWNER' && u.status !== 'ACTIVE') {
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('easup_auth_user');
+        }
+        setCurrentUser(null);
+        return;
+      }
       setCurrentUser(u);
       if (typeof window !== 'undefined') {
         localStorage.setItem('easup_auth_user', JSON.stringify(u));
@@ -162,10 +182,10 @@ export default function Navbar() {
             : 'bg-[#FBF9F5]/90 backdrop-blur-sm border-b border-[#E7E2D7]/60'
         }`}
       >
-        <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-2 md:py-0 md:h-20 flex flex-col md:flex-row md:items-center md:justify-between gap-1.5 md:gap-3">
-          {/* HÀNG 1: Brand Logo & 2 Dòng Tiêu Đề */}
-          <div className="flex items-center justify-between w-full md:w-auto shrink-0">
-            <Link href="/" className="flex items-center gap-2 sm:gap-2.5 group flex-1 md:flex-initial min-w-0">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 h-16 md:h-20 flex items-center justify-between gap-2 md:gap-3">
+          {/* Brand Logo & Tiêu Đề */}
+          <div className="flex items-center gap-2 sm:gap-2.5 min-w-0">
+            <Link href="/" className="flex items-center gap-2 sm:gap-2.5 group min-w-0">
               <div className="w-10 h-10 lg:w-11 lg:h-11 rounded-full overflow-hidden border-2 border-[#0066CC] shadow-md group-hover:scale-105 transition-transform shrink-0 bg-white">
                 <img
                   src="/logo-easup-official.png"
@@ -177,71 +197,157 @@ export default function Navbar() {
                 <span className="font-serif font-bold text-base sm:text-lg lg:text-xl text-[#1C1917] tracking-tight block leading-tight truncate">
                   DU LỊCH EA SÚP
                 </span>
-                <span className="text-[9px] sm:text-[10px] lg:text-[11px] uppercase tracking-wider text-[#A64B2A] font-bold block mt-0.5 truncate">
+                <span className="text-[9px] sm:text-[10px] lg:text-[11px] uppercase tracking-wider text-[#A64B2A] font-bold mt-0.5 truncate hidden sm:block">
                   BẢN SẮC, DẤU ẤN ĐẠI NGÀN TÂY NGUYÊN
                 </span>
               </div>
             </Link>
           </div>
 
-          {/* HÀNG 2 TRÊN MOBILE / MENU NGANG TRÊN DESKTOP */}
-          <div className="flex items-center justify-between md:justify-end gap-1.5 sm:gap-2 pt-1.5 md:pt-0 border-t border-[#E7E2D7]/50 md:border-t-0 w-full md:w-auto">
-            {/* Các liên kết điều hướng chính */}
-            <nav className="flex items-center justify-around md:justify-start gap-1 sm:gap-1.5 flex-1 md:flex-none overflow-x-auto no-scrollbar">
-              {navLinks.map((link) => {
-                const Icon = link.icon;
-                const isActive =
-                  link.href.includes('#')
-                    ? false
-                    : link.href === '/'
-                    ? pathname === '/' || pathname.startsWith('/mon-ngon')
-                    : pathname.startsWith(link.href);
-                const accent = 'accent' in link && link.accent;
-                return (
-                  <Link
-                    key={link.name}
-                    href={link.href}
-                    title={link.name}
-                    aria-label={link.name}
-                    className={`flex items-center justify-center gap-1.5 py-1.5 px-2 sm:px-2.5 lg:px-3 rounded-xl text-xs lg:text-sm font-medium transition-all shrink-0 ${
-                      accent
-                        ? isActive
-                          ? 'text-white bg-[#D9452B] font-semibold shadow-sm'
-                          : 'text-[#D9452B] bg-[#D9452B]/10 hover:bg-[#D9452B] hover:text-white font-semibold'
-                        : isActive
-                          ? 'text-[#0066CC] bg-[#0066CC]/10 font-semibold shadow-xs'
-                          : 'text-[#1C1917]/80 hover:text-[#0066CC] hover:bg-[#0066CC]/5'
-                    }`}
-                  >
-                    <Icon className={`w-4 h-4 shrink-0 ${accent ? '' : 'text-[#0066CC]'}`} />
-                    <span className="hidden md:inline whitespace-nowrap">{link.name}</span>
-                    {accent && <span className="md:hidden whitespace-nowrap text-xs font-semibold">Món ngon</span>}
-                  </Link>
-                );
-              })}
-            </nav>
-
-            {/* CỤM NÚT: ĐĂNG NHẬP / PROFILE & MENU 3 GẠCH (Chủ Quán, Quản Trị) */}
-            <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
-              {/* Menu 3 gạch: Chủ Quán & Quản Trị */}
-              <div className="relative" ref={menuRef}>
-                <button
-                  id="nav-more-menu-btn"
-                  type="button"
-                  onClick={() => setMenuOpen((v) => !v)}
-                  aria-label="Menu"
-                  aria-expanded={menuOpen}
-                  className="p-2 rounded-xl border border-[#E7E2D7] bg-white text-[#1C1917] hover:bg-stone-100 transition-colors shadow-xs"
+          {/* Các liên kết điều hướng chính (Chỉ hiện trên máy tính md+, trên mobile đưa vào 3 dấu gạch ngang) */}
+          <nav className="hidden md:flex items-center gap-1 sm:gap-1.5 shrink-0">
+            {navLinks.map((link) => {
+              const Icon = link.icon;
+              const isActive =
+                link.href.includes('#')
+                  ? false
+                  : link.href === '/'
+                  ? pathname === '/' || pathname.startsWith('/mon-ngon')
+                  : pathname.startsWith(link.href);
+              const accent = 'accent' in link && link.accent;
+              return (
+                <Link
+                  key={link.name}
+                  href={link.href}
+                  title={link.name}
+                  className={`flex items-center gap-1.5 py-1.5 px-2.5 lg:px-3 rounded-xl text-xs lg:text-sm font-medium transition-all shrink-0 ${
+                    accent
+                      ? isActive
+                        ? 'text-white bg-[#D9452B] font-semibold shadow-sm'
+                        : 'text-[#D9452B] bg-[#D9452B]/10 hover:bg-[#D9452B] hover:text-white font-semibold'
+                      : isActive
+                        ? 'text-[#0066CC] bg-[#0066CC]/10 font-semibold shadow-xs'
+                        : 'text-[#1C1917]/80 hover:text-[#0066CC] hover:bg-[#0066CC]/5'
+                  }`}
                 >
-                  {menuOpen ? <CloseIcon className="w-4 h-4" /> : <MenuIcon className="w-4 h-4" />}
-                </button>
+                  <Icon className={`w-4 h-4 shrink-0 ${accent ? '' : 'text-[#0066CC]'}`} />
+                  <span className="whitespace-nowrap">{link.name}</span>
+                </Link>
+              );
+            })}
+          </nav>
 
-                {menuOpen && (
-                  <div className="absolute right-0 top-full mt-2 w-52 bg-white rounded-2xl border border-[#E7E2D7] shadow-xl p-1.5 z-50 animate-in fade-in slide-in-from-top-1 duration-150">
+          {/* Cụm Tài Khoản & Menu 3 Gạch */}
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+            {/* Cụm Tài Khoản: Trên mobile chỉ để Avatar và chữ "Khách" hoặc "Quán" theo phân quyền */}
+            {currentUser ? (
+              <div className="flex items-center gap-1.5 bg-white border border-[#E7E2D7] py-1 px-2 rounded-xl shadow-xs shrink-0">
+                <div className="w-5 h-5 rounded-full overflow-hidden bg-blue-100 text-[#0066CC] flex items-center justify-center text-[10px] font-bold shrink-0">
+                  {currentUser.avatar ? (
+                    <img src={currentUser.avatar} alt={currentUser.name} className="w-full h-full object-cover" />
+                  ) : (
+                    currentUser.name?.charAt(0) || 'U'
+                  )}
+                </div>
+                {/* Tên chỉ hiện trên máy tính (md+), trên điện thoại ẩn đi */}
+                <span className="hidden md:inline max-w-[120px] truncate text-xs font-bold text-[#1C1917]">
+                  {currentUser.name}
+                </span>
+                {/* Badge phân quyền rút gọn: "Quán" hoặc "Khách" hoặc "Admin" */}
+                <span
+                  className={`text-[10px] px-1.5 py-0.5 rounded font-bold uppercase tracking-wider ${
+                    currentUser.role === 'ADMIN'
+                      ? 'bg-[#0066CC] text-white'
+                      : currentUser.role === 'OWNER'
+                      ? 'bg-[#D9452B] text-white'
+                      : 'bg-stone-100 text-stone-700 border border-stone-200'
+                  }`}
+                >
+                  {currentUser.role === 'ADMIN' ? 'Admin' : currentUser.role === 'OWNER' ? 'Quán' : 'Khách'}
+                </span>
+
+                {/* Nút Đăng Xuất */}
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  title="Đăng xuất tài khoản"
+                  className="p-1 rounded-lg text-stone-400 hover:text-red-600 hover:bg-red-50 transition-colors ml-0.5"
+                >
+                  <LogOut className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => {
+                  setAuthModalMode('login');
+                  setAuthModalOpen(true);
+                }}
+                className="flex items-center gap-1.5 py-1.5 px-3 rounded-xl text-xs font-bold bg-[#1C1917] text-white hover:bg-[#D9452B] transition-all shadow-xs shrink-0"
+              >
+                <LogIn className="w-4 h-4 shrink-0" />
+                <span>Đăng nhập</span>
+              </button>
+            )}
+
+            {/* Menu 3 gạch: Chứa toàn bộ liên kết trên mobile */}
+            <div className="relative" ref={menuRef}>
+              <button
+                id="nav-more-menu-btn"
+                type="button"
+                onClick={() => setMenuOpen((v) => !v)}
+                aria-label="Menu"
+                aria-expanded={menuOpen}
+                className="p-2 rounded-xl border border-[#E7E2D7] bg-white text-[#1C1917] hover:bg-stone-100 transition-colors shadow-xs"
+              >
+                {menuOpen ? <CloseIcon className="w-4 h-4" /> : <MenuIcon className="w-4 h-4" />}
+              </button>
+
+              {menuOpen && (
+                <div className="absolute right-0 top-full mt-2 w-56 bg-white rounded-2xl border border-[#E7E2D7] shadow-xl p-2 z-50 animate-in fade-in slide-in-from-top-1 duration-150">
+                  {/* Trên mobile: Đưa các nút vào trong 3 dấu gạch ngang */}
+                  <div className="md:hidden space-y-1 pb-2 mb-2 border-b border-stone-200">
+                    <p className="text-[10px] font-bold text-stone-400 uppercase tracking-wider px-2 py-0.5">
+                      Khám phá du lịch
+                    </p>
+                    {navLinks.map((link) => {
+                      const Icon = link.icon;
+                      const isActive =
+                        link.href.includes('#')
+                          ? false
+                          : link.href === '/'
+                          ? pathname === '/' || pathname.startsWith('/mon-ngon')
+                          : pathname.startsWith(link.href);
+                      return (
+                        <Link
+                          key={link.name}
+                          href={link.href}
+                          onClick={() => setMenuOpen(false)}
+                          className={`flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold transition-colors ${
+                            isActive
+                              ? link.accent
+                                ? 'bg-[#D9452B] text-white'
+                                : 'bg-[#0066CC] text-white'
+                              : 'text-stone-700 hover:bg-stone-100'
+                          }`}
+                        >
+                          <Icon className="w-4 h-4 shrink-0" />
+                          <span>{link.name}</span>
+                        </Link>
+                      );
+                    })}
+                  </div>
+
+                  {/* Mục Chủ Quán & Quản Trị */}
+                  <div className="space-y-1">
+                    <p className="text-[10px] font-bold text-stone-400 uppercase tracking-wider px-2 py-0.5 md:hidden">
+                      Hệ thống
+                    </p>
                     <Link
                       id="nav-menu-chu-quan"
                       href="/chu-quan"
-                      className={`flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors ${
+                      onClick={() => setMenuOpen(false)}
+                      className={`flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold transition-colors ${
                         pathname.startsWith('/chu-quan')
                           ? 'bg-[#D9452B] text-white'
                           : 'text-[#D9452B] hover:bg-[#FDEDE8]'
@@ -255,7 +361,8 @@ export default function Navbar() {
                       <Link
                         id="nav-menu-quan-tri"
                         href="/admin"
-                        className={`flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors ${
+                        onClick={() => setMenuOpen(false)}
+                        className={`flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold transition-colors ${
                           pathname.startsWith('/admin')
                             ? 'bg-[#0066CC] text-white'
                             : 'text-[#0066CC] hover:bg-blue-50'
@@ -266,56 +373,7 @@ export default function Navbar() {
                       </Link>
                     )}
                   </div>
-                )}
-              </div>
-
-              {/* Cụm Tài Khoản: Đăng Nhập hoặc Thông tin + Đăng xuất */}
-              {currentUser ? (
-                <div className="flex items-center gap-1.5 bg-white border border-[#E7E2D7] py-1 px-2 rounded-xl shadow-xs shrink-0">
-                  <div className="w-5 h-5 rounded-full overflow-hidden bg-blue-100 text-[#0066CC] flex items-center justify-center text-[10px] font-bold shrink-0">
-                    {currentUser.avatar ? (
-                      <img src={currentUser.avatar} alt={currentUser.name} className="w-full h-full object-cover" />
-                    ) : (
-                      currentUser.name?.charAt(0) || 'U'
-                    )}
-                  </div>
-                  <span className="max-w-[70px] sm:max-w-[95px] truncate text-xs font-bold text-[#1C1917]">
-                    {currentUser.name}
-                  </span>
-                  <span
-                    className={`text-[9px] px-1 py-0.2 rounded font-bold uppercase tracking-wider ${
-                      currentUser.role === 'ADMIN'
-                        ? 'bg-[#0066CC] text-white'
-                        : currentUser.role === 'OWNER'
-                        ? 'bg-[#D9452B] text-white'
-                        : 'bg-stone-200 text-stone-700'
-                    }`}
-                  >
-                    {currentUser.role === 'ADMIN' ? 'ADMIN' : currentUser.role === 'OWNER' ? 'QUÁN' : 'KHÁCH'}
-                  </span>
-
-                  {/* Nút Đăng Xuất */}
-                  <button
-                    type="button"
-                    onClick={handleLogout}
-                    title="Đăng xuất tài khoản"
-                    className="p-1 rounded-lg text-stone-400 hover:text-red-600 hover:bg-red-50 transition-colors ml-0.5"
-                  >
-                    <LogOut className="w-3.5 h-3.5" />
-                  </button>
                 </div>
-              ) : (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setAuthModalMode('login');
-                    setAuthModalOpen(true);
-                  }}
-                  className="flex items-center gap-1.5 py-1.5 px-3 sm:px-3.5 rounded-xl text-xs font-bold bg-[#1C1917] text-white hover:bg-[#D9452B] transition-all shadow-xs shrink-0"
-                >
-                  <LogIn className="w-4 h-4 shrink-0" />
-                  <span>Đăng nhập</span>
-                </button>
               )}
             </div>
           </div>

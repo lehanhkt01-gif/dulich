@@ -10,7 +10,28 @@
 > **Lưu ý / việc còn dở:** …
 > ```
 
-## [2026-10-04] Tối Ưu Mở Bàn Mới (Quán Dạng List, Ô Số Điện Thoại) & Ẩn Banner Chủ Quán Cho Khách
+## [2026-10-04] Bổ Sung Tọa Độ Bản Đồ, Ẩn/Hiện Mật Khẩu, Khắc Phục Lọt Đăng Nhập Khi Chưa Duyệt & Tối Ưu Mobile Menu
+
+**Yêu cầu:** 
+1. Ảnh 1: Tại ô địa chỉ, tạo thêm tọa độ bản đồ du lịch (GPS).
+2. Ảnh 2: Tạo thêm ánh mắt để ẩn/hiện mật khẩu.
+3. Ảnh 3: Sửa lỗi khi admin chưa phê duyệt nhưng chủ quán đã log được vào.
+4. Ảnh 4: Tại giao diện điện thoại, đưa các nút điều hướng vào trong menu 3 dấu gạch ngang; tên tài khoản đăng nhập rút gọn chỉ để Avatar và chữ "Khách" hoặc "Quán" theo phân quyền.
+
+**Đã làm:**
+- **Tọa độ bản đồ du lịch GPS ([`components/AuthModal.tsx`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/components/AuthModal.tsx), [`app/api/users/route.ts`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/app/api/users/route.ts)):**
+  - Thêm 2 ô input Vĩ độ (Lat) và Kinh độ (Lng) chuẩn bản đồ GIS ngay dưới ô địa chỉ của form Đăng ký Chủ Quán.
+  - Bổ sung nút 1 chạm "📍 Lấy GPS hiện tại" (qua HTML5 Geolocation API) và nút "Mặc định Ea Súp" (`13.2456, 107.8381`).
+  - Lưu trữ `restaurantLat` và `restaurantLng` vào database/JSON store phục vụ hiển thị ghim ẩm thực trên bản đồ.
+- **Icon ánh mắt ẩn/hiện mật khẩu ([`components/AuthModal.tsx`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/components/AuthModal.tsx)):**
+  - Thêm icon `Eye` / `EyeOff` (`lucide-react`) cho cả ô nhập "Mật khẩu quán *" (form đăng nhập) và "Mật khẩu khởi tạo *" (form đăng ký mở quán).
+- **Chặn triệt để tài khoản Chủ Quán chưa được duyệt ([`app/api/users/route.ts`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/app/api/users/route.ts), [`app/api/auth/login/route.ts`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/app/api/auth/login/route.ts), [`components/AuthModal.tsx`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/components/AuthModal.tsx), [`components/Navbar.tsx`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/components/Navbar.tsx)):**
+  - Sửa lỗi gốc rễ: gán tường minh `status: 'PENDING'` khi đăng ký tài khoản `OWNER` mới trong API `/api/users`.
+  - API `/api/auth/login` kiểm tra bắt buộc: nếu tài khoản có vai trò `OWNER` nhưng `status !== 'ACTIVE'`, từ chối ngay lập tức với mã HTTP 403.
+  - AuthModal và Navbar xác thực session và cache, nếu chủ quán chưa được duyệt thì ngăn đăng nhập, báo thông báo rõ ràng chờ Admin phê duyệt, tự động hủy phiên không hợp lệ.
+- **Tối ưu thanh điều hướng trên điện thoại Mobile ([`components/Navbar.tsx`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/components/Navbar.tsx)):**
+  - Đưa tất cả các nút ("Món ngon Ea Súp", "Điểm đến du lịch", "Bản đồ", "Lịch trình du lịch") ẩn khỏi thanh header ngoài trên mobile (`hidden md:flex`) và tích hợp toàn bộ vào trong menu 3 dấu gạch ngang (`hamburger menu`).
+  - Rút gọn hiển thị người dùng trên điện thoại: ẩn tên dài (`hidden md:inline`), chỉ giữ lại Avatar + Badge vai trò rút gọn `QUÁN` / `KHÁCH` / `ADMIN` + nút Đăng xuất. Header mobile chỉ còn 1 hàng gọn gàng, tinh tế.
 
 **Yêu cầu:** 
 1. Ảnh 1: Các ô quán ăn chỉ ghi rút gọn tên quán và địa chỉ chữ nhỏ (thiết kế theo dạng list), chỉ khi nào có khách chọn món ăn thì mới xuất hiện tên quán ăn, nếu quán nào không được chọn món ăn thì không hiện. Bỏ chữ "(Tên quán nằm phía trên)". Sửa chữ "Phía dưới là các món ăn" thành "Chọn món ăn".

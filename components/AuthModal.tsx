@@ -16,6 +16,9 @@ import {
   User as UserIcon,
   ShieldCheck,
   Lock,
+  Eye,
+  EyeOff,
+  Navigation,
 } from 'lucide-react';
 
 interface AuthModalProps {
@@ -43,7 +46,13 @@ export default function AuthModal({
     phone: '',
     restaurantName: '',
     restaurantAddress: '',
+    restaurantLat: 13.2456,
+    restaurantLng: 107.8381,
   });
+
+  // Toggle ẩn/hiện mật khẩu
+  const [showLoginPassword, setShowLoginPassword] = useState(false);
+  const [showRegisterPassword, setShowRegisterPassword] = useState(false);
 
   // Sub-tab dành riêng cho Chủ Quán
   const [ownerSubTab, setOwnerSubTab] = useState<'login' | 'register'>('login');
@@ -160,10 +169,10 @@ export default function AuthModal({
 
       const data = await res.json();
       if (!res.ok || !data.success) {
-        if (data.status === 'PENDING') {
+        if (data.status === 'PENDING' || res.status === 403) {
           setError(
             data.message ||
-              'Tài khoản Chủ Quán của bạn đang chờ Ban Quản Trị phê duyệt. Vui lòng quay lại sau.'
+              'Tài khoản Quán của bạn đang chờ Ban Quản Trị phê duyệt. Vui lòng liên hệ Admin để được kích hoạt trước khi đăng nhập.'
           );
           return;
         }
@@ -173,6 +182,14 @@ export default function AuthModal({
       // Kiểm tra nếu vai trò không phải OWNER hay ADMIN
       if (data.user.role !== 'OWNER' && data.user.role !== 'ADMIN') {
         throw new Error('Tài khoản này là Khách du lịch. Vui lòng đăng nhập ở tab Khách Du Lịch.');
+      }
+
+      // Kiểm tra nghiêm ngặt: Chủ quán bắt buộc phải ACTIVE mới được vào Không Gian Quán
+      if (data.user.role === 'OWNER' && data.user.status !== 'ACTIVE') {
+        setError(
+          'Tài khoản Quán của bạn đang chờ Ban Quản Trị phê duyệt. Vui lòng quay lại sau khi đã được Admin kích hoạt.'
+        );
+        return;
       }
 
       // Lưu thông tin đăng nhập vào localStorage
@@ -214,7 +231,7 @@ export default function AuthModal({
       setError('');
       setSuccessMsg('');
 
-      // Gọi API tạo tài khoản chủ quán vai trò OWNER
+      // Gọi API tạo tài khoản chủ quán vai trò OWNER kèm tọa độ GPS
       const res = await fetch('/api/users', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -226,6 +243,8 @@ export default function AuthModal({
           phone: ownerForm.phone,
           restaurantName: ownerForm.restaurantName,
           restaurantAddress: ownerForm.restaurantAddress || 'Xã Ea Súp, Tỉnh Đắk Lắk',
+          restaurantLat: Number(ownerForm.restaurantLat) || 13.2456,
+          restaurantLng: Number(ownerForm.restaurantLng) || 107.8381,
         }),
       });
 
@@ -235,13 +254,13 @@ export default function AuthModal({
       }
 
       setSuccessMsg(
-        `Đăng ký thành công! Hồ sơ quán "${ownerForm.restaurantName}" đang chờ Admin phê duyệt. Sau khi được duyệt, bạn đăng nhập bằng Gmail và mật khẩu vừa tạo.`
+        `Đăng ký hồ sơ quán "${ownerForm.restaurantName}" thành công! Vui lòng chờ Ban Quản Trị phê duyệt kích hoạt tài khoản trước khi đăng nhập.`
       );
       setTimeout(() => {
         setOwnerSubTab('login');
         setOwnerLoginGmail(ownerForm.email);
-        setOwnerLoginPassword(ownerRegisterPassword);
-      }, 2500);
+        setOwnerLoginPassword('');
+      }, 3000);
     } catch (err: any) {
       setError(err.message || 'Lỗi gửi hồ sơ mở quán');
     } finally {
@@ -437,14 +456,24 @@ export default function AuthModal({
                       <Lock className="w-3.5 h-3.5 text-stone-400" />
                       <span>Mật khẩu quán *</span>
                     </label>
-                    <input
-                      type="password"
-                      required
-                      placeholder="Nhập mật khẩu..."
-                      value={ownerLoginPassword}
-                      onChange={(e) => setOwnerLoginPassword(e.target.value)}
-                      className="w-full text-xs p-3 rounded-xl border border-stone-300 focus:outline-none focus:border-[#D9452B]"
-                    />
+                    <div className="relative">
+                      <input
+                        type={showLoginPassword ? 'text' : 'password'}
+                        required
+                        placeholder="Nhập mật khẩu..."
+                        value={ownerLoginPassword}
+                        onChange={(e) => setOwnerLoginPassword(e.target.value)}
+                        className="w-full text-xs p-3 pr-10 rounded-xl border border-stone-300 focus:outline-none focus:border-[#D9452B]"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowLoginPassword(!showLoginPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-700 p-1"
+                        aria-label={showLoginPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
+                      >
+                        {showLoginPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </div>
                   </div>
 
                   <button
@@ -550,28 +579,118 @@ export default function AuthModal({
                       <Lock className="w-3.5 h-3.5 text-stone-400" />
                       <span>Mật khẩu khởi tạo * (tối thiểu 6 ký tự)</span>
                     </label>
-                    <input
-                      type="password"
-                      required
-                      placeholder="Tối thiểu 6 ký tự..."
-                      value={ownerRegisterPassword}
-                      onChange={(e) => setOwnerRegisterPassword(e.target.value)}
-                      className="w-full text-xs p-2.5 rounded-xl border border-stone-300 focus:outline-none focus:border-[#D9452B]"
-                    />
+                    <div className="relative">
+                      <input
+                        type={showRegisterPassword ? 'text' : 'password'}
+                        required
+                        placeholder="Tối thiểu 6 ký tự..."
+                        value={ownerRegisterPassword}
+                        onChange={(e) => setOwnerRegisterPassword(e.target.value)}
+                        className="w-full text-xs p-2.5 pr-9 rounded-xl border border-stone-300 focus:outline-none focus:border-[#D9452B]"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowRegisterPassword(!showRegisterPassword)}
+                        className="absolute right-2.5 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-700 p-1"
+                        aria-label={showRegisterPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
+                      >
+                        {showRegisterPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </div>
                   </div>
 
-                  <div className="space-y-1">
-                    <label className="text-xs font-semibold text-stone-700 flex items-center gap-1.5">
-                      <MapPin className="w-3.5 h-3.5 text-stone-400" />
-                      <span>Địa chỉ quán tại Ea Súp</span>
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="Thôn/Buôn, Xã Ea Súp, Tỉnh Đắk Lắk"
-                      value={ownerForm.restaurantAddress}
-                      onChange={(e) => setOwnerForm({ ...ownerForm, restaurantAddress: e.target.value })}
-                      className="w-full text-xs p-2.5 rounded-xl border border-stone-300 focus:outline-none focus:border-[#D9452B]"
-                    />
+                  {/* Địa chỉ quán & Tọa độ bản đồ */}
+                  <div className="space-y-2 p-2.5 rounded-xl bg-stone-50 border border-stone-200">
+                    <div className="space-y-1">
+                      <label className="text-xs font-semibold text-stone-700 flex items-center gap-1.5">
+                        <MapPin className="w-3.5 h-3.5 text-[#D9452B]" />
+                        <span>Địa chỉ quán tại Ea Súp</span>
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="Thôn/Buôn, Xã Ea Súp, Tỉnh Đắk Lắk"
+                        value={ownerForm.restaurantAddress}
+                        onChange={(e) => setOwnerForm({ ...ownerForm, restaurantAddress: e.target.value })}
+                        className="w-full text-xs p-2.5 rounded-xl border border-stone-300 focus:outline-none focus:border-[#D9452B] bg-white"
+                      />
+                    </div>
+
+                    {/* Tọa độ bản đồ (Lat, Lng) */}
+                    <div className="pt-1 border-t border-stone-200/80">
+                      <div className="flex items-center justify-between mb-1.5">
+                        <span className="text-[11px] font-bold text-stone-600 flex items-center gap-1">
+                          <Navigation className="w-3 h-3 text-[#0066CC]" />
+                          <span>Tọa độ bản đồ du lịch (GPS)</span>
+                        </span>
+                        <div className="flex items-center gap-1.5">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (typeof window !== 'undefined' && 'geolocation' in navigator) {
+                                navigator.geolocation.getCurrentPosition(
+                                  (pos) => {
+                                    setOwnerForm((prev) => ({
+                                      ...prev,
+                                      restaurantLat: Number(pos.coords.latitude.toFixed(6)),
+                                      restaurantLng: Number(pos.coords.longitude.toFixed(6)),
+                                    }));
+                                  },
+                                  () => {
+                                    alert('Không thể lấy vị trí hiện tại. Giữ tọa độ mặc định Ea Súp.');
+                                  }
+                                );
+                              }
+                            }}
+                            className="text-[10px] text-[#0066CC] hover:underline font-semibold"
+                          >
+                            📍 Lấy GPS
+                          </button>
+                          <span className="text-stone-300">|</span>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setOwnerForm((prev) => ({
+                                ...prev,
+                                restaurantLat: 13.2456,
+                                restaurantLng: 107.8381,
+                              }))
+                            }
+                            className="text-[10px] text-stone-500 hover:underline"
+                          >
+                            Mặc định
+                          </button>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-2">
+                        <div>
+                          <label className="text-[10px] text-stone-500 block mb-0.5">Vĩ độ (Lat)</label>
+                          <input
+                            type="number"
+                            step="any"
+                            value={ownerForm.restaurantLat}
+                            onChange={(e) =>
+                              setOwnerForm({ ...ownerForm, restaurantLat: parseFloat(e.target.value) || 0 })
+                            }
+                            placeholder="13.2456"
+                            className="w-full text-xs p-2 rounded-lg border border-stone-300 focus:outline-none focus:border-[#D9452B] bg-white font-mono"
+                          />
+                        </div>
+                        <div>
+                          <label className="text-[10px] text-stone-500 block mb-0.5">Kinh độ (Lng)</label>
+                          <input
+                            type="number"
+                            step="any"
+                            value={ownerForm.restaurantLng}
+                            onChange={(e) =>
+                              setOwnerForm({ ...ownerForm, restaurantLng: parseFloat(e.target.value) || 0 })
+                            }
+                            placeholder="107.8381"
+                            className="w-full text-xs p-2 rounded-lg border border-stone-300 focus:outline-none focus:border-[#D9452B] bg-white font-mono"
+                          />
+                        </div>
+                      </div>
+                    </div>
                   </div>
 
                   <button

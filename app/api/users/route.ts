@@ -50,7 +50,7 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { name, email, password, role, restaurantName, restaurantAddress, phone } = body;
+    const { name, email, password, role, restaurantName, restaurantAddress, phone, restaurantLat, restaurantLng } = body;
 
     if (!name || !email || !password) {
       return NextResponse.json(
@@ -63,7 +63,11 @@ export async function POST(req: NextRequest) {
     // Hỗ trợ cả 4 vai trò: ADMIN, OWNER, EDITOR, TRAVELER
     const validRoles = ['ADMIN', 'OWNER', 'EDITOR', 'TRAVELER'];
     const assignedRole = validRoles.includes(role) ? role : 'TRAVELER';
+    // Chủ quán đăng ký mới BẮT BUỘC có status PENDING (chờ Admin duyệt), khách du lịch tự động ACTIVE
+    const initialStatus = assignedRole === 'OWNER' ? 'PENDING' : 'ACTIVE';
     const avatarUrl = `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(name)}`;
+    const finalLat = restaurantLat ? Number(restaurantLat) : 13.2456;
+    const finalLng = restaurantLng ? Number(restaurantLng) : 107.8381;
 
     let savedUser: any = null;
 
@@ -83,10 +87,13 @@ export async function POST(req: NextRequest) {
           email,
           password: hashedPassword,
           role: assignedRole,
+          status: initialStatus,
           avatar: avatarUrl,
           phone: phone || null,
           restaurantName: restaurantName || null,
           restaurantAddress: restaurantAddress || null,
+          restaurantLat: finalLat,
+          restaurantLng: finalLng,
         },
       });
 
@@ -94,6 +101,9 @@ export async function POST(req: NextRequest) {
       upsertStoredUser({
         ...savedUser,
         password: hashedPassword,
+        status: initialStatus,
+        restaurantLat: finalLat,
+        restaurantLng: finalLng,
       });
     } catch {
       // Fallback persistent storage
@@ -110,10 +120,13 @@ export async function POST(req: NextRequest) {
         email,
         password: hashedPassword,
         role: assignedRole,
+        status: initialStatus,
         avatar: avatarUrl,
         phone: phone || null,
         restaurantName: restaurantName || null,
         restaurantAddress: restaurantAddress || null,
+        restaurantLat: finalLat,
+        restaurantLng: finalLng,
       });
     }
 
