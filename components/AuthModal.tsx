@@ -45,10 +45,6 @@ export default function AuthModal({
     restaurantAddress: '',
   });
 
-  // Direct Gmail Input
-  const [customGmail, setCustomGmail] = useState('');
-  const [customName, setCustomName] = useState('');
-
   // Sub-tab dành riêng cho Chủ Quán
   const [ownerSubTab, setOwnerSubTab] = useState<'login' | 'register'>('login');
   const [ownerLoginGmail, setOwnerLoginGmail] = useState('');
@@ -329,73 +325,49 @@ export default function AuthModal({
           )}
 
           {mode === 'login' ? (
-            /* TAB 1: ĐĂNG NHẬP KHÁCH DU LỊCH BẰNG GMAIL HOẶC GOOGLE */
-            <div className="space-y-4">
-              <div className="text-center py-1">
+            /* TAB 1: ĐĂNG NHẬP KHÁCH DU LỊCH BẰNG GOOGLE (GMAIL) */
+            <div className="space-y-4 pt-1">
+              <div className="text-center pb-1">
                 <p className="text-xs text-stone-600">
-                  Nhập Gmail của bạn để đăng nhập nhanh, đặt món và theo dõi lịch sử chuyến đi.
+                  Đăng nhập nhanh bằng tài khoản Google để đặt món, kết nối bàn ăn và khám phá ẩm thực Ea Súp.
                 </p>
               </div>
 
-              {/* Form nhập Gmail đăng nhập trực tiếp của Khách */}
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  if (customGmail && customGmail.includes('@')) {
-                    handleGoogleAuth(
-                      customGmail.trim(),
-                      customName || customGmail.split('@')[0],
-                      'TRAVELER'
-                    );
-                  } else {
-                    setError('Vui lòng nhập tài khoản Gmail hợp lệ');
-                  }
-                }}
-                className="space-y-3 bg-[#FBF9F5] p-3.5 rounded-2xl border border-[#E7E2D7]"
-              >
-                <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-stone-700 flex items-center gap-1.5">
-                    <Mail className="w-3.5 h-3.5 text-[#0066CC]" />
-                    <span>Tài khoản Gmail của bạn *</span>
-                  </label>
-                  <input
-                    type="email"
-                    required
-                    placeholder="VD: zipzenhanh@gmail.com"
-                    value={customGmail}
-                    onChange={(e) => setCustomGmail(e.target.value)}
-                    className="w-full text-xs p-3 rounded-xl border border-stone-300 focus:outline-none focus:border-[#0066CC] bg-white"
-                  />
-                </div>
+              {/* Nút Đăng nhập Google (Gmail) được đưa lên trên cùng */}
+              <div className="pt-1">
+                <GoogleSignInButton
+                  text="Đăng Nhập Bằng Google (Gmail)"
+                  onClick={async () => {
+                    try {
+                      setLoading(true);
+                      setError('');
+                      await nextAuthSignIn('google', {
+                        callbackUrl: typeof window !== 'undefined' ? window.location.href : '/',
+                      });
+                    } catch (err: any) {
+                      console.warn('Google OAuth flow fallback to Gmail prompt:', err);
+                      const inputEmail = prompt(
+                        'Vui lòng nhập địa chỉ Gmail của bạn để đăng nhập nhanh:',
+                        'zipzenhanh@gmail.com'
+                      );
+                      if (inputEmail && inputEmail.includes('@')) {
+                        handleGoogleAuth(
+                          inputEmail.trim(),
+                          inputEmail.split('@')[0],
+                          'TRAVELER'
+                        );
+                      }
+                    } finally {
+                      setLoading(false);
+                    }
+                  }}
+                />
+              </div>
 
-                <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-stone-700 flex items-center gap-1.5">
-                    <UserIcon className="w-3.5 h-3.5 text-stone-400" />
-                    <span>Họ và tên du khách (Tùy chọn)</span>
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="VD: Lê Hạnh"
-                    value={customName}
-                    onChange={(e) => setCustomName(e.target.value)}
-                    className="w-full text-xs p-3 rounded-xl border border-stone-300 focus:outline-none focus:border-[#0066CC] bg-white"
-                  />
-                </div>
-
-                <button
-                  type="submit"
-                  disabled={loading || !customGmail}
-                  className="w-full py-3 px-4 bg-[#0066CC] hover:bg-[#0052A3] text-white text-xs font-bold rounded-2xl shadow-md shadow-[#0066CC]/20 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
-                >
-                  <Sparkles className="w-4 h-4 text-amber-200" />
-                  <span>{loading ? 'Đang xác thực...' : 'Đăng Nhập Khách Du Lịch'}</span>
-                </button>
-              </form>
-
-              <div className="relative flex items-center justify-center my-2">
+              <div className="relative flex items-center justify-center my-3">
                 <div className="border-t border-stone-200 w-full"></div>
                 <span className="bg-white px-3 text-[11px] text-stone-400 uppercase tracking-wider shrink-0 font-medium">
-                  Hoặc đăng nhập nhanh
+                  Hoặc trải nghiệm nhanh
                 </span>
                 <div className="border-t border-stone-200 w-full"></div>
               </div>
@@ -403,6 +375,7 @@ export default function AuthModal({
               {/* Nút Đăng nhập nhanh 1 chạm */}
               <button
                 type="button"
+                id="btn-fast-guest-login"
                 disabled={loading}
                 onClick={() =>
                   handleGoogleAuth('khach.dulich@gmail.com', 'Du Khách Ea Súp', 'TRAVELER')
@@ -412,32 +385,12 @@ export default function AuthModal({
                 <span>⚡ Đăng nhập thử nghiệm 1 chạm (Khách du lịch)</span>
               </button>
 
-              {/* Nút Đăng nhập Google OAuth */}
-              <GoogleSignInButton
-                text="Đăng Nhập Bằng Google (Gmail)"
-                onClick={() => {
-                  if (customGmail && customGmail.includes('@')) {
-                    handleGoogleAuth(
-                      customGmail.trim(),
-                      customName || customGmail.split('@')[0],
-                      'TRAVELER'
-                    );
-                  } else {
-                    const inputEmail = prompt(
-                      'Vui lòng nhập địa chỉ Gmail của bạn để đăng nhập nhanh:',
-                      'zipzenhanh@gmail.com'
-                    );
-                    if (inputEmail && inputEmail.includes('@')) {
-                      setCustomGmail(inputEmail);
-                      handleGoogleAuth(
-                        inputEmail.trim(),
-                        inputEmail.split('@')[0],
-                        'TRAVELER'
-                      );
-                    }
-                  }
-                }}
-              />
+              <div className="pt-1 text-center">
+                <p className="text-[11px] text-stone-400 flex items-center justify-center gap-1.5">
+                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                  <span>Tài khoản khách được tự động kích hoạt ngay không cần phê duyệt.</span>
+                </p>
+              </div>
             </div>
           ) : (
             /* TAB 2: CHỦ QUÁN ĂN - CHỈ ĐĂNG NHẬP BẰNG GMAIL VÀ MẬT KHẨU */

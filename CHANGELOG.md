@@ -10,6 +10,18 @@
 > **Lưu ý / việc còn dở:** …
 > ```
 
+## [2026-10-04] Tối Ưu Modal Đăng Nhập: Đưa Nút Google (Gmail) Lên Đầu & Bỏ Form Nhập Thủ Công Của Khách
+
+**Yêu cầu:** 
+Đưa phần "Đăng nhập bằng google (gmail)" lên trên. Bỏ phần ở hình 2 đi (form nhập thủ công Gmail, Họ tên du khách và nút Đăng Nhập Khách Du Lịch).
+
+**Đã làm:**
+- **Tái cấu trúc Tab Khách trong AuthModal ([`components/AuthModal.tsx`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/components/AuthModal.tsx)):**
+  - **Đưa nút Google lên trên cùng:** Nút `GoogleSignInButton` ("Đăng Nhập Bằng Google (Gmail)") được đặt ở vị trí đầu tiên, nổi bật với biểu tượng logo Google 4 màu chuẩn thương hiệu, kích hoạt xác thực OAuth trực tiếp.
+  - **Gỡ bỏ form nhập thủ công ở Hình 2:** Loại bỏ hoàn toàn khối văn bản và thẻ form nhập Gmail cá nhân, input Họ tên du khách và nút "Đăng Nhập Khách Du Lịch".
+  - **Sắp xếp nút Trải nghiệm nhanh:** Nút "⚡ Đăng nhập thử nghiệm 1 chạm (Khách du lịch)" nằm bên dưới đường kẻ phân cách tinh tế, thuận tiện cho việc kiểm thử và trải nghiệm nhanh mà không phải gõ tài khoản.
+  - Dọn dẹp sạch sẽ các state thừa (`customGmail`, `customName`), giữ code gọn nhẹ và chuẩn TypeScript.
+
 ## [2026-10-04] Nâng Cấp Giao Diện Mở Bàn Mới: Tên Quán Nằm Trên Nền Đỏ, Chọn Nhiều Món & Cảnh Báo Chọn 2 Quán
 
 **Yêu cầu:** 
