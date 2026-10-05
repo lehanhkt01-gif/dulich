@@ -21,6 +21,8 @@ export interface DishRestaurant {
   coverImage?: string | null;
   ownerName?: string | null;
   isApproved?: boolean;
+  lat?: number | null;
+  lng?: number | null;
 }
 
 export interface Dish {

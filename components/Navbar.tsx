@@ -14,16 +14,17 @@ import {
   ShoppingBag,
   LogIn,
   LogOut,
+  UserPlus,
   Menu as MenuIcon,
   X as CloseIcon,
 } from 'lucide-react';
-import AuthModal from '@/components/AuthModal';
+import AuthModal, { AuthModalMode } from '@/components/AuthModal';
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [authModalOpen, setAuthModalOpen] = useState(false);
-  const [authModalMode, setAuthModalMode] = useState<'login' | 'register_owner'>('login');
+  const [authModalMode, setAuthModalMode] = useState<AuthModalMode>('customer');
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = React.useRef<HTMLDivElement>(null);
@@ -320,8 +321,9 @@ export default function Navbar() {
             ) : (
               <button
                 type="button"
+                id="nav-login-btn"
                 onClick={() => {
-                  setAuthModalMode('login');
+                  setAuthModalMode('customer');
                   setAuthModalOpen(true);
                 }}
                 className="flex items-center gap-1.5 py-1.5 px-3 rounded-xl text-xs font-bold bg-[#1C1917] text-white hover:bg-[#D9452B] transition-all shadow-xs shrink-0"
@@ -345,7 +347,7 @@ export default function Navbar() {
               </button>
 
               {menuOpen && (
-                <div className="absolute right-0 top-full mt-2 w-56 bg-white rounded-2xl border border-[#E7E2D7] shadow-xl p-2 z-50 animate-in fade-in slide-in-from-top-1 duration-150">
+                <div className="absolute right-0 top-full mt-2 w-64 bg-white rounded-2xl border border-[#E7E2D7] shadow-xl p-2.5 z-50 animate-in fade-in slide-in-from-top-1 duration-150">
                   {/* Trên mobile: Đưa các nút vào trong 3 dấu gạch ngang */}
                   <div className="md:hidden space-y-1 pb-2 mb-2 border-b border-stone-200">
                     <p className="text-[10px] font-bold text-stone-400 uppercase tracking-wider px-2 py-0.5">
@@ -402,21 +404,54 @@ export default function Navbar() {
                       </Link>
                     )}
 
-                    {/* Nút Chủ Quán: Chỉ hiện khi chưa đăng nhập hoặc khi tài khoản là Chủ Quán/Admin */}
+                    {/* KHU VỰC DÀNH CHO CHỦ QUÁN ĂN/UỐNG (Chỉ hiện khi chưa đăng nhập hoặc khi là Chủ Quán/Admin) */}
                     {showOwnerLink && (
-                      <Link
-                        id="nav-menu-chu-quan"
-                        href="/chu-quan"
-                        onClick={() => setMenuOpen(false)}
-                        className={`flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold transition-colors ${
-                          pathname.startsWith('/chu-quan')
-                            ? 'bg-[#D9452B] text-white'
-                            : 'text-[#D9452B] hover:bg-[#FDEDE8]'
-                        }`}
-                      >
-                        <Store className="w-4 h-4 shrink-0" />
-                        <span>Chủ Quán</span>
-                      </Link>
+                      <div className="pt-1.5 border-t border-stone-100 space-y-1">
+                        <p className="text-[10px] font-bold text-[#D9452B] uppercase tracking-wider px-2 py-0.5 flex items-center gap-1.5">
+                          <Store className="w-3.5 h-3.5" />
+                          <span>Dành Cho Chủ Quán</span>
+                        </p>
+
+                        {currentUser?.role === 'OWNER' ? (
+                          <Link
+                            id="nav-menu-chu-quan-dashboard"
+                            href="/chu-quan/dashboard"
+                            onClick={() => setMenuOpen(false)}
+                            className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold bg-[#D9452B] text-white shadow-xs"
+                          >
+                            <Store className="w-4 h-4 shrink-0" />
+                            <span>Không gian Quán của tôi</span>
+                          </Link>
+                        ) : (
+                          <>
+                            {/* 1. Đăng nhập "Chủ quán" */}
+                            <button
+                              type="button"
+                              id="nav-menu-owner-login"
+                              onClick={() => {
+                                setMenuOpen(false);
+                                setAuthModalMode('owner_login');
+                                setAuthModalOpen(true);
+                              }}
+                              className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-[#D9452B] hover:bg-[#FDEDE8] transition-colors text-left"
+                            >
+                              <LogIn className="w-4 h-4 shrink-0 text-[#D9452B]" />
+                              <span>Đăng nhập "Chủ quán"</span>
+                            </button>
+
+                            {/* 2. Đăng ký làm chủ quán mới */}
+                            <Link
+                              id="nav-menu-owner-register"
+                              href="/mon-ngon/dang-ky-chu-quan"
+                              onClick={() => setMenuOpen(false)}
+                              className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-[#D9452B] hover:bg-[#FDEDE8] transition-colors"
+                            >
+                              <UserPlus className="w-4 h-4 shrink-0 text-[#D9452B]" />
+                              <span>Đăng ký làm chủ quán mới</span>
+                            </Link>
+                          </>
+                        )}
+                      </div>
                     )}
 
                     {showAdminLink && (

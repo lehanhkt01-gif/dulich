@@ -10,6 +10,39 @@
 > **Lưu ý / việc còn dở:** …
 > ```
 
+## [2026-10-05] Tách Biệt Đăng Nhập Khách Hàng Và Chuyển Cụm Đăng Nhập/Đăng Ký Chủ Quán Vào Menu 3 Gạch
+
+**Yêu cầu:**
+- Ảnh 1: Chỉ để phần đăng nhập cho "khách hàng".
+- Ảnh 2: Phần đăng nhập và đăng ký "chủ quán" đưa vào khu vực dấu 3 gạch ngang: Nút chủ quán bao gồm đăng nhập "Chủ quán" và phần Đăng ký làm chủ quán mới.
+
+**Đã làm:**
+- **Modal Đăng nhập Khách hàng chuyên biệt ([`components/AuthModal.tsx`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/components/AuthModal.tsx)):**
+  - Loại bỏ hoàn toàn thanh tab bar `[Khách] | [Chủ Quán Ăn/Uống]`, biến modal khi mở từ nút "Đăng nhập" chính thành giao diện chuyên dụng 100% cho Khách du lịch (Google Gmail và 1 chạm thử nghiệm).
+  - Tách riêng chế độ `owner_login` mở form đăng nhập chuyên dụng cho Chủ Quán bằng Gmail & Mật khẩu khi được kích hoạt từ menu.
+- **Tích hợp nhóm nút Chủ quán vào Menu 3 gạch ngang ([`components/Navbar.tsx`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/components/Navbar.tsx)):**
+  - Mở rộng menu 3 gạch ngang (`w-64`), phân chia mục rõ ràng "Dành Cho Chủ Quán".
+  - Hiển thị 2 nút chuyên biệt:
+    1. **Đăng nhập "Chủ quán"**: Bấm vào mở Modal đăng nhập Chủ quán (Gmail & Mật khẩu).
+    2. **Đăng ký làm chủ quán mới**: Bấm vào chuyển tới trang đăng ký hồ sơ quán mới (`/mon-ngon/dang-ky-chu-quan`).
+  - Nếu đã đăng nhập là Chủ Quán: Hiển thị liên kết "Không gian Quán của tôi" (`/chu-quan/dashboard`).
+  - Khách hàng đã đăng nhập (`TRAVELER`): Vẫn tiếp tục được ẩn hoàn toàn nhóm Chủ quán, chỉ hiển thị "Lịch sử đặt món & bàn".
+
+## [2026-10-05] Ẩn Nút "Đổi Ảnh Bìa Quán" Với Khách Hàng & Gắn Link Google Maps Tại Địa Chỉ Quán
+
+**Yêu cầu:**
+- Ảnh 1: Hãy ẩn nút "Đổi ảnh bìa quán" ở các giao diện khách đi, ngoài giao diện của "chủ quán".
+- Ảnh 2: Tại vị trí địa chỉ của quán, hãy tạo đường link mở googlemap để khách tìm đến.
+
+**Đã làm:**
+- **Ẩn nút "Đổi ảnh bìa quán" trên banner đối với khách hàng ([`app/mon-ngon/[slug]/page.tsx`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/app/mon-ngon/[slug]/page.tsx)):**
+  - Tích hợp kiểm tra quyền `canEditCover`: Chỉ tài khoản Quản trị viên (`ADMIN`) hoặc Chủ quán (`OWNER` của quán đó) mới nhìn thấy nút 📷 "Đổi ảnh bìa quán".
+  - Với tài khoản Khách hàng (`TRAVELER`) hoặc khách vãng lai chưa đăng nhập: Nút này hoàn toàn bị ẩn, mang lại giao diện du lịch tinh gọn, chuyên nghiệp.
+- **Tạo liên kết mở Google Maps chỉ đường tại địa chỉ quán ([`app/mon-ngon/[slug]/page.tsx`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/app/mon-ngon/[slug]/page.tsx) & [`components/mon-ngon/MonNgonClient.tsx`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/components/mon-ngon/MonNgonClient.tsx)):**
+  - Chuyển toàn bộ các vị trí hiển thị địa chỉ quán (trên banner chi tiết quán, danh sách quán ăn/uống, popup thông tin quán ăn) thành link liên kết mở Google Maps tab mới.
+  - Tự động ưu tiên tọa độ GPS chuẩn xác (`lat`, `lng`) nếu có; trường hợp chưa có GPS sẽ tự động tìm kiếm theo tên quán + địa chỉ + Ea Súp, Đắk Lắk.
+  - Bổ sung huy hiệu "🗺️ Chỉ đường" nổi bật và hiệu ứng hover trực quan giúp khách du lịch dễ dàng định vị và tìm đường đến quán.
+
 ## [2026-10-05] Ẩn Hoàn Toàn Nút "Chủ Quán" Trong Menu Khi Người Dùng Đăng Nhập Với Vai Trò "Khách Hàng"
 
 **Yêu cầu:**

@@ -240,4 +240,6 @@ export interface DishRestaurantInfo {
   coverImage?: string | null;
   isApproved?: boolean;
   ownerName?: string | null;
+  lat?: number | null;
+  lng?: number | null;
 }

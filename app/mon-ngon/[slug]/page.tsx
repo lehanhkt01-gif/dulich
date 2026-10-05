@@ -53,19 +53,23 @@ export default function RestaurantDetailPage() {
   });
   const [submittingBooking, setSubmittingBooking] = useState(false);
 
+  const [currentUser, setCurrentUser] = useState<any>(null);
+
   // Tự động tải thông tin khách hàng đang đăng nhập và tự điền Họ tên + SĐT
   useEffect(() => {
     const autofillCustomerInfo = async () => {
       try {
         let name = '';
         let phone = '';
+        let loggedUser: any = null;
 
         // 1. Đọc từ localStorage
         if (typeof window !== 'undefined') {
-          const cached = localStorage.getItem('easup_auth_user');
+          const cached = localStorage.getItem('easup_auth_user') || localStorage.getItem('admin_user');
           if (cached) {
             try {
               const parsed = JSON.parse(cached);
+              loggedUser = parsed;
               if (parsed.name) name = parsed.name;
               if (parsed.phone) phone = parsed.phone;
             } catch {}
@@ -77,10 +81,15 @@ export default function RestaurantDetailPage() {
           const res = await fetch('/api/auth/me');
           const data = await res.json();
           if (data.authenticated && data.user) {
+            loggedUser = { ...(loggedUser || {}), ...data.user };
             if (data.user.name) name = data.user.name;
             if (data.user.phone) phone = data.user.phone;
           }
         } catch {}
+
+        if (loggedUser) {
+          setCurrentUser(loggedUser);
+        }
 
         if (name || phone) {
           setOrderForm((prev) => ({
@@ -273,6 +282,25 @@ export default function RestaurantDetailPage() {
     );
   }
 
+  // Quyền đổi ảnh bìa: Chỉ hiển thị cho Chủ quán (OWNER) hoặc Quản trị viên (ADMIN), ẩn hoàn toàn với khách hàng
+  const canEditCover = Boolean(
+    currentUser &&
+      (currentUser.role === 'ADMIN' ||
+        (currentUser.role === 'OWNER' &&
+          (restaurant?.ownerId
+            ? (restaurant.ownerId === currentUser.userId || restaurant.ownerId === currentUser.id)
+            : (currentUser.restaurantName === restaurant?.name || currentUser.restaurantId === restaurant?.id || true))))
+  );
+
+  // Link Google Maps chỉ đường
+  const googleMapsUrl = restaurant
+    ? restaurant.lat && restaurant.lng
+      ? `https://www.google.com/maps/search/?api=1&query=${restaurant.lat},${restaurant.lng}`
+      : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+          `${restaurant.name}, ${restaurant.address}, Ea Súp, Đắk Lắk`
+        )}`
+    : '#';
+
   return (
     <div className="min-h-screen bg-[#FBF9F5] text-[#1C1917] pb-32">
       {/* Banner Ảnh & Header Quán */}
@@ -294,15 +322,17 @@ export default function RestaurantDetailPage() {
           </Link>
         </div>
 
-        {/* Nút Đổi ảnh bìa quán dành cho Chủ quán */}
-        <div className="absolute top-4 right-4 z-10 flex items-center gap-2">
-          <Link
-            href="/chu-quan/dashboard"
-            className="inline-flex items-center gap-1.5 py-1.5 px-3.5 rounded-xl bg-[#D9452B] hover:bg-[#BF3A22] backdrop-blur-md text-white text-xs font-bold transition-all shadow-md border border-white/20"
-          >
-            <span>📷 Đổi ảnh bìa quán</span>
-          </Link>
-        </div>
+        {/* Nút Đổi ảnh bìa quán: Chỉ hiển thị cho Chủ quán / Admin, ẩn với khách hàng */}
+        {canEditCover && (
+          <div className="absolute top-4 right-4 z-10 flex items-center gap-2">
+            <Link
+              href="/chu-quan/dashboard"
+              className="inline-flex items-center gap-1.5 py-1.5 px-3.5 rounded-xl bg-[#D9452B] hover:bg-[#BF3A22] backdrop-blur-md text-white text-xs font-bold transition-all shadow-md border border-white/20"
+            >
+              <span>📷 Đổi ảnh bìa quán</span>
+            </Link>
+          </div>
+        )}
 
         <div className="absolute bottom-6 left-0 right-0 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-white space-y-2">
           <div className="flex flex-wrap items-center gap-2">
@@ -317,10 +347,21 @@ export default function RestaurantDetailPage() {
             {restaurant.name}
           </h1>
           <div className="flex flex-wrap items-center gap-4 text-xs text-white/90">
-            <p className="flex items-center gap-1.5">
-              <MapPin className="w-3.5 h-3.5 text-[#D9452B]" />
-              <span>{restaurant.address}</span>
-            </p>
+            {restaurant.address && (
+              <a
+                href={googleMapsUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 hover:text-amber-300 transition-colors group cursor-pointer"
+                title="Nhấn để mở Google Maps chỉ đường đến quán"
+              >
+                <MapPin className="w-3.5 h-3.5 text-[#D9452B] group-hover:scale-110 transition-transform shrink-0" />
+                <span className="group-hover:underline underline-offset-2">{restaurant.address}</span>
+                <span className="text-[10px] text-amber-300 font-medium ml-0.5 bg-black/40 px-1.5 py-0.5 rounded border border-amber-300/30 flex items-center gap-0.5">
+                  🗺️ Chỉ đường
+                </span>
+              </a>
+            )}
             {restaurant.phone && (
               <a href={`tel:${restaurant.phone}`} className="flex items-center gap-1.5 hover:underline">
                 <Phone className="w-3.5 h-3.5 text-[#0066CC]" />

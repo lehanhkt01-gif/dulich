@@ -21,20 +21,22 @@ import {
   Navigation,
 } from 'lucide-react';
 
+export type AuthModalMode = 'customer' | 'owner_login' | 'owner_register' | 'login' | 'register_owner';
+
 interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: (user: any) => void;
-  defaultMode?: 'login' | 'register_owner';
+  defaultMode?: AuthModalMode;
 }
 
 export default function AuthModal({
   isOpen,
   onClose,
   onSuccess,
-  defaultMode = 'login',
+  defaultMode = 'customer',
 }: AuthModalProps) {
-  const [mode, setMode] = useState<'login' | 'register_owner'>(defaultMode);
+  const [mode, setMode] = useState<AuthModalMode>(defaultMode);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
@@ -64,6 +66,11 @@ export default function AuthModal({
 
   useEffect(() => {
     setMode(defaultMode);
+    if (defaultMode === 'owner_register') {
+      setOwnerSubTab('register');
+    } else {
+      setOwnerSubTab('login');
+    }
     setError('');
     setSuccessMsg('');
   }, [defaultMode, isOpen]);
@@ -274,11 +281,19 @@ export default function AuthModal({
     }
   };
 
+  const isOwnerMode = mode === 'owner_login' || mode === 'owner_register' || mode === 'register_owner';
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
       <div className="relative w-full max-w-md bg-white rounded-3xl shadow-2xl border border-[#E7E2D7] overflow-hidden flex flex-col max-h-[92vh]">
         {/* Header với tông màu đẹp */}
-        <div className="bg-gradient-to-r from-[#D9452B] via-[#E05A3F] to-[#0066CC] p-5 text-white relative">
+        <div
+          className={`p-5 text-white relative transition-colors ${
+            isOwnerMode
+              ? 'bg-gradient-to-r from-[#D9452B] to-[#BF3A22]'
+              : 'bg-gradient-to-r from-[#D9452B] via-[#E05A3F] to-[#0066CC]'
+          }`}
+        >
           <button
             onClick={onClose}
             className="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center text-white transition-colors"
@@ -288,49 +303,25 @@ export default function AuthModal({
 
           <div className="flex items-center gap-2 mb-1">
             <span className="w-7 h-7 rounded-lg bg-white/20 flex items-center justify-center">
-              <Sparkles className="w-4 h-4 text-amber-200" />
+              {isOwnerMode ? (
+                <Store className="w-4 h-4 text-amber-200" />
+              ) : (
+                <Sparkles className="w-4 h-4 text-amber-200" />
+              )}
             </span>
             <span className="text-xs uppercase tracking-wider font-bold text-amber-200">
-              Hệ thống Du lịch Ea Súp
+              {isOwnerMode ? 'Dành Cho Chủ Quán Ăn/Uống' : 'Hệ thống Du lịch Ea Súp'}
             </span>
           </div>
 
           <h3 className="font-serif text-xl font-bold text-white">
-            {mode === 'login' ? 'Đăng Nhập' : 'Chủ Quán Ăn/Uống (Gmail & Mật Khẩu)'}
+            {isOwnerMode ? 'Đăng Nhập Chủ Quán' : 'Đăng Nhập'}
           </h3>
           <p className="text-xs text-white/90 mt-1">
-            {mode === 'login'
-              ? 'Đăng nhập Google để đặt món, kết nối bàn ăn và khám phá ẩm thực đại ngàn.'
-              : 'Đăng nhập Không Gian Quán bằng tài khoản Gmail và Mật khẩu của bạn.'}
+            {isOwnerMode
+              ? 'Đăng nhập Không Gian Quán bằng tài khoản Gmail và Mật khẩu của bạn.'
+              : 'Đăng nhập Google để đặt món, kết nối bàn ăn và khám phá ẩm thực đại ngàn.'}
           </p>
-        </div>
-
-        {/* Tab chuyển đổi chế độ */}
-        <div className="grid grid-cols-2 p-1.5 bg-[#FBF9F5] border-b border-[#E7E2D7] text-xs font-semibold">
-          <button
-            type="button"
-            onClick={() => setMode('login')}
-            className={`py-2 px-3 rounded-xl flex items-center justify-center gap-1.5 transition-all ${
-              mode === 'login'
-                ? 'bg-white text-[#0066CC] shadow-xs'
-                : 'text-stone-500 hover:text-stone-800'
-            }`}
-          >
-            <Compass className="w-4 h-4" />
-            <span>Khách</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => setMode('register_owner')}
-            className={`py-2 px-3 rounded-xl flex items-center justify-center gap-1.5 transition-all ${
-              mode === 'register_owner'
-                ? 'bg-[#D9452B] text-white shadow-xs'
-                : 'text-stone-500 hover:text-stone-800'
-            }`}
-          >
-            <Store className="w-4 h-4" />
-            <span>Chủ Quán Ăn/Uống</span>
-          </button>
         </div>
 
         {/* Body content */}
@@ -349,8 +340,8 @@ export default function AuthModal({
             </div>
           )}
 
-          {mode === 'login' ? (
-            /* TAB 1: ĐĂNG NHẬP KHÁCH DU LỊCH BẰNG GOOGLE (GMAIL) */
+          {!isOwnerMode ? (
+            /* ĐĂNG NHẬP KHÁCH DU LỊCH BẰNG GOOGLE (GMAIL) */
             <div className="space-y-4 pt-1">
               <div className="text-center pb-1">
                 <p className="text-xs text-stone-600">

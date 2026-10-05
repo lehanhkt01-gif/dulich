@@ -112,6 +112,8 @@ docker compose up -d --build
 - [x] Đổi tên tab "Quán ăn/uống Ea Súp" thành "TÌM QUÁN ĂN/UỐNG" với màu sắc riêng (nền xanh dương đậm #0066CC nổi bật khi chưa chọn, khi chọn đổi màu đỏ cam #D9452B) để tăng sự chú ý của du khách.
 - [x] Khắc phục triệt để lỗi Google OAuth Configuration trên tên miền VPS dulich.easupso.com (checks: ['none'], AUTH_URL https, Nginx X-Forwarded-Proto Cloudflare).
 - [x] Ẩn nút "Chủ Quán" màu đỏ trong menu dropdown khi người dùng đăng nhập với vai trò Khách hàng (thay bằng link Lịch sử đặt món).
+- [x] Ẩn nút "Đổi ảnh bìa quán" đối với giao diện Khách hàng (chỉ hiển thị cho Chủ quán / Admin) và gắn link Google Maps chỉ đường trực tiếp tại vị trí địa chỉ quán.
+- [x] Tách biệt Đăng nhập Khách hàng chuyên biệt (bỏ tab Chủ quán trên modal chính) và đưa cụm "Đăng nhập Chủ quán" + "Đăng ký làm chủ quán mới" vào menu 3 gạch.
 - [ ] Mở rộng tính năng bình luận và đánh giá món ăn/quán ăn cho du khách.
 
 ## 8. Lưu ý quan trọng

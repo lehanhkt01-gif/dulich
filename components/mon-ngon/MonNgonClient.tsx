@@ -745,10 +745,22 @@ export default function MonNgonClient() {
                         </h3>
 
                         <div className="space-y-1.5 mt-2.5 text-xs text-[#7D6B62]">
-                          <div className="flex items-center gap-1.5">
-                            <MapPin className="w-3.5 h-3.5 text-[#D9452B] shrink-0" />
-                            <span className="line-clamp-1">{r.address}</span>
-                          </div>
+                          <a
+                            href={
+                              r.lat && r.lng
+                                ? `https://www.google.com/maps/search/?api=1&query=${r.lat},${r.lng}`
+                                : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+                                    `${r.name}, ${r.address}, Ea Súp, Đắk Lắk`
+                                  )}`
+                            }
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-1.5 hover:text-[#D9452B] transition-colors group cursor-pointer"
+                            title="Mở Google Maps chỉ đường"
+                          >
+                            <MapPin className="w-3.5 h-3.5 text-[#D9452B] group-hover:scale-110 transition-transform shrink-0" />
+                            <span className="line-clamp-1 group-hover:underline">{r.address}</span>
+                          </a>
                           <div className="flex items-center gap-1.5">
                             <Clock className="w-3.5 h-3.5 text-blue-500 shrink-0" />
                             <span>Mở cửa: {r.openTime || '07:00'} - {r.closeTime || '22:00'}</span>
@@ -1398,10 +1410,23 @@ function RestaurantInfo({
             <Store className="w-3.5 h-3.5 shrink-0 text-[#D9452B]" />
             <span className="truncate">{restaurant.name}</span>
           </p>
-          <p className="text-[10px] text-[#7D6B62] flex items-center gap-1 mt-0.5 truncate">
-            <MapPin className="w-3 h-3 shrink-0 text-stone-400" />
-            <span className="truncate">{restaurant.address}</span>
-          </p>
+          <a
+            href={
+              restaurant.lat && restaurant.lng
+                ? `https://www.google.com/maps/search/?api=1&query=${restaurant.lat},${restaurant.lng}`
+                : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+                    `${restaurant.name}, ${restaurant.address}, Ea Súp, Đắk Lắk`
+                  )}`
+            }
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={(e) => e.stopPropagation()}
+            className="text-[10px] text-[#7D6B62] hover:text-[#D9452B] flex items-center gap-1 mt-0.5 truncate group cursor-pointer"
+            title="Mở Google Maps chỉ đường"
+          >
+            <MapPin className="w-3 h-3 shrink-0 text-[#D9452B] group-hover:scale-110 transition-transform" />
+            <span className="truncate group-hover:underline">{restaurant.address}</span>
+          </a>
         </div>
         <button
           type="button"
