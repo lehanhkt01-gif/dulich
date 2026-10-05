@@ -11,6 +11,7 @@ import {
   ShieldCheck,
   UtensilsCrossed,
   Store,
+  ShoppingBag,
   LogIn,
   LogOut,
   Menu as MenuIcon,
@@ -197,6 +198,12 @@ export default function Navbar() {
     { name: 'Lịch trình du lịch', href: '/diem-den#lich-trinh', icon: Calendar },
   ];
 
+  const isTraveler =
+    currentUser?.role === 'TRAVELER' || currentUser?.role === 'USER';
+
+  // Khách hàng đã đăng nhập thì ẨN HOÀN TOÀN nút Chủ Quán
+  const showOwnerLink = !isTraveler;
+
   const showAdminLink =
     !currentUser ||
     currentUser.role === 'ADMIN' ||
@@ -372,24 +379,45 @@ export default function Navbar() {
                     })}
                   </div>
 
-                  {/* Mục Chủ Quán & Quản Trị */}
+                  {/* Mục Hệ Thống / Tiện Ích */}
                   <div className="space-y-1">
                     <p className="text-[10px] font-bold text-stone-400 uppercase tracking-wider px-2 py-0.5 md:hidden">
-                      Hệ thống
+                      {isTraveler ? 'Cá nhân' : 'Hệ thống'}
                     </p>
-                    <Link
-                      id="nav-menu-chu-quan"
-                      href="/chu-quan"
-                      onClick={() => setMenuOpen(false)}
-                      className={`flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold transition-colors ${
-                        pathname.startsWith('/chu-quan')
-                          ? 'bg-[#D9452B] text-white'
-                          : 'text-[#D9452B] hover:bg-[#FDEDE8]'
-                      }`}
-                    >
-                      <Store className="w-4 h-4 shrink-0" />
-                      <span>Chủ Quán</span>
-                    </Link>
+
+                    {/* Nếu là Khách hàng: Hiện Lịch sử đặt món & bàn, ẨN HOÀN TOÀN nút Chủ Quán */}
+                    {isTraveler && (
+                      <Link
+                        id="nav-menu-lich-su"
+                        href="/mon-ngon/lich-su-dat"
+                        onClick={() => setMenuOpen(false)}
+                        className={`flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold transition-colors ${
+                          pathname.startsWith('/mon-ngon/lich-su-dat')
+                            ? 'bg-[#0066CC] text-white'
+                            : 'text-blue-600 hover:bg-blue-50'
+                        }`}
+                      >
+                        <ShoppingBag className="w-4 h-4 shrink-0" />
+                        <span>Lịch sử đặt món & bàn</span>
+                      </Link>
+                    )}
+
+                    {/* Nút Chủ Quán: Chỉ hiện khi chưa đăng nhập hoặc khi tài khoản là Chủ Quán/Admin */}
+                    {showOwnerLink && (
+                      <Link
+                        id="nav-menu-chu-quan"
+                        href="/chu-quan"
+                        onClick={() => setMenuOpen(false)}
+                        className={`flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold transition-colors ${
+                          pathname.startsWith('/chu-quan')
+                            ? 'bg-[#D9452B] text-white'
+                            : 'text-[#D9452B] hover:bg-[#FDEDE8]'
+                        }`}
+                      >
+                        <Store className="w-4 h-4 shrink-0" />
+                        <span>Chủ Quán</span>
+                      </Link>
+                    )}
 
                     {showAdminLink && (
                       <Link

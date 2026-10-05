@@ -10,6 +10,18 @@
 > **Lưu ý / việc còn dở:** …
 > ```
 
+## [2026-10-05] Ẩn Hoàn Toàn Nút "Chủ Quán" Trong Menu Khi Người Dùng Đăng Nhập Với Vai Trò "Khách Hàng"
+
+**Yêu cầu:**
+Khi đăng nhập ở giao diện "khách hàng" thì ẩn nút "Chủ quán" màu đỏ trên hình kia đi.
+
+**Đã làm:**
+- **Ẩn nút Chủ Quán khi là Khách hàng ([`components/Navbar.tsx`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/components/Navbar.tsx)):**
+  - Xác định `isTraveler = currentUser?.role === 'TRAVELER' || currentUser?.role === 'USER'`.
+  - Thiết lập `showOwnerLink = !isTraveler`: Nút "Chủ Quán" màu đỏ được ẩn hoàn toàn khỏi menu dropdown khi người dùng đăng nhập bằng tài khoản Khách hàng.
+  - Thay thế bằng liên kết tiện ích riêng cho du khách: `Lịch sử đặt món & bàn` (`/mon-ngon/lich-su-dat`).
+  - Nút "Chủ Quán" chỉ hiển thị khi chưa đăng nhập (để ai muốn mở quán có chỗ truy cập) hoặc khi tài khoản đăng nhập là Chủ Quán (`OWNER`) / Admin (`ADMIN`).
+
 ## [2026-10-05] Khắc Phục Triệt Để Lỗi Đăng Nhập Google OAuth (Gmail) Trên Tên Miền dulich.easupso.com
 
 **Yêu cầu:**

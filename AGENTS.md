@@ -111,6 +111,7 @@ docker compose up -d --build
 - [x] Sắp xếp lại giao diện Admin khoa học, gọn gàng (tách Top Header Action và Navigation Tabs Bar 2 nhóm Nội dung / Tài khoản), và đổi tên chức danh cán bộ thành "Chủ tịch MTTQ".
 - [x] Đổi tên tab "Quán ăn/uống Ea Súp" thành "TÌM QUÁN ĂN/UỐNG" với màu sắc riêng (nền xanh dương đậm #0066CC nổi bật khi chưa chọn, khi chọn đổi màu đỏ cam #D9452B) để tăng sự chú ý của du khách.
 - [x] Khắc phục triệt để lỗi Google OAuth Configuration trên tên miền VPS dulich.easupso.com (checks: ['none'], AUTH_URL https, Nginx X-Forwarded-Proto Cloudflare).
+- [x] Ẩn nút "Chủ Quán" màu đỏ trong menu dropdown khi người dùng đăng nhập với vai trò Khách hàng (thay bằng link Lịch sử đặt món).
 - [ ] Mở rộng tính năng bình luận và đánh giá món ăn/quán ăn cho du khách.
 
 ## 8. Lưu ý quan trọng
