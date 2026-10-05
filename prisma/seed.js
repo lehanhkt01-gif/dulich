@@ -15,7 +15,7 @@ async function main() {
     update: {},
     create: {
       id: 'user-admin-1',
-      name: 'Cán Bộ Văn Hóa Ea Súp',
+      name: 'Chủ tịch MTTQ',
       email: 'admin@easup.daklak.gov.vn',
       password: adminPassword,
       role: 'ADMIN',

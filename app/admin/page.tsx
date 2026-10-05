@@ -134,15 +134,31 @@ export default function AdminPage() {
   // Kiểm tra phiên đăng nhập
   const checkAuth = async () => {
     try {
-      const savedUser = localStorage.getItem('admin_user');
+      const savedUser = localStorage.getItem('admin_user') || localStorage.getItem('easup_auth_user');
       if (savedUser) {
-        setCurrentUser(JSON.parse(savedUser));
+        try {
+          const parsed = JSON.parse(savedUser);
+          if (parsed.email === 'admin@easup.daklak.gov.vn' || parsed.name === 'Cán Bộ Văn Hóa Ea Súp' || parsed.name === 'Quản Trị Viên Ea Súp') {
+            parsed.name = 'Chủ tịch MTTQ';
+          }
+          if (['ADMIN', 'CADRE', 'EDITOR'].includes(parsed.role)) {
+            setCurrentUser(parsed);
+            localStorage.setItem('admin_user', JSON.stringify(parsed));
+            localStorage.setItem('easup_auth_user', JSON.stringify(parsed));
+          }
+        } catch (e) {}
       } else {
         const res = await fetch('/api/auth/me');
         const data = await res.json();
         if (data.authenticated && data.user) {
+          if (data.user.email === 'admin@easup.daklak.gov.vn' || data.user.name === 'Cán Bộ Văn Hóa Ea Súp' || data.user.name === 'Quản Trị Viên Ea Súp') {
+            data.user.name = 'Chủ tịch MTTQ';
+          }
           setCurrentUser(data.user);
           localStorage.setItem('admin_user', JSON.stringify(data.user));
+          localStorage.setItem('easup_auth_user', JSON.stringify(data.user));
+          window.dispatchEvent(new Event('storage'));
+          window.dispatchEvent(new CustomEvent('auth-changed', { detail: data.user }));
         }
       }
     } catch (e) {
@@ -165,8 +181,14 @@ export default function AdminPage() {
       });
       const data = await res.json();
       if (data.success && data.user) {
+        if (data.user.email === 'admin@easup.daklak.gov.vn' || data.user.name === 'Cán Bộ Văn Hóa Ea Súp' || data.user.name === 'Quản Trị Viên Ea Súp') {
+          data.user.name = 'Chủ tịch MTTQ';
+        }
         setCurrentUser(data.user);
         localStorage.setItem('admin_user', JSON.stringify(data.user));
+        localStorage.setItem('easup_auth_user', JSON.stringify(data.user));
+        window.dispatchEvent(new Event('storage'));
+        window.dispatchEvent(new CustomEvent('auth-changed', { detail: data.user }));
       } else {
         setLoginError(data.message || 'Email hoặc mật khẩu không chính xác');
       }
@@ -185,6 +207,8 @@ export default function AdminPage() {
     localStorage.removeItem('admin_user');
     localStorage.removeItem('easup_auth_user');
     sessionStorage.clear();
+    window.dispatchEvent(new Event('storage'));
+    window.dispatchEvent(new CustomEvent('auth-changed', { detail: null }));
     setCurrentUser(null);
     window.location.href = '/';
   };
@@ -819,18 +843,20 @@ export default function AdminPage() {
       {/* Top Header */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-[#E7E2D7] pb-6">
         <div>
-          <div className="flex items-center gap-2.5 mb-2">
+          <div className="flex flex-wrap items-center gap-2 mb-2">
             <img
               src="/logo-doan-thanh-nien.png"
               alt="Huy hiệu Đoàn Thanh Niên"
               className="w-7 h-7 object-contain shrink-0 drop-shadow-sm"
             />
             <span className="text-xs font-bold text-[#0066CC] uppercase tracking-wider">
-              ĐOÀN THANH NIÊN EA SÚP - ĐĂK LĂK (XÃ EA SÚP)
+              ĐOÀN THANH NIÊN EA SÚP - ĐẮK LẮK (XÃ EA SÚP)
             </span>
             <span className="text-stone-300">•</span>
             <div className="flex items-center gap-1.5">
-              <span className="text-xs text-stone-600 font-medium">Cán bộ: <strong>{currentUser.name}</strong></span>
+              <span className="text-xs text-stone-600 font-medium">
+                Cán bộ: <strong>{currentUser.name === 'Cán Bộ Văn Hóa Ea Súp' || currentUser.name === 'Quản Trị Viên Ea Súp' ? 'Chủ tịch MTTQ' : (currentUser.name || 'Chủ tịch MTTQ')}</strong>
+              </span>
               <span
                 className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
                   currentUser.role === 'ADMIN'
@@ -850,10 +876,12 @@ export default function AdminPage() {
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+        {/* Nút tác vụ nhanh trên Header */}
+        <div className="flex items-center gap-2.5">
           <Link
             href="/"
-            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white border border-[#E7E2D7] text-xs font-semibold text-stone-700 hover:bg-stone-50"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white border border-[#E7E2D7] text-xs font-semibold text-stone-700 hover:bg-stone-50 hover:text-[#0066CC] transition-colors shadow-xs"
+            title="Xem giao diện người dùng bên ngoài"
           >
             <ArrowLeft className="w-4 h-4" />
             <span>Trang Chủ</span>
@@ -862,82 +890,97 @@ export default function AdminPage() {
           <button
             onClick={() => {
               setEditingDest(null);
-              setActiveTab('list');
+              setActiveTab('create');
             }}
-            className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold transition-all shadow-sm ${
-              activeTab === 'list'
-                ? 'bg-[#0066CC] text-white'
-                : 'bg-white border border-[#E7E2D7] text-stone-700 hover:bg-stone-50'
-            }`}
+            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#0066CC] hover:bg-[#0052A3] text-white text-xs font-bold transition-all shadow-sm"
           >
-            <FileText className="w-4 h-4" />
-            <span>Danh Sách Di Tích</span>
+            <Plus className="w-4 h-4" />
+            <span>+ Thêm Mới Danh Thắng</span>
           </button>
+        </div>
+      </div>
+
+      {/* Thanh Điều Hướng Chức Năng (Phân cụm khoa học, gọn gàng) */}
+      <div className="bg-white p-2.5 rounded-2xl border border-[#E7E2D7] shadow-xs flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+        {/* Phân nhóm 1: Quản Lý Di Tích & Ẩm Thực */}
+        <div className="flex items-center gap-2 overflow-x-auto no-scrollbar">
+          <span className="text-[11px] font-bold text-stone-400 uppercase tracking-wider px-1 hidden lg:inline">
+            Nội dung:
+          </span>
 
           <button
             onClick={() => {
               setEditingDest(null);
-              setActiveTab('create');
+              setActiveTab('list');
             }}
-            className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold transition-all shadow-sm ${
-              activeTab === 'create'
-                ? 'bg-[#0066CC] text-white'
-                : 'bg-white border border-[#E7E2D7] text-stone-700 hover:bg-stone-50'
+            className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold transition-all ${
+              activeTab === 'list'
+                ? 'bg-[#0066CC] text-white shadow-xs'
+                : 'text-stone-700 hover:bg-stone-100 border border-transparent'
             }`}
           >
-            <Plus className="w-4 h-4" />
-            <span>Thêm Mới Danh Thắng</span>
+            <FileText className="w-4 h-4" />
+            <span>Danh Sách Di Tích</span>
+            <span
+              className={`px-1.5 py-0.2 rounded-full text-[10px] font-extrabold ${
+                activeTab === 'list' ? 'bg-white/20 text-white' : 'bg-stone-100 text-stone-600'
+              }`}
+            >
+              {destinations.length}
+            </span>
           </button>
 
-          {/* Tab Món Ngon & Bàn Ăn */}
           <button
-            onClick={() => {
-              setActiveTab('food-tables');
-            }}
-            className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold transition-all shadow-sm ${
+            onClick={() => setActiveTab('food-tables')}
+            className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold transition-all ${
               activeTab === 'food-tables'
-                ? 'bg-[#D9452B] text-white'
-                : 'bg-white border border-[#EADBD0] text-[#D9452B] hover:bg-[#FDEDE8]'
+                ? 'bg-[#D9452B] text-white shadow-xs'
+                : 'text-[#D9452B] hover:bg-[#FDEDE8] border border-transparent'
             }`}
           >
             <UtensilsCrossed className="w-4 h-4" />
             <span>Món Ngon & Bàn Ăn</span>
           </button>
+        </div>
 
-          {/* Nút 1: Khách Hàng (Tự động kích hoạt bằng Gmail) */}
+        {/* Phân nhóm 2: Quản Lý Người Dùng & Phân Quyền */}
+        <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pt-2 md:pt-0 border-t md:border-t-0 border-stone-100">
+          <span className="text-[11px] font-bold text-stone-400 uppercase tracking-wider px-1 hidden lg:inline">
+            Tài khoản:
+          </span>
+
+          {/* Tab Khách Hàng */}
           <button
             onClick={() => setActiveTab('customers')}
-            className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold transition-all shadow-sm ${
+            className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold transition-all ${
               activeTab === 'customers'
-                ? 'bg-purple-600 text-white shadow-purple-200 ring-2 ring-purple-400'
-                : 'bg-purple-50 border border-purple-200 text-purple-800 hover:bg-purple-100'
+                ? 'bg-purple-600 text-white shadow-xs ring-2 ring-purple-300'
+                : 'bg-purple-50/70 border border-purple-200/80 text-purple-800 hover:bg-purple-100'
             }`}
-            title="Quản lý khách du lịch (Đăng nhập Gmail, tự động kích hoạt, không cần duyệt)"
+            title="Quản lý khách du lịch (Đăng nhập Gmail, tự động kích hoạt)"
           >
-            <Users className="w-4 h-4 text-purple-600" />
+            <Users className="w-4 h-4" />
             <span>Khách Hàng</span>
             <span
               className={`ml-1 px-1.5 py-0.5 rounded-full text-[10px] font-extrabold ${
-                activeTab === 'customers'
-                  ? 'bg-white text-purple-700'
-                  : 'bg-purple-200/80 text-purple-900'
+                activeTab === 'customers' ? 'bg-white text-purple-700' : 'bg-purple-200/80 text-purple-900'
               }`}
             >
               {counts.customers}
             </span>
           </button>
 
-          {/* Nút 2: Chủ Quán (Đăng ký qua Gmail, Admin bắt buộc phê duyệt) */}
+          {/* Tab Chủ Quán */}
           <button
             onClick={() => setActiveTab('owners')}
-            className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold transition-all shadow-sm ${
+            className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold transition-all ${
               activeTab === 'owners'
-                ? 'bg-[#D9452B] text-white shadow-red-200 ring-2 ring-red-400'
-                : 'bg-orange-50 border border-orange-200 text-[#D9452B] hover:bg-orange-100'
+                ? 'bg-[#D9452B] text-white shadow-xs ring-2 ring-red-300'
+                : 'bg-orange-50/70 border border-orange-200/80 text-[#D9452B] hover:bg-orange-100'
             }`}
-            title="Quản lý chủ quán ăn (Đăng nhập Gmail, Admin phê duyệt, vào thẳng quán)"
+            title="Quản lý chủ quán ăn/uống (Chờ Admin duyệt hồ sơ)"
           >
-            <Store className="w-4 h-4 text-[#D9452B]" />
+            <Store className="w-4 h-4" />
             <span>Chủ Quán</span>
             {pendingApprovals.length > 0 ? (
               <span className="ml-1 px-1.5 py-0.5 rounded-full text-[10px] bg-red-600 text-white font-extrabold animate-pulse">
@@ -946,9 +989,7 @@ export default function AdminPage() {
             ) : (
               <span
                 className={`ml-1 px-1.5 py-0.5 rounded-full text-[10px] font-extrabold ${
-                  activeTab === 'owners'
-                    ? 'bg-white text-[#D9452B]'
-                    : 'bg-orange-200/80 text-orange-900'
+                  activeTab === 'owners' ? 'bg-white text-[#D9452B]' : 'bg-orange-200/80 text-orange-900'
                 }`}
               >
                 {counts.owners}
@@ -956,17 +997,17 @@ export default function AdminPage() {
             )}
           </button>
 
-          {/* Nút 3: Cán Bộ (Tài khoản nội bộ quản lý hệ thống & phân quyền) */}
+          {/* Tab Cán Bộ */}
           <button
             onClick={() => setActiveTab('cadres')}
-            className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold transition-all shadow-sm ${
+            className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold transition-all ${
               activeTab === 'cadres' || activeTab === 'users'
-                ? 'bg-[#0066CC] text-white shadow-blue-200 ring-2 ring-blue-400'
-                : 'bg-blue-50 border border-blue-200 text-[#0066CC] hover:bg-blue-100'
+                ? 'bg-[#0066CC] text-white shadow-xs ring-2 ring-blue-300'
+                : 'bg-blue-50/70 border border-blue-200/80 text-[#0066CC] hover:bg-blue-100'
             }`}
             title="Cấp quyền quản lý cho cán bộ (ADMIN, CADRE, EDITOR)"
           >
-            <Shield className="w-4 h-4 text-[#0066CC]" />
+            <Shield className="w-4 h-4" />
             <span>Cán Bộ</span>
             <span
               className={`ml-1 px-1.5 py-0.5 rounded-full text-[10px] font-extrabold ${
@@ -981,15 +1022,6 @@ export default function AdminPage() {
                 ).length
               }
             </span>
-          </button>
-
-          <button
-            onClick={handleLogout}
-            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-red-50 border border-red-200 text-xs font-bold text-red-700 hover:bg-red-100 transition-colors"
-            title="Đăng xuất khỏi hệ thống"
-          >
-            <LogOut className="w-4 h-4" />
-            <span>Đăng Xuất</span>
           </button>
         </div>
       </div>

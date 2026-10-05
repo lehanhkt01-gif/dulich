@@ -107,6 +107,8 @@ docker compose up -d --build
 - [x] Sửa triệt để lỗi Configuration Google OAuth, cấu hình prompt select_account hiển thị danh sách tài khoản Gmail đã đăng nhập trên máy cho người dân chọn, và bỏ hoàn toàn nút màu đỏ "+ Đăng ký quán của bạn" tại trang Món ngon.
 - [x] Ràng buộc vai trò Chủ Quán - Khách Hàng (Email đã là Chủ Quán không được làm Khách; Email Khách được nâng cấp làm Chủ Quán và xóa vai trò Khách), bổ sung ô Nhập lại mật khẩu cho Chủ Quán, tính năng Đổi Mật Khẩu trong Dashboard và tự động gửi Email xác nhận bạn đã đăng ký chủ quán thành công kèm link đăng nhập khi Admin phê duyệt.
 - [x] Admin Reset Mật Khẩu Chủ Quán: Tạo nút "Reset MK" tại trang quản trị Admin, tự động sinh mật khẩu ngẫu nhiên 8 ký tự an toàn (hoa, thường, số), băm bcrypt lưu DB và gửi email thông báo mật khẩu mới cùng link đăng nhập đến Gmail của Chủ quán.
+- [x] Đồng bộ trạng thái đăng nhập tức thì giữa Admin và Navbar: Thay nút "Đăng nhập" trên Navbar thành nút "Đăng xuất" (kèm Avatar, tên, badge vai trò) khi đã đăng nhập, và bỏ nút "Đăng Xuất" dư thừa bên dưới giao diện Admin.
+- [x] Sắp xếp lại giao diện Admin khoa học, gọn gàng (tách Top Header Action và Navigation Tabs Bar 2 nhóm Nội dung / Tài khoản), và đổi tên chức danh cán bộ thành "Chủ tịch MTTQ".
 - [ ] Mở rộng tính năng bình luận và đánh giá món ăn/quán ăn cho du khách.
 
 ## 8. Lưu ý quan trọng

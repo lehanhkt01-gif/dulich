@@ -10,6 +10,36 @@
 > **Lưu ý / việc còn dở:** …
 > ```
 
+## [2026-10-05] Sắp Xếp Giao Diện Admin Khoa Học, Gọn Gàng & Đổi Tên Cán Bộ Thành "Chủ tịch MTTQ"
+
+**Yêu cầu:**
+Sắp xếp lại cho gọn gàng, khoa học hơn. "Cán bộ văn hóa Ea Súp" sửa lại thành "Chủ tịch MTTQ".
+
+**Đã làm:**
+- **Đổi tên hiển thị và dữ liệu cán bộ ([`app/admin/page.tsx`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/app/admin/page.tsx), [`data/users.json`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/data/users.json), [`lib/data/seed-data.ts`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/lib/data/seed-data.ts), [`prisma/seed.js`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/prisma/seed.js)):**
+  - Chuyển toàn bộ tên "Cán Bộ Văn Hóa Ea Súp" / "Quản Trị Viên Ea Súp" sang chức danh trang trọng chuẩn mực: **"Chủ tịch MTTQ"**.
+  - Tự động chuẩn hóa tên trong `checkAuth` và `handleLogin` khi tải giao diện Admin.
+- **Tái cấu trúc Header & Thanh điều hướng Tab khoa học ([`app/admin/page.tsx`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/app/admin/page.tsx)):**
+  - **Tầng 1 (Top Header):** Tinh gọn chỉ giữ lại thông tin đơn vị + Cán bộ: **Chủ tịch MTTQ** [QUẢN TRỊ VIÊN], tiêu đề hệ thống, và 2 nút hành động quan trọng phía bên phải: `+ Thêm Mới Danh Thắng` (nút chính CTA) và `Trang Chủ` (nút phụ).
+  - **Tầng 2 (Thanh Điều Hướng Tabs Chuyên Biệt):** Đặt riêng biệt ngay bên dưới Header, phân định 2 nhóm chức năng rành mạch:
+    - *Nhóm Nội dung:* **Danh Sách Di Tích** (kèm badge tổng số di tích), **Món Ngon & Bàn Ăn**.
+    - *Nhóm Tài khoản:* **Khách Hàng** (badge số lượng), **Chủ Quán** (badge cam / cảnh báo đỏ nhấp nháy nếu có đơn chờ duyệt), **Cán Bộ** (badge số lượng cán bộ).
+  - Loại bỏ hoàn toàn sự lộn xộn của 7-8 nút bị dồn cục ở góc phải trước đây.
+
+## [2026-10-05] Thay Nút Đăng Nhập Trên Navbar Thành Nút Đăng Xuất Khi Đã Đăng Nhập & Xóa Nút Đăng Xuất Thừa Trong Admin
+
+**Yêu cầu:**
+Khi admin đã đăng nhập rồi thì nút "đăng nhập" phải thay bằng nút "Đăng xuất", bỏ nút bên dưới đi.
+
+**Đã làm:**
+- **Đồng bộ trạng thái đăng nhập tức thì giữa Admin và Navbar ([`components/Navbar.tsx`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/components/Navbar.tsx), [`app/admin/page.tsx`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/app/admin/page.tsx)):**
+  - Đồng bộ `admin_user` và `easup_auth_user` trong `localStorage` khi admin đăng nhập, kiểm tra phiên hoặc đăng xuất.
+  - Lắng nghe và kích hoạt sự kiện `storage` và `auth-changed` trên `window` giúp Navbar nhận biết ngay lập tức trạng thái đăng nhập của Admin mà không cần tải lại trang.
+- **Thay nút "Đăng nhập" bằng nút "Đăng xuất" trên Navbar ([`components/Navbar.tsx`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/components/Navbar.tsx)):**
+  - Khi Admin (hoặc người dùng) đã đăng nhập, nút "Đăng nhập" màu đen được thay thế trực tiếp bằng cụm hiển thị thông tin tài khoản (Avatar + Tên + Badge vai trò) cùng nút **"Đăng xuất"** (icon `LogOut` + chữ "Đăng xuất" rõ ràng với tông màu đỏ trang nhã).
+- **Bỏ nút "Đăng Xuất" dư thừa bên dưới ([`app/admin/page.tsx`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/app/admin/page.tsx)):**
+  - Xóa bỏ nút "Đăng Xuất" nằm dưới thanh tab trong giao diện quản trị `/admin` để giao diện gọn gàng, thanh thoát, tập trung toàn bộ thao tác đăng xuất lên thanh Navbar trên cùng.
+
 ## [2026-10-05] Thiết Lập Chức Năng Admin Reset Mật Khẩu Chủ Quán & Gửi Mật Khẩu Random 8 Ký Tự Qua Email
 
 **Yêu cầu:**

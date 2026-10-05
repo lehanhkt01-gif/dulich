@@ -42,12 +42,41 @@ export default function Navbar() {
 
   const fetchAuthUser = async () => {
     try {
+      // 1. Kiểm tra localStorage trước (cả easup_auth_user và admin_user) để giao diện tức thì
+      let localUser: any = null;
+      if (typeof window !== 'undefined') {
+        const easupUser = localStorage.getItem('easup_auth_user');
+        const adminUser = localStorage.getItem('admin_user');
+        if (easupUser) {
+          try {
+            localUser = JSON.parse(easupUser);
+          } catch (e) {}
+        }
+        if (!localUser && adminUser) {
+          try {
+            localUser = JSON.parse(adminUser);
+          } catch (e) {}
+        }
+      }
+
+      if (localUser) {
+        if (localUser.role === 'OWNER' && localUser.status !== 'ACTIVE') {
+          if (typeof window !== 'undefined') {
+            localStorage.removeItem('easup_auth_user');
+          }
+          setCurrentUser(null);
+        } else {
+          setCurrentUser(localUser);
+        }
+      }
+
+      // 2. Fetch /api/auth/me để kiểm tra token từ server
       const res = await fetch('/api/auth/me');
       const data = await res.json();
       if (data.authenticated && data.user) {
         let userDetail = data.user;
         if (typeof window !== 'undefined') {
-          const cached = localStorage.getItem('easup_auth_user');
+          const cached = localStorage.getItem('easup_auth_user') || localStorage.getItem('admin_user');
           if (cached) {
             try {
               const parsed = JSON.parse(cached);
@@ -66,30 +95,17 @@ export default function Navbar() {
           return;
         }
         setCurrentUser(userDetail);
-      } else {
         if (typeof window !== 'undefined') {
-          const cached = localStorage.getItem('easup_auth_user');
-          if (cached) {
-            try {
-              const parsed = JSON.parse(cached);
-              if (parsed.role === 'OWNER' && parsed.status !== 'ACTIVE') {
-                localStorage.removeItem('easup_auth_user');
-                setCurrentUser(null);
-                return;
-              }
-              setCurrentUser(parsed);
-            } catch (e) {
-              setCurrentUser(null);
-            }
-          } else {
-            setCurrentUser(null);
+          localStorage.setItem('easup_auth_user', JSON.stringify(userDetail));
+          if (['ADMIN', 'CADRE', 'EDITOR'].includes(userDetail.role)) {
+            localStorage.setItem('admin_user', JSON.stringify(userDetail));
           }
-        } else {
-          setCurrentUser(null);
         }
+      } else if (!localUser) {
+        setCurrentUser(null);
       }
     } catch {
-      setCurrentUser(null);
+      // Giữ nguyên localUser nếu mạng lỗi
     }
   };
 
@@ -97,9 +113,21 @@ export default function Navbar() {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
     };
+    const handleAuthChange = () => {
+      fetchAuthUser();
+    };
+
     window.addEventListener('scroll', handleScroll);
+    window.addEventListener('storage', handleAuthChange);
+    window.addEventListener('auth-changed', handleAuthChange);
+
     fetchAuthUser();
-    return () => window.removeEventListener('scroll', handleScroll);
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('storage', handleAuthChange);
+      window.removeEventListener('auth-changed', handleAuthChange);
+    };
   }, [pathname]);
 
   const { data: session } = useSession();
@@ -146,6 +174,8 @@ export default function Navbar() {
       localStorage.removeItem('admin_user');
       sessionStorage.clear();
       document.cookie = 'auth_token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+      window.dispatchEvent(new Event('storage'));
+      window.dispatchEvent(new CustomEvent('auth-changed', { detail: null }));
     }
 
     setCurrentUser(null);
@@ -241,39 +271,43 @@ export default function Navbar() {
           <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
             {/* Cụm Tài Khoản: Trên mobile chỉ để Avatar và chữ "Khách" hoặc "Quán" theo phân quyền */}
             {currentUser ? (
-              <div className="flex items-center gap-1.5 bg-white border border-[#E7E2D7] py-1 px-2 rounded-xl shadow-xs shrink-0">
-                <div className="w-5 h-5 rounded-full overflow-hidden bg-blue-100 text-[#0066CC] flex items-center justify-center text-[10px] font-bold shrink-0">
-                  {currentUser.avatar ? (
-                    <img src={currentUser.avatar} alt={currentUser.name} className="w-full h-full object-cover" />
-                  ) : (
-                    currentUser.name?.charAt(0) || 'U'
-                  )}
+              <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+                {/* Thông tin tài khoản */}
+                <div className="flex items-center gap-1.5 bg-white border border-[#E7E2D7] py-1 px-2 rounded-xl shadow-xs shrink-0">
+                  <div className="w-5 h-5 rounded-full overflow-hidden bg-blue-100 text-[#0066CC] flex items-center justify-center text-[10px] font-bold shrink-0">
+                    {currentUser.avatar ? (
+                      <img src={currentUser.avatar} alt={currentUser.name} className="w-full h-full object-cover" />
+                    ) : (
+                      currentUser.name?.charAt(0) || 'U'
+                    )}
+                  </div>
+                  {/* Tên chỉ hiện trên máy tính (md+), trên điện thoại ẩn đi */}
+                  <span className="hidden md:inline max-w-[120px] truncate text-xs font-bold text-[#1C1917]">
+                    {currentUser.name}
+                  </span>
+                  {/* Badge phân quyền rút gọn: "Quán" hoặc "Khách" hoặc "Admin" */}
+                  <span
+                    className={`text-[10px] px-1.5 py-0.5 rounded font-bold uppercase tracking-wider ${
+                      currentUser.role === 'ADMIN'
+                        ? 'bg-[#0066CC] text-white'
+                        : currentUser.role === 'OWNER'
+                        ? 'bg-[#D9452B] text-white'
+                        : 'bg-stone-100 text-stone-700 border border-stone-200'
+                    }`}
+                  >
+                    {currentUser.role === 'ADMIN' ? 'Admin' : currentUser.role === 'OWNER' ? 'Quán' : 'Khách'}
+                  </span>
                 </div>
-                {/* Tên chỉ hiện trên máy tính (md+), trên điện thoại ẩn đi */}
-                <span className="hidden md:inline max-w-[120px] truncate text-xs font-bold text-[#1C1917]">
-                  {currentUser.name}
-                </span>
-                {/* Badge phân quyền rút gọn: "Quán" hoặc "Khách" hoặc "Admin" */}
-                <span
-                  className={`text-[10px] px-1.5 py-0.5 rounded font-bold uppercase tracking-wider ${
-                    currentUser.role === 'ADMIN'
-                      ? 'bg-[#0066CC] text-white'
-                      : currentUser.role === 'OWNER'
-                      ? 'bg-[#D9452B] text-white'
-                      : 'bg-stone-100 text-stone-700 border border-stone-200'
-                  }`}
-                >
-                  {currentUser.role === 'ADMIN' ? 'Admin' : currentUser.role === 'OWNER' ? 'Quán' : 'Khách'}
-                </span>
 
-                {/* Nút Đăng Xuất */}
+                {/* Nút Đăng Xuất thay thế vị trí nút Đăng Nhập */}
                 <button
                   type="button"
                   onClick={handleLogout}
                   title="Đăng xuất tài khoản"
-                  className="p-1 rounded-lg text-stone-400 hover:text-red-600 hover:bg-red-50 transition-colors ml-0.5"
+                  className="flex items-center gap-1.5 py-1.5 px-3 rounded-xl text-xs font-bold bg-red-50 text-red-600 border border-red-200 hover:bg-red-600 hover:text-white transition-all shadow-xs shrink-0"
                 >
-                  <LogOut className="w-3.5 h-3.5" />
+                  <LogOut className="w-3.5 h-3.5 shrink-0" />
+                  <span>Đăng xuất</span>
                 </button>
               </div>
             ) : (

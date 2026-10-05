@@ -3,7 +3,7 @@ import { Category, Destination, ItineraryItem, User } from '../types';
 export const INITIAL_USERS: User[] = [
   {
     id: 'user-admin-1',
-    name: 'Cán Bộ Văn Hóa Ea Súp',
+    name: 'Chủ tịch MTTQ',
     email: 'admin@easup.daklak.gov.vn',
     role: 'ADMIN',
     avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80',
