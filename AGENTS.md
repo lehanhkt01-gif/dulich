@@ -69,10 +69,15 @@ public/
 ## 6. Lệnh thường dùng
 
 ```bash
+# Local:
 npm run dev          # chạy local http://localhost:3000
 npx tsc --noEmit     # kiểm tra kiểu
 npm run build        # prisma generate + next build
-docker compose up -d --build   # trên VPS
+
+# Triển khai trên VPS (Thư mục dự án: /opt/dulich):
+cd /opt/dulich
+git pull origin master
+docker compose up -d --build
 ```
 
 ## 7. Trạng thái hiện tại & việc tiếp theo

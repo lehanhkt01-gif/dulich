@@ -87,9 +87,9 @@ Mở **Termius**, kết nối SSH vào VPS qua IP và thực hiện:
 # 1. Cập nhật hệ thống và cài đặt Docker Compose (nếu VPS mới)
 sudo apt update && sudo apt install -y git curl docker.io docker-compose-plugin
 
-# 2. Kéo mã nguồn từ GitHub về thư mục làm việc
-git clone https://github.com/YOUR_ACCOUNT/danh-thang-ky.git /opt/danh-thang-ky
-cd /opt/danh-thang-ky
+# 2. Kéo mã nguồn từ GitHub về thư mục làm việc (/opt/dulich)
+git clone https://github.com/lehanhkt01-gif/dulich.git /opt/dulich
+cd /opt/dulich
 
 # 3. Tạo file cấu hình môi trường .env từ Bitwarden
 cp .env.example .env
