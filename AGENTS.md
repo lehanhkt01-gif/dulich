@@ -109,6 +109,8 @@ docker compose up -d --build
 - [x] Admin Reset Mật Khẩu Chủ Quán: Tạo nút "Reset MK" tại trang quản trị Admin, tự động sinh mật khẩu ngẫu nhiên 8 ký tự an toàn (hoa, thường, số), băm bcrypt lưu DB và gửi email thông báo mật khẩu mới cùng link đăng nhập đến Gmail của Chủ quán.
 - [x] Đồng bộ trạng thái đăng nhập tức thì giữa Admin và Navbar: Thay nút "Đăng nhập" trên Navbar thành nút "Đăng xuất" (kèm Avatar, tên, badge vai trò) khi đã đăng nhập, và bỏ nút "Đăng Xuất" dư thừa bên dưới giao diện Admin.
 - [x] Sắp xếp lại giao diện Admin khoa học, gọn gàng (tách Top Header Action và Navigation Tabs Bar 2 nhóm Nội dung / Tài khoản), và đổi tên chức danh cán bộ thành "Chủ tịch MTTQ".
+- [x] Đổi tên tab "Quán ăn/uống Ea Súp" thành "TÌM QUÁN ĂN/UỐNG" với màu sắc riêng (nền xanh dương đậm #0066CC nổi bật khi chưa chọn, khi chọn đổi màu đỏ cam #D9452B) để tăng sự chú ý của du khách.
+- [x] Khắc phục triệt để lỗi Google OAuth Configuration trên tên miền VPS dulich.easupso.com (checks: ['none'], AUTH_URL https, Nginx X-Forwarded-Proto Cloudflare).
 - [ ] Mở rộng tính năng bình luận và đánh giá món ăn/quán ăn cho du khách.
 
 ## 8. Lưu ý quan trọng

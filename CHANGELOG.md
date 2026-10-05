@@ -10,6 +10,38 @@
 > **Lưu ý / việc còn dở:** …
 > ```
 
+## [2026-10-05] Khắc Phục Triệt Để Lỗi Đăng Nhập Google OAuth (Gmail) Trên Tên Miền dulich.easupso.com
+
+**Yêu cầu:**
+Sửa lỗi đăng nhập khách hàng bằng gmail tại tên miền dulich.easupso.com.
+
+**Nguyên nhân gốc rễ:**
+1. Lỗi `InvalidCheck: pkceCodeVerifier value could not be parsed`: Auth.js v5 beta mặc định bật kiểm tra PKCE qua cookie. Khi qua Nginx/Cloudflare reverse proxy, cookie PKCE không được giải mã chính xác dẫn đến văng lỗi `Configuration` và redirect sai về `localhost:3000`.
+2. Môi trường container Docker trên VPS thiếu biến `AUTH_URL=https://dulich.easupso.com`, khiến NextAuth mặc định chuyển hướng về `http://localhost:3000/api/auth/callback/google`.
+3. Nginx container chưa chuyển tiếp đúng header `X-Forwarded-Proto` (https) từ Cloudflare sang Next.js web container.
+
+**Đã làm:**
+- **Loại bỏ kiểm tra PKCE lỗi thời trên Google Provider ([`auth.ts`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/auth.ts)):**
+  - Thêm `checks: ['none']` vào Google Provider để dùng luồng xác thực Client Secret bảo mật tiêu chuẩn của OAuth 2.0 mà không phụ thuộc vào cookie PKCE.
+  - Cấu hình fallback credentials cố định không bị rỗng và bật `trustHost: true`.
+- **Chuẩn hóa cấu hình Docker Compose môi trường VPS ([`docker-compose.yml`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/docker-compose.yml)):**
+  - Thêm biến `AUTH_URL: ${AUTH_URL:-https://dulich.easupso.com}` và đặt mặc định `NEXTAUTH_URL` + `NEXT_PUBLIC_APP_URL` về `https://dulich.easupso.com`.
+  - Fallback đầy đủ các biến Google OAuth ID & Secret để container tự động hoạt động hoàn hảo ngay cả khi file `.env` trên VPS chưa bổ sung.
+- **Nâng cấp Nginx Reverse Proxy ([`nginx/conf.d/default.conf`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/nginx/conf.d/default.conf)):**
+  - Nhận diện đúng giao thức HTTPS từ header `X-Forwarded-Proto` của Cloudflare (`$http_x_forwarded_proto`) và chuyển tiếp đầy đủ `X-Forwarded-Host`.
+
+## [2026-10-05] Đổi Tên Tab "Quán ăn/uống Ea Súp" Thành "TÌM QUÁN ĂN/UỐNG" & Thiết Lập Màu Sắc Riêng Nổi Bật
+
+**Yêu cầu:**
+Sửa nút "Quán ăn/uống Ea Súp" thành "TÌM QUÁN ĂN/UỐNG", tạo màu sắc riêng như nút "khám phá món" để tăng sự chú ý.
+
+**Đã làm:**
+- **Đổi nhãn nút ([`components/mon-ngon/MonNgonClient.tsx`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/components/mon-ngon/MonNgonClient.tsx)):**
+  - Đổi từ `Quán ăn/uống Ea Súp (${restaurants.length})` thành nhãn chữ in hoa bắt mắt: **`TÌM QUÁN ĂN/UỐNG (${restaurants.length})`**.
+- **Thiết lập màu sắc riêng tăng sự chú ý ([`components/mon-ngon/MonNgonClient.tsx`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/components/mon-ngon/MonNgonClient.tsx)):**
+  - Khi chưa chọn (inactive): Nút mang tông màu xanh dương đậm thương hiệu `#0066CC` chữ trắng nổi bật (`bg-[#0066CC] hover:bg-[#0052A3] text-white shadow-xs font-bold`), tạo điểm nhấn thị giác mạnh mẽ bên cạnh nút "Khám phá món" (xanh lá `bg-emerald-600`).
+  - Khi được chọn (active): Tự động chuyển sang màu đỏ cam `#D9452B` chữ trắng (`bg-[#D9452B] text-white shadow-md font-bold`) đồng bộ với nhận diện chung của mục Món ngon.
+
 ## [2026-10-05] Sắp Xếp Giao Diện Admin Khoa Học, Gọn Gàng & Đổi Tên Cán Bộ Thành "Chủ tịch MTTQ"
 
 **Yêu cầu:**

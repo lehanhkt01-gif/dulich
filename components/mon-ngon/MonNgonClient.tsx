@@ -470,7 +470,7 @@ export default function MonNgonClient() {
           {(
             [
               { id: 'kham-pha', label: 'Khám phá món', icon: Compass },
-              { id: 'quan-an', label: `Quán ăn/uống Ea Súp (${restaurants.length})`, icon: Store },
+              { id: 'quan-an', label: `TÌM QUÁN ĂN/UỐNG (${restaurants.length})`, icon: Store },
               { id: 'ban-an', label: 'Bàn ăn/uống đang mở', icon: Utensils },
               { id: 'lich-hen', label: 'Lịch hẹn của tôi', icon: CalendarDays },
             ] as const
@@ -478,12 +478,19 @@ export default function MonNgonClient() {
             const Icon = t.icon;
             const active = tab === t.id;
             
-            // Nút Khám phá món: nền xanh lá cây chữ trắng, khi chọn thì chuyển nền màu đỏ. Các tab khác khi chọn cũng chuyển sang nền màu đỏ.
+            // Màu sắc các nút:
+            // - Khám phá món: nền xanh lá cây chữ trắng khi chưa chọn, khi chọn thì nền đỏ.
+            // - TÌM QUÁN ĂN/UỐNG: nền xanh dương đậm #0066CC chữ trắng khi chưa chọn để tạo sự chú ý riêng, khi chọn thì nền đỏ.
+            // - Các tab khác: chữ nâu, khi chọn thì chuyển sang nền màu đỏ.
             let buttonStyle = '';
             if (t.id === 'kham-pha') {
               buttonStyle = active
                 ? 'bg-[#D9452B] text-white shadow-md font-bold'
                 : 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs font-bold';
+            } else if (t.id === 'quan-an') {
+              buttonStyle = active
+                ? 'bg-[#D9452B] text-white shadow-md font-bold'
+                : 'bg-[#0066CC] hover:bg-[#0052A3] text-white shadow-xs font-bold';
             } else {
               buttonStyle = active
                 ? 'bg-[#D9452B] text-white shadow-md font-bold'

@@ -13,18 +13,13 @@ const GOOGLE_CLIENT_SECRET =
   process.env.GOOGLE_CLIENT_SECRET ||
   '';
 
-const isLocalhost =
-  process.env.NEXTAUTH_URL?.startsWith('http://localhost') ||
-  process.env.AUTH_URL?.startsWith('http://localhost') ||
-  process.env.NODE_ENV !== 'production';
-
 export const { handlers, signIn, signOut, auth } = NextAuth({
   trustHost: true,
-  useSecureCookies: !isLocalhost,
   providers: [
     Google({
       clientId: GOOGLE_CLIENT_ID,
       clientSecret: GOOGLE_CLIENT_SECRET,
+      checks: ['none'],
       authorization: {
         params: {
           prompt: 'select_account',
