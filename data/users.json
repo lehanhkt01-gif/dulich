@@ -11,8 +11,10 @@
     "restaurantAddress": "Xã Ea Súp, Tỉnh Đắk Lắk",
     "restaurantPhone": "0888023023",
     "password": "google_oauth_authenticated",
-    "updatedAt": "2026-10-04T05:36:36.663Z",
-    "status": "ACTIVE"
+    "updatedAt": "2026-10-04T17:10:47.077Z",
+    "status": "ACTIVE",
+    "restaurantLat": 13.2456,
+    "restaurantLng": 107.8381
   },
   {
     "id": "user-editor-1",
@@ -131,7 +133,7 @@
     "id": "user-1791082874824",
     "name": "zipzenhanh",
     "email": "zipzenhanh@gmail.com",
-    "avatar": "https://api.dicebear.com/7.x/initials/svg?seed=zipzenhanh",
+    "avatar": "https://lh3.googleusercontent.com/a/ACg8ocLqES8eeda8FCyXUWJWSNMcROWdUsj8sBNKZVopkTJiIWbkhY8=s96-c",
     "role": "TRAVELER",
     "createdAt": "2026-10-04T03:01:14.824Z",
     "status": "ACTIVE",
@@ -145,20 +147,36 @@
     "restaurantLng": 107.8381
   },
   {
-    "id": "user-google-1791105857015",
-    "name": "Lehanhkt01",
-    "email": "lehanhkt01@gmail.com",
+    "name": "Ea Bung Đảng Ủy",
+    "email": "danguyeabung@gmail.com",
+    "avatar": "https://lh3.googleusercontent.com/a/ACg8ocLeNaO8avH1E8ThmEiMmSppVM8oIP_ifKLZUOBSHsh9DctFDpI=s96-c",
     "role": "TRAVELER",
+    "id": "user-1791133388825",
+    "createdAt": "2026-10-04T17:03:08.825Z",
+    "status": "ACTIVE"
+  },
+  {
+    "name": "Ea Súp Số",
+    "email": "easupsohoa@gmail.com",
+    "avatar": "https://lh3.googleusercontent.com/a/ACg8ocIjCwCqi4bPdvKXJmzjBHrCmoVHQ5xkkKQw0rjih9CPfESuFM0=s96-c",
+    "role": "TRAVELER",
+    "id": "user-1791133553799",
+    "createdAt": "2026-10-04T17:05:53.799Z",
+    "status": "ACTIVE"
+  },
+  {
+    "name": "Lê Hồng Hạnh",
+    "email": "lehanhkt01@gmail.com",
+    "password": "$2a$10$PZyK8xms/6HKVMH.Coo9GehobeqIJP3FU3un/7JbH0USYua8NSVni",
+    "role": "ADMIN",
     "status": "ACTIVE",
-    "avatar": "https://api.dicebear.com/7.x/initials/svg?seed=Lehanhkt01",
+    "avatar": "https://api.dicebear.com/7.x/initials/svg?seed=L%C3%AA%20H%E1%BB%93ng%20H%E1%BA%A1nh",
     "phone": null,
     "restaurantName": null,
     "restaurantAddress": null,
-    "restaurantPhone": null,
     "restaurantLat": 13.2456,
     "restaurantLng": 107.8381,
-    "password": "google_oauth_authenticated",
-    "updatedAt": "2026-10-04T09:24:17.015Z",
-    "createdAt": "2026-10-04T09:24:17.021Z"
+    "id": "user-1791207710074",
+    "createdAt": "2026-10-05T13:41:50.074Z"
   }
 ]

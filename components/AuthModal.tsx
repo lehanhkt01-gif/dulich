@@ -53,12 +53,14 @@ export default function AuthModal({
   // Toggle ẩn/hiện mật khẩu
   const [showLoginPassword, setShowLoginPassword] = useState(false);
   const [showRegisterPassword, setShowRegisterPassword] = useState(false);
+  const [showRegisterConfirmPassword, setShowRegisterConfirmPassword] = useState(false);
 
   // Sub-tab dành riêng cho Chủ Quán
   const [ownerSubTab, setOwnerSubTab] = useState<'login' | 'register'>('login');
   const [ownerLoginGmail, setOwnerLoginGmail] = useState('');
   const [ownerLoginPassword, setOwnerLoginPassword] = useState('');
   const [ownerRegisterPassword, setOwnerRegisterPassword] = useState('');
+  const [ownerRegisterConfirmPassword, setOwnerRegisterConfirmPassword] = useState('');
 
   useEffect(() => {
     setMode(defaultMode);
@@ -223,6 +225,10 @@ export default function AuthModal({
     }
     if (!ownerRegisterPassword || ownerRegisterPassword.length < 6) {
       setError('Mật khẩu khởi tạo phải có tối thiểu 6 ký tự');
+      return;
+    }
+    if (ownerRegisterPassword !== ownerRegisterConfirmPassword) {
+      setError('Mật khẩu nhập lại không khớp. Vui lòng kiểm tra lại!');
       return;
     }
 
@@ -595,6 +601,31 @@ export default function AuthModal({
                         aria-label={showRegisterPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
                       >
                         {showRegisterPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="text-xs font-semibold text-stone-700 flex items-center gap-1.5">
+                      <Lock className="w-3.5 h-3.5 text-stone-400" />
+                      <span>Nhập lại mật khẩu *</span>
+                    </label>
+                    <div className="relative">
+                      <input
+                        type={showRegisterConfirmPassword ? 'text' : 'password'}
+                        required
+                        placeholder="Nhập lại chính xác mật khẩu trên..."
+                        value={ownerRegisterConfirmPassword}
+                        onChange={(e) => setOwnerRegisterConfirmPassword(e.target.value)}
+                        className="w-full text-xs p-2.5 pr-9 rounded-xl border border-stone-300 focus:outline-none focus:border-[#D9452B]"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowRegisterConfirmPassword(!showRegisterConfirmPassword)}
+                        className="absolute right-2.5 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-700 p-1"
+                        aria-label={showRegisterConfirmPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
+                      >
+                        {showRegisterConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                       </button>
                     </div>
                   </div>

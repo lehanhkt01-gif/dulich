@@ -365,33 +365,121 @@ export async function sendOwnerInfoChangedEmail({
 
 /**
  * 5. Thông báo cho CHỦ QUÁN khi Admin PHÊ DUYỆT QUÁN THÀNH CÔNG
+ * Xác nhận bạn đã đăng ký chủ quán thành công và gửi link đăng nhập
  */
 export async function sendOwnerApprovedEmail({
   ownerName,
   ownerEmail,
   restaurantName,
+  loginUrl,
 }: {
   ownerName: string;
   ownerEmail: string;
   restaurantName: string;
+  loginUrl?: string;
 }) {
   if (!ownerEmail || !ownerEmail.includes('@')) return;
 
+  const siteUrl = process.env.NEXTAUTH_URL || process.env.AUTH_URL || 'http://localhost:3000';
+  const targetLoginUrl = loginUrl || `${siteUrl}/chu-quan`;
+
   const bodyHtml = `
     <p>Xin chúc mừng <strong>${ownerName}</strong>,</p>
-    <p>Hồ sơ quán <strong>${restaurantName}</strong> của bạn đã được <strong>Ban Quản Trị Ea Súp CHÍNH THỨC PHÊ DUYỆT!</strong></p>
-    <div style="background: #D1FAE5; border: 1px solid #6EE7B7; padding: 15px; border-radius: 12px; margin: 15px 0;">
-      <p style="margin: 0; color: #065F46; font-bold;">Trạng thái tài khoản: <span class="badge badge-approved">ĐÃ KÍCH HOẠT (ACTIVE)</span></p>
-      <p style="margin: 8px 0 0; font-size: 13px; color: #047857;">Bây giờ bạn đã có thể đăng nhập bằng Gmail và Mật khẩu của quán để vào Không Gian Quán, thêm thực đơn và tiếp nhận đơn hàng của du khách.</p>
+    <p>Hồ sơ quán ăn <strong>${restaurantName}</strong> của bạn đã được <strong>Ban Quản Trị Hệ Thống Du Lịch Ea Súp PHÊ DUYỆT THÀNH CÔNG!</strong></p>
+    
+    <div style="background: #D1FAE5; border: 1px solid #6EE7B7; padding: 18px; border-radius: 14px; margin: 18px 0;">
+      <p style="margin: 0 0 8px; color: #065F46; font-weight: bold; font-size: 15px;">
+        🎉 BẠN ĐÃ ĐĂNG KÝ CHỦ QUÁN THÀNH CÔNG!
+      </p>
+      <p style="margin: 0; color: #047857; font-size: 13px; line-height: 1.5;">
+        Tài khoản của bạn đã được kích hoạt trạng thái <strong>ACTIVE (Hoạt động)</strong>. Bạn có toàn quyền truy cập Không Gian Chủ Quán để tải hình ảnh quán, đăng thực đơn món ngon đặc sản, quản lý bàn ăn/uống và độc quyền tiếp nhận đơn đặt của du khách.
+      </p>
     </div>
-    <p style="text-align: center;">
-      <a href="http://localhost:3000/chu-quan" class="btn">ĐĂNG NHẬP KHÔNG GIAN QUÁN NGAY</a>
+
+    <div style="background: #F8FAFC; border: 1px dashed #CBD5E1; padding: 14px 16px; border-radius: 12px; margin: 16px 0;">
+      <p style="margin: 0 0 6px; font-weight: bold; color: #1E293B; font-size: 13px;">🔗 Link đăng nhập dành riêng cho Chủ Quán:</p>
+      <p style="margin: 0; font-family: monospace; font-size: 13px; color: #D9452B; word-break: break-all;">
+        <a href="${targetLoginUrl}" style="color: #D9452B; text-decoration: underline;">${targetLoginUrl}</a>
+      </p>
+      <p style="margin: 6px 0 0; font-size: 12px; color: #64748B;">
+        (Dùng chính tài khoản Gmail và Mật khẩu bạn đã đăng ký để đăng nhập)
+      </p>
+    </div>
+
+    <p style="text-align: center; margin: 25px 0 10px;">
+      <a href="${targetLoginUrl}" class="btn" style="background: #D9452B; color: #ffffff !important; padding: 12px 28px; border-radius: 12px; font-weight: bold; text-decoration: none; display: inline-block;">
+        👉 ĐĂNG NHẬP KHÔNG GIAN QUÁN NGAY
+      </a>
     </p>
   `;
 
   await sendEmail({
     to: ownerEmail,
-    subject: `🎉 [CHÚC MỪNG] Hồ sơ quán "${restaurantName}" đã được Admin phê duyệt kích hoạt!`,
-    html: renderEmailLayout('PHÊ DUYỆT KÍCH HOẠT THÀNH CÔNG', bodyHtml),
+    subject: `🎉 [XÁC NHẬN] Bạn đã đăng ký Chủ Quán thành công & Hồ sơ quán "${restaurantName}" đã được duyệt!`,
+    html: renderEmailLayout('XÁC NHẬN ĐĂNG KÝ CHỦ QUÁN THÀNH CÔNG', bodyHtml),
+  });
+}
+
+/**
+ * 6. Thông báo CẤP LẠI MẬT KHẨU MỚI (Random 8 ký tự) cho CHỦ QUÁN
+ */
+export async function sendOwnerPasswordResetEmail({
+  ownerName,
+  ownerEmail,
+  restaurantName,
+  newPassword,
+  loginUrl,
+}: {
+  ownerName: string;
+  ownerEmail: string;
+  restaurantName: string;
+  newPassword: string;
+  loginUrl?: string;
+}) {
+  if (!ownerEmail || !ownerEmail.includes('@')) return;
+
+  const siteUrl = process.env.NEXTAUTH_URL || process.env.AUTH_URL || 'http://localhost:3000';
+  const targetLoginUrl = loginUrl || `${siteUrl}/chu-quan`;
+
+  const bodyHtml = `
+    <p>Xin chào <strong>${ownerName}</strong>,</p>
+    <p>Ban Quản Trị Hệ Thống Du Lịch Ea Súp đã thực hiện <strong>ĐẶT LẠI MẬT KHẨU</strong> cho tài khoản quản lý quán <strong>"${restaurantName}"</strong> của bạn theo yêu cầu cấp lại tài khoản.</p>
+
+    <div style="background: #FEF2F2; border: 1px solid #FECACA; padding: 20px; border-radius: 16px; margin: 18px 0; text-align: center;">
+      <p style="margin: 0 0 10px; color: #991B1B; font-weight: bold; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px;">
+        Mật khẩu mới khởi tạo ngẫu nhiên (8 ký tự)
+      </p>
+      <div style="display: inline-block; background: #ffffff; border: 2px dashed #DC2626; border-radius: 12px; padding: 10px 24px; font-family: monospace; font-size: 24px; font-weight: bold; letter-spacing: 4px; color: #DC2626;">
+        ${newPassword}
+      </div>
+      <p style="margin: 12px 0 0; color: #7F1D1D; font-size: 12px; line-height: 1.5;">
+        ⚠️ <strong>Lưu ý bảo mật:</strong> Sau khi đăng nhập, vui lòng vào ngay tab <strong>"Đổi Mật Khẩu"</strong> trong Không Gian Quán để thiết lập lại mật khẩu riêng của bạn.
+      </p>
+    </div>
+
+    <div style="background: #F8FAFC; border: 1px dashed #CBD5E1; padding: 14px 16px; border-radius: 12px; margin: 16px 0;">
+      <p style="margin: 0 0 6px; font-weight: bold; color: #1E293B; font-size: 13px;">🔗 Thông tin đăng nhập Không Gian Quán:</p>
+      <p style="margin: 0 0 4px; font-size: 13px; color: #334155;">
+        • Tài khoản Gmail: <strong style="font-family: monospace; color: #0066CC;">${ownerEmail}</strong>
+      </p>
+      <p style="margin: 0 0 4px; font-size: 13px; color: #334155;">
+        • Mật khẩu mới: <strong style="font-family: monospace; color: #DC2626;">${newPassword}</strong>
+      </p>
+      <p style="margin: 6px 0 0; font-size: 12px; color: #64748B;">
+        • Đường dẫn đăng nhập: <a href="${targetLoginUrl}" style="color: #D9452B; text-decoration: underline;">${targetLoginUrl}</a>
+      </p>
+    </div>
+
+    <p style="text-align: center; margin: 25px 0 10px;">
+      <a href="${targetLoginUrl}" class="btn" style="background: #D9452B; color: #ffffff !important; padding: 12px 28px; border-radius: 12px; font-weight: bold; text-decoration: none; display: inline-block;">
+        👉 ĐĂNG NHẬP VÀ ĐỔI MẬT KHẨU NGAY
+      </a>
+    </p>
+  `;
+
+  await sendEmail({
+    to: ownerEmail,
+    subject: `🔐 [CẤP LẠI MẬT KHẨU] Mật khẩu đăng nhập mới cho Chủ Quán "${restaurantName}"`,
+    html: renderEmailLayout('CẤP LẠI MẬT KHẨU CHỦ QUÁN THÀNH CÔNG', bodyHtml),
   });
 }

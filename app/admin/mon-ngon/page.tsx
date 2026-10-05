@@ -27,6 +27,7 @@ import {
   UserCog,
   BadgeAlert,
   Building2,
+  KeyRound,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import {
@@ -35,6 +36,7 @@ import {
   rejectOwnerAction,
   updateUserRoleStatusAction,
   deleteUserAction,
+  resetOwnerPasswordAction,
 } from '@/actions/admin-actions';
 import { Role, UserStatus } from '@/lib/types';
 
@@ -162,6 +164,33 @@ export default function AdminMonNgonPage() {
       }
     } catch (err: any) {
       toast.error('Lỗi khi xóa: ' + err.message);
+    } finally {
+      setProcessingId(null);
+    }
+  };
+
+  // Handle Reset Password cho Chủ Quán
+  const handleResetPassword = async (userId: string, userName: string, userEmail: string) => {
+    if (
+      !confirm(
+        `Bạn có chắc muốn RESET MẬT KHẨU cho "${userName}" (${userEmail})?\n\nHệ thống sẽ tự động tạo mật khẩu ngẫu nhiên 8 ký tự và gửi email trực tiếp cho chủ quán.`
+      )
+    ) {
+      return;
+    }
+
+    setProcessingId(userId);
+    try {
+      toast.loading('Đang khởi tạo mật khẩu ngẫu nhiên 8 ký tự và gửi email...', { id: 'reset-pwd' });
+      const res = await resetOwnerPasswordAction(userId);
+      if (res.success) {
+        toast.success(res.message, { id: 'reset-pwd', duration: 7000 });
+        await loadData(true);
+      } else {
+        toast.error(res.message || 'Reset mật khẩu thất bại', { id: 'reset-pwd' });
+      }
+    } catch (err: any) {
+      toast.error('Lỗi: ' + err.message, { id: 'reset-pwd' });
     } finally {
       setProcessingId(null);
     }
@@ -413,10 +442,26 @@ export default function AdminMonNgonPage() {
                       <button
                         onClick={() => handleApprove(item.ownerId, item.id, item.name)}
                         disabled={processingId === item.id}
-                        className="flex-1 py-2.5 px-4 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-xl text-xs flex items-center justify-center gap-1.5 transition shadow-sm"
+                        className="flex-1 py-2.5 px-3 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-xl text-xs flex items-center justify-center gap-1.5 transition shadow-sm"
                       >
                         <CheckCircle2 className="w-4 h-4" />
-                        <span>{processingId === item.id ? 'Đang duyệt...' : 'Chấp thuận phê duyệt'}</span>
+                        <span>{processingId === item.id ? 'Đang duyệt...' : 'Chấp thuận'}</span>
+                      </button>
+
+                      <button
+                        onClick={() =>
+                          handleResetPassword(
+                            item.ownerId,
+                            item.owner?.name || 'Chủ Quán',
+                            item.owner?.email || ''
+                          )
+                        }
+                        disabled={processingId === item.ownerId}
+                        className="py-2.5 px-3 bg-rose-50 hover:bg-rose-100 text-rose-700 font-medium rounded-xl text-xs flex items-center justify-center gap-1 transition border border-rose-200"
+                        title="Reset mật khẩu ngẫu nhiên 8 ký tự và gửi email"
+                      >
+                        <KeyRound className="w-3.5 h-3.5 text-rose-600" />
+                        <span>Reset MK</span>
                       </button>
 
                       <button
@@ -569,14 +614,28 @@ export default function AdminMonNgonPage() {
                           </td>
 
                           <td className="py-3 px-4 text-right">
-                            <button
-                              onClick={() => handleDeleteUser(u.id, u.name || u.email)}
-                              disabled={processingId === u.id}
-                              className="p-1.5 text-stone-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition"
-                              title="Xóa vĩnh viễn tài khoản"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
+                            <div className="flex items-center justify-end gap-1.5">
+                              {u.role === 'OWNER' && (
+                                <button
+                                  type="button"
+                                  onClick={() => handleResetPassword(u.id, u.name || 'Chủ Quán', u.email)}
+                                  disabled={processingId === u.id}
+                                  className="px-2 py-1 text-[11px] font-semibold bg-rose-50 text-rose-700 hover:bg-rose-100 rounded-lg transition border border-rose-200 flex items-center gap-1"
+                                  title="Reset mật khẩu ngẫu nhiên 8 ký tự và gửi email"
+                                >
+                                  <KeyRound className="w-3 h-3 text-rose-600" />
+                                  <span>Reset MK</span>
+                                </button>
+                              )}
+                              <button
+                                onClick={() => handleDeleteUser(u.id, u.name || u.email)}
+                                disabled={processingId === u.id}
+                                className="p-1.5 text-stone-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition"
+                                title="Xóa vĩnh viễn tài khoản"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </div>
                           </td>
                         </tr>
                       ))

@@ -79,11 +79,22 @@ export async function POST(req: NextRequest) {
       existingUser = storedUsers.find((u) => u.email.toLowerCase() === normalizedEmail);
     }
 
-    // Xác định vai trò
-    let finalRole = existingUser ? existingUser.role : (roleRequest === 'OWNER' ? 'OWNER' : 'TRAVELER');
+    // QUY ĐỊNH RÀNG BUỘC VAI TRÒ:
+    // 1. Mail nào đã đăng ký làm chủ quán thì không được đăng ký/đăng nhập làm khách hàng nữa
+    if (existingUser && existingUser.role === 'OWNER' && roleRequest !== 'OWNER') {
+      return NextResponse.json(
+        {
+          success: false,
+          message: 'Email này đã đăng ký làm chủ quán, không thể đăng ký khách hàng.',
+          isOwner: true,
+        },
+        { status: 400 }
+      );
+    }
 
-    // Nếu tài khoản cũ là TRAVELER mà lần này bấm "Đăng ký Chủ Quán", cho phép nâng cấp lên OWNER
-    if (roleRequest === 'OWNER' && existingUser && existingUser.role === 'TRAVELER') {
+    // 2. Nhưng nếu email đó đã đăng ký làm khách hàng thì vẫn được đăng ký làm chủ quán và xóa vai trò khách hàng
+    let finalRole = existingUser ? existingUser.role : (roleRequest === 'OWNER' ? 'OWNER' : 'TRAVELER');
+    if (roleRequest === 'OWNER' && existingUser && (existingUser.role === 'TRAVELER' || existingUser.role === 'USER')) {
       finalRole = 'OWNER';
     }
 
@@ -92,7 +103,7 @@ export async function POST(req: NextRequest) {
     // - Chủ quán mới: PENDING (bắt buộc phải được Admin phê duyệt mới được hoạt động)
     let finalStatus = 'ACTIVE';
     if (finalRole === 'OWNER') {
-      finalStatus = existingUser?.status || 'PENDING';
+      finalStatus = existingUser?.role === 'OWNER' && existingUser?.status === 'ACTIVE' ? 'ACTIVE' : 'PENDING';
     } else {
       finalStatus = existingUser?.status || 'ACTIVE';
     }

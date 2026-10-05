@@ -10,7 +10,48 @@
 > **Lưu ý / việc còn dở:** …
 > ```
 
-## [2026-10-04] Sửa Triệt Để Lỗi Configuration Khi Đăng Nhập Gmail, Hiển Thị Danh Sách Tài Khoản & Bỏ Nút Đỏ Đăng Ký Quán
+## [2026-10-05] Thiết Lập Chức Năng Admin Reset Mật Khẩu Chủ Quán & Gửi Mật Khẩu Random 8 Ký Tự Qua Email
+
+**Yêu cầu:**
+Thiết lập tài khoản admin có chức năng reset mật khẩu của chủ quán và gửi mật khẩu random 8 ký tự về Email chủ quán để chủ quán thay đổi khi đăng nhập.
+
+**Đã làm:**
+- **Thuật toán sinh mật khẩu ngẫu nhiên 8 ký tự an toàn ([`actions/admin-actions.ts`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/actions/admin-actions.ts)):**
+  - Hàm `generateRandomPassword(8)` đảm bảo đúng 8 ký tự, gồm ít nhất 1 chữ hoa, 1 chữ thường, 1 chữ số, các ký tự an toàn dễ nhìn (loại bỏ ký tự dễ nhầm lẫn) và xáo trộn ngẫu nhiên Fisher-Yates.
+- **Mã hóa và lưu trữ mật khẩu mới an toàn:**
+  - Hash mật khẩu mới bằng `bcrypt.hash(randomPassword, 10)` trước khi lưu vào CSDL PostgreSQL Prisma (`prisma.user.update`) và file JSON lưu trữ dự phòng offline (`upsertStoredUser`).
+- **Mẫu Email Reset Mật Khẩu Chủ Quán ([`lib/email.ts`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/lib/email.ts)):**
+  - Tạo hàm `sendOwnerPasswordResetEmail`: Gửi email giao diện chuyên nghiệp qua Nodemailer đến hộp thư của Chủ quán.
+  - Hiển thị nổi bật mật khẩu mới 8 ký tự trong khung monospace to rõ màu đỏ viền cam, kèm tên quán, email đăng nhập, đường link truy cập Không Gian Chủ Quán (`/chu-quan`) và hướng dẫn chủ quán đổi lại mật khẩu sau khi đăng nhập.
+- **Tích hợp nút "Reset MK" trên giao diện Admin ([`app/admin/page.tsx`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/app/admin/page.tsx), [`app/admin/mon-ngon/page.tsx`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/app/admin/mon-ngon/page.tsx)):**
+  - Bổ sung nút **"Reset MK"** (kèm icon `KeyRound`) tại danh sách phê duyệt chủ quán (`pendingApprovals`) và danh sách chủ quán đang hoạt động (`activeTab === 'owners'`) tại cả 2 trang quản trị `/admin` và `/admin/mon-ngon`.
+  - Có hộp thoại `confirm()` xác nhận trước khi thực hiện để tránh bấm nhầm, đồng thời hiển thị thông báo toast thành công/thất bại rõ ràng.
+- **Tạo thông báo trong hệ thống ([`actions/admin-actions.ts`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/actions/admin-actions.ts)):**
+  - Tự động tạo bản ghi `Notification` gửi tới tài khoản chủ quán để họ cũng thấy thông báo về việc mật khẩu đã được quản trị viên cấp lại.
+
+## [2026-10-05] Quy Định Ràng Buộc Vai Trò Chủ Quán - Khách Hàng, Ô Nhập Lại Mật Khẩu, Tính Năng Đổi Mật Khẩu & Email Duyệt Kèm Link Đăng Nhập
+
+**Yêu cầu:**
+1. Mail nào đã đăng ký làm chủ quán thì không được đăng ký làm khách hàng được nữa; nếu đăng ký làm khách hàng thì thông báo: "Email này đã đăng ký làm chủ quán, không thể đăng ký khách hàng". Nhưng nếu email đó đã đăng ký làm khách hàng thì vẫn được đăng ký làm chủ quán và xóa vai trò khách hàng.
+2. Tại phần đăng ký làm "Chủ quán", để thêm 1 ô nhập lại mật khẩu.
+3. Tạo thêm chức năng chủ quán có thể đổi mật khẩu.
+4. Khi chủ quán được duyệt thì gửi thông báo Email đến xác nhận cho chủ quán biết là bạn đã đăng ký chủ quán thành công, và gửi link đăng nhập cho chủ quán.
+
+**Đã làm:**
+- **Quy định ràng buộc vai trò Chủ Quán - Khách Hàng ([`app/api/auth/google/route.ts`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/app/api/auth/google/route.ts), [`auth.ts`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/auth.ts), [`components/mon-ngon/MonNgonClient.tsx`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/components/mon-ngon/MonNgonClient.tsx), [`app/api/users/route.ts`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/app/api/users/route.ts), [`actions/auth-actions.ts`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/actions/auth-actions.ts)):**
+  - Chặn triệt để: Nếu email đã đăng ký làm Chủ Quán (`role: 'OWNER'`), khi đăng nhập hoặc đăng ký làm khách du lịch (qua Google hoặc form), hệ thống từ chối và báo rõ: *"Email này đã đăng ký làm chủ quán, không thể đăng ký khách hàng. Vui lòng đăng nhập tại tab Chủ Quán."*
+  - Cho phép nâng cấp: Nếu email trước đó đã đăng ký làm Khách hàng (`role: 'TRAVELER'`), khi đăng ký mở quán ăn/uống, hệ thống cho phép nâng cấp lên `role: 'OWNER'`, xóa vai trò khách hàng cũ, chuyển trạng thái `status: 'PENDING'` chờ Admin duyệt và tạo bản ghi Quán ăn/Uống tương ứng.
+- **Bổ sung ô Nhập lại mật khẩu cho Chủ Quán ([`components/AuthModal.tsx`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/components/AuthModal.tsx), [`app/mon-ngon/dang-ky-chu-quan/page.tsx`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/app/mon-ngon/dang-ky-chu-quan/page.tsx)):**
+  - Thêm ô "Nhập lại mật khẩu *" kèm icon con mắt bật/tắt hiển thị mật khẩu.
+  - Kiểm tra mật khẩu khớp nhau và độ dài tối thiểu 6 ký tự trước khi gửi hồ sơ lên máy chủ.
+- **Tính năng Chủ Quán Đổi Mật Khẩu ([`actions/owner-actions.ts`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/actions/owner-actions.ts), [`app/chu-quan/dashboard/page.tsx`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/app/chu-quan/dashboard/page.tsx)):**
+  - Bổ sung Tab **"Đổi Mật Khẩu"** trực tiếp trên thanh điều hướng Không Gian Chủ Quán (`/chu-quan/dashboard`).
+  - Giao diện form đổi mật khẩu chuyên nghiệp gồm: Mật khẩu hiện tại, Mật khẩu mới (>= 6 ký tự), Nhập lại mật khẩu mới, tích hợp đầy đủ nút bật/tắt ẩn hiện mật khẩu.
+  - Server action `changeOwnerPasswordAction`: Kiểm tra xác thực mật khẩu cũ bằng bcrypt, mã hóa bảo mật mật khẩu mới và đồng bộ vào DB & persistent storage.
+- **Email thông báo duyệt Chủ Quán thành công kèm link đăng nhập ([`lib/email.ts`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/lib/email.ts), [`actions/admin-actions.ts`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/actions/admin-actions.ts)):**
+  - Cập nhật hàm `sendOwnerApprovedEmail`: Gửi email xác nhận với tiêu đề chúc mừng, thông báo rõ ràng *"BẠN ĐÃ ĐĂNG KÝ CHỦ QUÁN THÀNH CÔNG!"*, tài khoản đã được kích hoạt trạng thái **ACTIVE**.
+  - Hiển thị cả nút bấm trực tiếp và đường link văn bản đầy đủ (`http://localhost:3000/chu-quan` hoặc domain thực tế) để chủ quán click vào hoặc copy đăng nhập.
+  - Tự động kích hoạt khi Admin duyệt qua nút "Phê duyệt" hoặc khi Admin đổi trạng thái tài khoản sang `ACTIVE`.
 
 **Yêu cầu:** 
 1. Ảnh 1 + 2: Sửa lỗi `api/auth/error?error=Configuration` khi bấm nút Đăng nhập bằng Google (Gmail); khi bấm đăng nhập Gmail thì hiện lên một danh sách các Gmail đã đăng nhập trên máy để người dân lựa chọn tài khoản.

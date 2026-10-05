@@ -53,6 +53,7 @@ import {
   type TimeSlot,
   DEFAULT_RESTAURANTS,
 } from '@/lib/data/mon-ngon';
+import { toast as sonnerToast } from 'sonner';
 import { SEED_DISH_RESTAURANT } from '@/lib/account-sync';
 
 type Tab = 'kham-pha' | 'quan-an' | 'ban-an' | 'lich-hen';
@@ -91,6 +92,15 @@ export default function MonNgonClient() {
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('error') === 'EmailDaDangKyChuQuan') {
+        sonnerToast.error(
+          'Email này đã đăng ký làm chủ quán, không thể đăng ký/sử dụng với vai trò khách hàng. Vui lòng đăng nhập tại tab Chủ Quán!',
+          { duration: 6000 }
+        );
+        window.history.replaceState({}, '', window.location.pathname);
+      }
+
       const saved = localStorage.getItem('easup_auth_user');
       if (saved) {
         try {

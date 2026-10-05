@@ -28,6 +28,10 @@ import {
   ChevronDown,
   ChevronUp,
   FolderOpen,
+  KeyRound,
+  Lock,
+  Eye,
+  EyeOff,
 } from 'lucide-react';
 import {
   getOwnerDashboardDataAction,
@@ -40,6 +44,7 @@ import {
   updateOrderStatusAction,
   updateBookingStatusAction,
   updateRestaurantInfoAction,
+  changeOwnerPasswordAction,
 } from '@/actions/owner-actions';
 import { toast } from 'sonner';
 
@@ -72,7 +77,49 @@ export default function OwnerDashboardPage() {
   const [data, setData] = useState<any>(null);
   const [authError, setAuthError] = useState<string | null>(null);
 
-  const [activeTab, setActiveTab] = useState<'orders' | 'menu' | 'tables' | 'info'>('orders');
+  const [activeTab, setActiveTab] = useState<'orders' | 'menu' | 'tables' | 'info' | 'password'>('orders');
+
+  // Đổi mật khẩu chủ quán
+  const [passwordLoading, setPasswordLoading] = useState(false);
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [passwordForm, setPasswordForm] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: '',
+  });
+
+  const handleChangePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!passwordForm.newPassword || passwordForm.newPassword.length < 6) {
+      toast.error('Mật khẩu mới phải có tối thiểu 6 ký tự.');
+      return;
+    }
+    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+      toast.error('Mật khẩu xác nhận không khớp. Vui lòng kiểm tra lại!');
+      return;
+    }
+
+    try {
+      setPasswordLoading(true);
+      const res = await changeOwnerPasswordAction(passwordForm);
+      if (res.success) {
+        toast.success(res.message);
+        setPasswordForm({
+          currentPassword: '',
+          newPassword: '',
+          confirmPassword: '',
+        });
+      } else {
+        toast.error(res.message);
+      }
+    } catch (err: any) {
+      toast.error(err.message || 'Lỗi khi đổi mật khẩu.');
+    } finally {
+      setPasswordLoading(false);
+    }
+  };
 
   // Chỉnh sửa thông tin quán & đổi ảnh bìa
   const [infoEditing, setInfoEditing] = useState(false);
@@ -607,6 +654,19 @@ export default function OwnerDashboardPage() {
           >
             <Store className="w-4 h-4" />
             <span>Thông Tin Quán Ăn/Uống</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveTab('password')}
+            className={`py-2 px-4 rounded-xl text-xs font-bold flex items-center gap-2 transition-all shrink-0 ${
+              activeTab === 'password'
+                ? 'bg-[#D9452B] text-white shadow-xs'
+                : 'bg-white text-stone-600 border border-[#E7E2D7] hover:bg-stone-50'
+            }`}
+          >
+            <KeyRound className="w-4 h-4" />
+            <span>Đổi Mật Khẩu</span>
           </button>
         </div>
 
@@ -1224,6 +1284,124 @@ export default function OwnerDashboardPage() {
                   </div>
                 </div>
               )}
+            </div>
+          </div>
+        )}
+
+        {/* TAB 5: ĐỔI MẬT KHẨU CHỦ QUÁN */}
+        {activeTab === 'password' && (
+          <div className="mt-6 max-w-xl mx-auto animate-in fade-in duration-200">
+            <div className="bg-white rounded-3xl border border-[#E7E2D7] p-6 sm:p-8 shadow-heritage space-y-6">
+              <div className="flex items-center gap-3 pb-4 border-b border-[#E7E2D7]">
+                <div className="w-12 h-12 rounded-2xl bg-[#FDEDE8] text-[#D9452B] flex items-center justify-center font-bold shrink-0 shadow-inner">
+                  <KeyRound className="w-6 h-6" />
+                </div>
+                <div>
+                  <h2 className="font-serif text-lg font-bold text-[#1C1917]">
+                    Đổi Mật Khẩu Không Gian Quán
+                  </h2>
+                  <p className="text-xs text-stone-500">
+                    Cập nhật mật khẩu mới để bảo vệ an toàn cho tài khoản quán của bạn
+                  </p>
+                </div>
+              </div>
+
+              <form onSubmit={handleChangePassword} className="space-y-4">
+                <div>
+                  <label className="block text-xs font-bold text-[#1C1917] mb-1.5">
+                    Mật khẩu hiện tại
+                  </label>
+                  <div className="relative">
+                    <input
+                      type={showCurrentPassword ? 'text' : 'password'}
+                      placeholder="Nhập mật khẩu hiện tại..."
+                      value={passwordForm.currentPassword}
+                      onChange={(e) =>
+                        setPasswordForm({ ...passwordForm, currentPassword: e.target.value })
+                      }
+                      className="w-full px-3.5 py-2.5 pr-10 rounded-xl border border-stone-200 text-xs focus:outline-none focus:border-[#D9452B] transition-all"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-700 p-1"
+                      aria-label={showCurrentPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
+                    >
+                      {showCurrentPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                  <p className="text-[10px] text-stone-400 mt-1">
+                    Nếu bạn đăng ký qua Google hoặc chưa đặt mật khẩu trước đó, có thể để trống hoặc nhập mật khẩu khởi tạo ban đầu.
+                  </p>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-[#1C1917] mb-1.5">
+                    Mật khẩu mới <span className="text-red-500">*</span> (tối thiểu 6 ký tự)
+                  </label>
+                  <div className="relative">
+                    <input
+                      type={showNewPassword ? 'text' : 'password'}
+                      required
+                      placeholder="Nhập mật khẩu mới..."
+                      value={passwordForm.newPassword}
+                      onChange={(e) =>
+                        setPasswordForm({ ...passwordForm, newPassword: e.target.value })
+                      }
+                      className="w-full px-3.5 py-2.5 pr-10 rounded-xl border border-stone-200 text-xs focus:outline-none focus:border-[#D9452B] transition-all"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowNewPassword(!showNewPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-700 p-1"
+                      aria-label={showNewPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
+                    >
+                      {showNewPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-[#1C1917] mb-1.5">
+                    Xác nhận mật khẩu mới <span className="text-red-500">*</span>
+                  </label>
+                  <div className="relative">
+                    <input
+                      type={showConfirmPassword ? 'text' : 'password'}
+                      required
+                      placeholder="Nhập lại chính xác mật khẩu mới..."
+                      value={passwordForm.confirmPassword}
+                      onChange={(e) =>
+                        setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })
+                      }
+                      className="w-full px-3.5 py-2.5 pr-10 rounded-xl border border-stone-200 text-xs focus:outline-none focus:border-[#D9452B] transition-all"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-700 p-1"
+                      aria-label={showConfirmPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
+                    >
+                      {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                </div>
+
+                <div className="pt-2">
+                  <button
+                    type="submit"
+                    disabled={passwordLoading}
+                    className="w-full py-3 px-4 rounded-xl bg-[#D9452B] hover:bg-[#BF3A22] text-white text-xs font-bold shadow-md shadow-[#D9452B]/30 transition-all flex items-center justify-center gap-2 disabled:opacity-60"
+                  >
+                    {passwordLoading ? (
+                      <span className="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    ) : (
+                      <Lock className="w-4 h-4" />
+                    )}
+                    <span>Cập Nhật Mật Khẩu Mới</span>
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
         )}

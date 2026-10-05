@@ -37,6 +37,12 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       if (account?.provider === 'google' && user.email) {
         const normalizedEmail = user.email.toLowerCase().trim();
         const existing = getStoredUserByEmail(normalizedEmail);
+
+        // Quy định: Mail đã đăng ký làm chủ quán thì không được đăng ký/đăng nhập làm khách hàng
+        if (existing && existing.role === 'OWNER') {
+          return '/mon-ngon?error=EmailDaDangKyChuQuan';
+        }
+
         if (!existing) {
           upsertStoredUser({
             name: user.name || normalizedEmail.split('@')[0],

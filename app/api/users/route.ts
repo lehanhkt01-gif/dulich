@@ -1,7 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
 import { prisma } from '@/lib/prisma';
-import { getStoredUsers, upsertStoredUser, deleteStoredUser, getStoredUserById } from '@/lib/storage';
+import {
+  getStoredUsers,
+  upsertStoredUser,
+  deleteStoredUser,
+  getStoredUserById,
+  upsertStoredRestaurant,
+} from '@/lib/storage';
 import { getAuthUser, isAdmin } from '@/lib/auth';
 import { sendNewOwnerRegisteredEmail } from '@/lib/email';
 
@@ -71,20 +77,136 @@ export async function POST(req: NextRequest) {
 
     let savedUser: any = null;
 
+    const emailNorm = email.toLowerCase().trim();
+
+    // Kiểm tra tài khoản đã tồn tại hay chưa
+    let existing: any = null;
     try {
-      // Check existing email in DB
-      const existing = await prisma.user.findUnique({ where: { email } });
-      if (existing) {
-        return NextResponse.json(
-          { success: false, message: 'Email này đã tồn tại trong hệ thống' },
-          { status: 400 }
-        );
+      existing = await prisma.user.findUnique({ where: { email: emailNorm } });
+    } catch {
+      const storedUsers = getStoredUsers();
+      existing = storedUsers.find((u) => u.email?.toLowerCase() === emailNorm);
+    }
+    if (!existing) {
+      const storedUsers = getStoredUsers();
+      existing = storedUsers.find((u) => u.email?.toLowerCase() === emailNorm);
+    }
+
+    // QUY ĐỊNH RÀNG BUỘC VAI TRÒ:
+    if (existing) {
+      // 1. Mail nào đã đăng ký làm chủ quán thì KHÔNG được đăng ký làm khách hàng
+      if (existing.role === 'OWNER') {
+        if (assignedRole === 'TRAVELER') {
+          return NextResponse.json(
+            { success: false, message: 'Email này đã đăng ký làm chủ quán, không thể đăng ký khách hàng.' },
+            { status: 400 }
+          );
+        } else {
+          return NextResponse.json(
+            { success: false, message: 'Email này đã đăng ký làm chủ quán từ trước. Vui lòng đăng nhập tại tab Chủ Quán.' },
+            { status: 400 }
+          );
+        }
       }
 
+      // 2. Nếu email đó đã đăng ký làm khách hàng thì VẪN ĐƯỢC đăng ký làm chủ quán và XÓA vai trò khách hàng
+      if (assignedRole === 'OWNER' && (existing.role === 'TRAVELER' || existing.role === 'USER')) {
+        const updateData: any = {
+          role: 'OWNER',
+          status: 'PENDING',
+          password: hashedPassword,
+          phone: phone || existing.phone,
+          restaurantName: restaurantName || `Quán của ${existing.name}`,
+          restaurantAddress: restaurantAddress || 'Xã Ea Súp, Tỉnh Đắk Lắk',
+          restaurantPhone: phone || existing.phone,
+          restaurantLat: finalLat,
+          restaurantLng: finalLng,
+        };
+
+        try {
+          savedUser = await (prisma.user as any).update({
+            where: { id: existing.id },
+            data: updateData,
+          });
+        } catch {
+          // Bỏ qua lỗi DB nếu chưa kết nối
+        }
+
+        savedUser = upsertStoredUser({
+          ...existing,
+          ...updateData,
+          id: existing.id,
+          name: name || existing.name,
+        });
+
+        // Tạo thông tin quán ăn gắn liền với chủ quán
+        const resName = updateData.restaurantName;
+        const resSlug = `quan-${resName
+          .toLowerCase()
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '')
+          .replace(/[^a-z0-9]+/g, '-')
+          .replace(/(^-|-$)+/g, '')}-${existing.id.substring(0, 5)}`;
+
+        const resData = {
+          id: `res-${existing.id}`,
+          name: resName,
+          slug: resSlug,
+          address: updateData.restaurantAddress,
+          village: 'Buôn A2, Ea Súp',
+          phone: updateData.phone,
+          coverImage: '/mon-ngon/ga-nuong.jpg',
+          openTime: '07:30',
+          closeTime: '22:00',
+          isApproved: false,
+          ownerId: existing.id,
+        };
+
+        try {
+          await (prisma.restaurant as any).upsert({
+            where: { id: resData.id },
+            create: resData,
+            update: resData,
+          });
+        } catch {
+          upsertStoredRestaurant(resData);
+        }
+        upsertStoredRestaurant(resData);
+
+        // Gửi email thông báo hồ sơ mới cho Admin
+        sendNewOwnerRegisteredEmail({
+          ownerName: savedUser.name,
+          ownerEmail: emailNorm,
+          ownerPhone: phone || savedUser.phone,
+          restaurantName: resName,
+          restaurantAddress: updateData.restaurantAddress,
+        }).catch(console.error);
+
+        return NextResponse.json({
+          success: true,
+          message: 'Tài khoản khách hàng của bạn đã được chuyển đổi thành Chủ Quán thành công! Hồ sơ đang chờ Ban Quản Trị phê duyệt.',
+          data: {
+            id: savedUser.id,
+            name: savedUser.name,
+            email: savedUser.email,
+            role: savedUser.role,
+            status: savedUser.status,
+            restaurantName: savedUser.restaurantName,
+          },
+        });
+      }
+
+      return NextResponse.json(
+        { success: false, message: 'Email này đã tồn tại trong hệ thống' },
+        { status: 400 }
+      );
+    }
+
+    try {
       savedUser = await (prisma.user as any).create({
         data: {
           name,
-          email,
+          email: emailNorm,
           password: hashedPassword,
           role: assignedRole,
           status: initialStatus,
@@ -106,18 +228,9 @@ export async function POST(req: NextRequest) {
         restaurantLng: finalLng,
       });
     } catch {
-      // Fallback persistent storage
-      const existingUsers = getStoredUsers();
-      if (existingUsers.some((u) => u.email.toLowerCase() === email.toLowerCase())) {
-        return NextResponse.json(
-          { success: false, message: 'Email này đã tồn tại trong hệ thống' },
-          { status: 400 }
-        );
-      }
-
       savedUser = upsertStoredUser({
         name,
-        email,
+        email: emailNorm,
         password: hashedPassword,
         role: assignedRole,
         status: initialStatus,
@@ -130,11 +243,47 @@ export async function POST(req: NextRequest) {
       });
     }
 
+    // Nếu là tài khoản OWNER mới, tạo bản ghi Quán ăn ban đầu
+    if (assignedRole === 'OWNER') {
+      const resName = restaurantName || `Quán của ${name}`;
+      const resSlug = `quan-${resName
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/(^-|-$)+/g, '')}-${savedUser.id.substring(0, 5)}`;
+
+      const resData = {
+        id: `res-${savedUser.id}`,
+        name: resName,
+        slug: resSlug,
+        address: restaurantAddress || 'Xã Ea Súp, Tỉnh Đắk Lắk',
+        village: 'Buôn A2, Ea Súp',
+        phone: phone || '0912 345 678',
+        coverImage: '/mon-ngon/ga-nuong.jpg',
+        openTime: '07:30',
+        closeTime: '22:00',
+        isApproved: false,
+        ownerId: savedUser.id,
+      };
+
+      try {
+        await (prisma.restaurant as any).upsert({
+          where: { id: resData.id },
+          create: resData,
+          update: resData,
+        });
+      } catch {
+        upsertStoredRestaurant(resData);
+      }
+      upsertStoredRestaurant(resData);
+    }
+
     // Nếu là đăng ký vai trò OWNER, tự động gửi Email thông báo cho ADMIN (Lehanhkt01@gmail.com)
     if (assignedRole === 'OWNER') {
       sendNewOwnerRegisteredEmail({
         ownerName: name,
-        ownerEmail: email,
+        ownerEmail: emailNorm,
         ownerPhone: phone,
         restaurantName: restaurantName || 'Quán ăn mới',
         restaurantAddress,

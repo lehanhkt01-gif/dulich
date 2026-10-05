@@ -16,6 +16,9 @@ import {
   ShieldCheck,
   AlertCircle,
   Info,
+  Lock,
+  Eye,
+  EyeOff,
 } from 'lucide-react';
 import { registerOwnerAction } from '@/actions/auth-actions';
 import { toast } from 'sonner';
@@ -25,11 +28,15 @@ export default function DangKyChuQuanPage() {
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [successInfo, setSuccessInfo] = useState<{ name: string; restaurant: string } | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
     email: '',
+    password: '',
+    confirmPassword: '',
     restaurantName: '',
     restaurantAddress: '',
     village: 'Buôn A2',
@@ -54,6 +61,16 @@ export default function DangKyChuQuanPage() {
     e.preventDefault();
     if (!formData.name || !formData.phone || !formData.email || !formData.restaurantName) {
       toast.error('Vui lòng điền đầy đủ các thông tin có dấu sao (*).');
+      return;
+    }
+
+    if (!formData.password || formData.password.length < 6) {
+      toast.error('Mật khẩu khởi tạo phải có tối thiểu 6 ký tự.');
+      return;
+    }
+
+    if (formData.password !== formData.confirmPassword) {
+      toast.error('Mật khẩu nhập lại không khớp. Vui lòng kiểm tra lại!');
       return;
     }
 
@@ -297,6 +314,56 @@ export default function DangKyChuQuanPage() {
                   <p className="text-[10px] text-stone-500 mt-1">
                     Dùng chính Gmail này để đăng nhập vào Không Gian Chủ Quán sau khi Ban Quản Trị phê duyệt.
                   </p>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                  <div>
+                    <label className="block text-xs font-bold text-[#1C1917] mb-1.5">
+                      Mật khẩu khởi tạo <span className="text-red-500">*</span> (tối thiểu 6 ký tự)
+                    </label>
+                    <div className="relative">
+                      <input
+                        type={showPassword ? 'text' : 'password'}
+                        required
+                        placeholder="Tối thiểu 6 ký tự..."
+                        value={formData.password}
+                        onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                        className="w-full px-3.5 py-2.5 pr-10 rounded-xl border border-stone-200 text-xs focus:outline-none focus:border-[#D9452B] transition-all"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-700 p-1"
+                        aria-label={showPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
+                      >
+                        {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-[#1C1917] mb-1.5">
+                      Nhập lại mật khẩu <span className="text-red-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <input
+                        type={showConfirmPassword ? 'text' : 'password'}
+                        required
+                        placeholder="Nhập lại mật khẩu..."
+                        value={formData.confirmPassword}
+                        onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                        className="w-full px-3.5 py-2.5 pr-10 rounded-xl border border-stone-200 text-xs focus:outline-none focus:border-[#D9452B] transition-all"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-700 p-1"
+                        aria-label={showConfirmPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
+                      >
+                        {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </div>
 

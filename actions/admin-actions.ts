@@ -15,7 +15,8 @@ import {
   addStoredNotification,
 } from '@/lib/storage';
 import { Role, UserStatus } from '@/lib/types';
-import { sendOwnerApprovedEmail } from '@/lib/email';
+import { sendOwnerApprovedEmail, sendOwnerPasswordResetEmail } from '@/lib/email';
+import bcrypt from 'bcryptjs';
 import { revalidatePath } from 'next/cache';
 import {
   mergeByKey,
@@ -242,8 +243,9 @@ export async function rejectOwnerAction(userId: string, restaurantId: string, re
 export async function updateUserRoleStatusAction(userId: string, role: Role, status: UserStatus) {
   await requireAdmin();
 
+  let targetUser: any = null;
   try {
-    await prisma.user.update({
+    targetUser = await prisma.user.update({
       where: { id: userId },
       data: { role, status },
     });
@@ -251,8 +253,17 @@ export async function updateUserRoleStatusAction(userId: string, role: Role, sta
     const users = getStoredUsers();
     const u = users.find((x) => x.id === userId);
     if (u) {
-      upsertStoredUser({ ...u, role, status });
+      targetUser = upsertStoredUser({ ...u, role, status });
     }
+  }
+
+  // Nếu chuyển chủ quán sang ACTIVE, gửi email xác nhận bạn đã đăng ký chủ quán thành công & link đăng nhập
+  if (role === 'OWNER' && status === 'ACTIVE' && targetUser?.email) {
+    sendOwnerApprovedEmail({
+      ownerName: targetUser.name || 'Chủ Quán',
+      ownerEmail: targetUser.email,
+      restaurantName: targetUser.restaurantName || 'Quán của bạn',
+    }).catch(console.error);
   }
 
   revalidatePath('/admin/mon-ngon');
@@ -275,4 +286,108 @@ export async function deleteUserAction(userId: string) {
   revalidatePath('/admin/mon-ngon');
   revalidatePath('/admin');
   return { success: true, message: 'Đã xóa tài khoản vĩnh viễn khỏi hệ thống.' };
+}
+
+/**
+ * Hàm sinh mật khẩu ngẫu nhiên 8 ký tự (gồm chữ hoa, chữ thường, số)
+ */
+function generateRandomPassword(length = 8): string {
+  const upper = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
+  const lower = 'abcdefghijkmnpqrstuvwxyz';
+  const digits = '23456789';
+  const allChars = upper + lower + digits;
+
+  // Đảm bảo có ít nhất 1 chữ hoa, 1 chữ thường, 1 số
+  const pwd = [
+    upper[Math.floor(Math.random() * upper.length)],
+    lower[Math.floor(Math.random() * lower.length)],
+    digits[Math.floor(Math.random() * digits.length)],
+  ];
+
+  for (let i = 3; i < length; i++) {
+    pwd.push(allChars[Math.floor(Math.random() * allChars.length)]);
+  }
+
+  // Trộn ngẫu nhiên (Fisher-Yates shuffle)
+  for (let i = pwd.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [pwd[i], pwd[j]] = [pwd[j], pwd[i]];
+  }
+
+  return pwd.join('');
+}
+
+/**
+ * Đặt lại mật khẩu ngẫu nhiên 8 ký tự cho Chủ Quán và gửi email thông báo
+ */
+export async function resetOwnerPasswordAction(userId: string) {
+  await requireAdmin();
+
+  let targetUser: any = null;
+  try {
+    targetUser = await prisma.user.findUnique({ where: { id: userId } });
+  } catch {
+    const users = getStoredUsers();
+    targetUser = users.find((u) => u.id === userId);
+  }
+  if (!targetUser) {
+    const users = getStoredUsers();
+    targetUser = users.find((u) => u.id === userId);
+  }
+
+  if (!targetUser) {
+    return { success: false, message: 'Không tìm thấy tài khoản người dùng.' };
+  }
+
+  if (!targetUser.email || !targetUser.email.includes('@')) {
+    return { success: false, message: 'Tài khoản không có địa chỉ email hợp lệ để nhận mật khẩu.' };
+  }
+
+  // Sinh mật khẩu ngẫu nhiên 8 ký tự
+  const newRandomPassword = generateRandomPassword(8);
+  const hashedPassword = await bcrypt.hash(newRandomPassword, 10);
+
+  try {
+    await prisma.user.update({
+      where: { id: userId },
+      data: { password: hashedPassword },
+    });
+  } catch {
+    // Fallback persistent storage
+  }
+
+  upsertStoredUser({
+    ...targetUser,
+    password: hashedPassword,
+  });
+
+  // Gửi email chứa mật khẩu ngẫu nhiên 8 ký tự đến email của Chủ Quán
+  await sendOwnerPasswordResetEmail({
+    ownerName: targetUser.name || 'Chủ Quán',
+    ownerEmail: targetUser.email,
+    restaurantName: targetUser.restaurantName || 'Quán của bạn',
+    newPassword: newRandomPassword,
+  });
+
+  // Tạo thông báo nội bộ trong hệ thống
+  const notif = {
+    userId,
+    title: 'Mật khẩu tài khoản đã được cấp lại',
+    message: `Admin đã thiết lập lại mật khẩu cho tài khoản quán của bạn và gửi mật khẩu mới 8 ký tự về email ${targetUser.email}. Vui lòng đổi lại mật khẩu khi đăng nhập.`,
+    link: '/chu-quan/dashboard',
+  };
+  try {
+    await prisma.notification.create({ data: notif });
+  } catch {
+    addStoredNotification(notif);
+  }
+
+  revalidatePath('/admin');
+  revalidatePath('/admin/mon-ngon');
+
+  return {
+    success: true,
+    message: `Đã reset mật khẩu thành công! Mật khẩu mới (${newRandomPassword}) đã được gửi tới email ${targetUser.email}.`,
+    newPassword: newRandomPassword,
+  };
 }

@@ -11,10 +11,15 @@ import {
 import { signJwtToken } from '@/lib/auth';
 import { cookies } from 'next/headers';
 
+import bcrypt from 'bcryptjs';
+import { sendNewOwnerRegisteredEmail } from '@/lib/email';
+
 export interface RegisterOwnerInput {
   name: string;
   phone: string;
   email: string;
+  password?: string;
+  confirmPassword?: string;
   restaurantName: string;
   restaurantAddress: string;
   village?: string;
@@ -32,6 +37,15 @@ export async function registerOwnerAction(input: RegisterOwnerInput) {
       return { success: false, message: 'Vui lòng điền đầy đủ các thông tin bắt buộc.' };
     }
 
+    if (input.password) {
+      if (input.password.length < 6) {
+        return { success: false, message: 'Mật khẩu phải có tối thiểu 6 ký tự.' };
+      }
+      if (input.confirmPassword && input.password !== input.confirmPassword) {
+        return { success: false, message: 'Mật khẩu nhập lại không khớp. Vui lòng kiểm tra lại.' };
+      }
+    }
+
     const emailNorm = input.email.trim().toLowerCase();
 
     // 1. Kiểm tra tài khoản đã tồn tại hay chưa
@@ -43,8 +57,16 @@ export async function registerOwnerAction(input: RegisterOwnerInput) {
       existingUser = storedUsers.find((u) => u.email?.toLowerCase() === emailNorm);
     }
 
+    // Quy định: Nếu email đã đăng ký làm chủ quán
+    if (existingUser && existingUser.role === 'OWNER') {
+      return {
+        success: false,
+        message: 'Email này đã đăng ký làm chủ quán từ trước. Vui lòng đăng nhập tại tab Chủ Quán.',
+      };
+    }
+
     let userId = existingUser?.id;
-    const now = new Date().toISOString();
+    const hashedPassword = input.password ? await bcrypt.hash(input.password, 10) : 'oauth_or_pending';
 
     if (!existingUser) {
       // Tạo User mới với role OWNER, status PENDING
@@ -57,15 +79,13 @@ export async function registerOwnerAction(input: RegisterOwnerInput) {
         restaurantName: input.restaurantName,
         restaurantAddress: input.restaurantAddress,
         restaurantPhone: input.phone,
+        password: hashedPassword,
         avatar: `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(input.name)}`,
       };
 
       try {
         const created = await prisma.user.create({
-          data: {
-            ...newUser,
-            password: 'oauth_or_pending',
-          },
+          data: newUser,
         });
         userId = created.id;
       } catch {
@@ -73,26 +93,27 @@ export async function registerOwnerAction(input: RegisterOwnerInput) {
         userId = created.id;
       }
     } else {
-      // Nếu đã có tài khoản (ví dụ tài khoản khách Google), cập nhật thành OWNER và PENDING
+      // QUY ĐỊNH: Nếu đã có tài khoản khách hàng (TRAVELER / USER), cho phép nâng cấp lên OWNER và XÓA vai trò khách hàng
+      const updateData: any = {
+        role: 'OWNER',
+        status: 'PENDING',
+        phone: input.phone,
+        restaurantName: input.restaurantName,
+        restaurantAddress: input.restaurantAddress,
+      };
+      if (input.password) {
+        updateData.password = hashedPassword;
+      }
+
       try {
         await prisma.user.update({
           where: { id: existingUser.id },
-          data: {
-            role: 'OWNER',
-            status: 'PENDING',
-            phone: input.phone,
-            restaurantName: input.restaurantName,
-            restaurantAddress: input.restaurantAddress,
-          },
+          data: updateData,
         });
       } catch {
         upsertStoredUser({
           ...existingUser,
-          role: 'OWNER',
-          status: 'PENDING',
-          phone: input.phone,
-          restaurantName: input.restaurantName,
-          restaurantAddress: input.restaurantAddress,
+          ...updateData,
         });
       }
     }
@@ -136,6 +157,15 @@ export async function registerOwnerAction(input: RegisterOwnerInput) {
     } catch {
       addStoredNotification(adminNotif);
     }
+
+    // 4. Gửi email thông báo hồ sơ mới cho Admin (Lehanhkt01@gmail.com)
+    sendNewOwnerRegisteredEmail({
+      ownerName: input.name,
+      ownerEmail: emailNorm,
+      ownerPhone: input.phone,
+      restaurantName: input.restaurantName,
+      restaurantAddress: input.restaurantAddress,
+    }).catch(console.error);
 
     return {
       success: true,
