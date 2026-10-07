@@ -10,6 +10,27 @@
 > **Lưu ý / việc còn dở:** …
 > ```
 
+## [2026-10-07] Loại Bỏ Chọn Thôn Buôn & Bổ Sung Ô Nhập Tọa Độ X, Y (Kinh Độ / Vĩ Độ) Cho Quán Ăn
+
+**Yêu cầu:**
+- Tại phần khai thông tin "Chủ quán", loại bỏ nút/ô nhập chọn tên thôn, buôn.
+- Bổ sung thêm ô nhập tọa độ X, Y của quán ăn (không bắt buộc).
+
+**Đã làm:**
+- **Prisma Schema & Model (`prisma/schema.prisma`, `lib/types.ts`):**
+  - Bổ sung trường `lat Float?` (tọa độ Y / Vĩ độ) và `lng Float?` (tọa độ X / Kinh độ) vào model `Restaurant`.
+  - Sinh lại Prisma client (`npx prisma generate`).
+- **Đăng ký Chủ Quán (`app/mon-ngon/dang-ky-chu-quan/page.tsx`, `actions/auth-actions.ts`):**
+  - Loại bỏ hoàn toàn dropdown `<select>` chọn Thôn / Buôn.
+  - Mở rộng ô Địa chỉ cụ thể quán ăn/uống thành toàn chiều rộng (full width).
+  - Bổ sung khối nhập "Tọa độ vị trí quán (X, Y) (Không bắt buộc)" gồm 2 ô: `Tọa độ X (Kinh độ / Longitude)` và `Tọa độ Y (Vĩ độ / Latitude)` kèm nút `📍 Lấy vị trí hiện tại` tự động lấy GPS thiết bị qua Geolocation API.
+  - Cập nhật action `registerOwnerAction` lưu chính xác `lat`, `lng` vào tài khoản User và dữ liệu Restaurant.
+- **Không gian Chủ Quán Dashboard (`app/chu-quan/dashboard/page.tsx`, `actions/owner-actions.ts`):**
+  - Đồng bộ cập nhật thông tin quán trong Dashboard: thêm 2 ô nhập tọa độ X, Y, nút lấy vị trí GPS và hiển thị tọa độ bản đồ trong bảng thông tin quán.
+  - Cập nhật `updateRestaurantInfoAction` lưu `lat`, `lng` khi chủ quán chỉnh sửa thông tin.
+
+---
+
 ## [2026-10-07] Hoàn Tất 07 Hạng Mục Nâng Cấp & Tối Ưu Hệ Thống dulich.easupso.com
 
 **Yêu cầu:**

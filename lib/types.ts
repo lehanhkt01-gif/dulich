@@ -30,6 +30,8 @@ export interface Restaurant {
   village?: string | null;
   phone?: string | null;
   coverImage?: string | null;
+  lat?: number | null;
+  lng?: number | null;
   openTime?: string | null;
   closeTime?: string | null;
   isApproved: boolean;

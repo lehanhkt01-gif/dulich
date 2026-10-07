@@ -86,6 +86,8 @@ export async function updateRestaurantInfoAction(data: {
   openTime?: string;
   closeTime?: string;
   coverImage?: string;
+  lat?: number | null;
+  lng?: number | null;
 }) {
   const { user, restaurant } = await requireOwner();
 
@@ -108,6 +110,8 @@ export async function updateRestaurantInfoAction(data: {
 
   const village = (data.village || '').trim();
   const coverImage = (data.coverImage || restaurant.coverImage || '').trim();
+  const latVal = data.lat !== undefined ? (data.lat !== null && !isNaN(Number(data.lat)) ? Number(data.lat) : null) : (restaurant as any).lat ?? null;
+  const lngVal = data.lng !== undefined ? (data.lng !== null && !isNaN(Number(data.lng)) ? Number(data.lng) : null) : (restaurant as any).lng ?? null;
 
   try {
     await prisma.restaurant.update({
@@ -119,6 +123,8 @@ export async function updateRestaurantInfoAction(data: {
         phone: phone || null,
         openTime,
         closeTime,
+        lat: latVal,
+        lng: lngVal,
         ...(coverImage ? { coverImage } : {}),
       },
     });
@@ -131,6 +137,8 @@ export async function updateRestaurantInfoAction(data: {
       phone,
       openTime,
       closeTime,
+      lat: latVal,
+      lng: lngVal,
       coverImage: coverImage || restaurant.coverImage,
       ownerId: restaurant.ownerId,
     } as any);

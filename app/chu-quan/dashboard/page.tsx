@@ -32,6 +32,7 @@ import {
   Lock,
   Eye,
   EyeOff,
+  MapPin,
 } from 'lucide-react';
 import {
   getOwnerDashboardDataAction,
@@ -134,6 +135,8 @@ export default function OwnerDashboardPage() {
     openTime: '08:00',
     closeTime: '22:00',
     coverImage: '',
+    lat: '',
+    lng: '',
   });
 
   const handleStartEditInfo = (r: any) => {
@@ -145,6 +148,8 @@ export default function OwnerDashboardPage() {
       openTime: r.openTime || '08:00',
       closeTime: r.closeTime || '22:00',
       coverImage: r.coverImage || '',
+      lat: r.lat != null ? String(r.lat) : '',
+      lng: r.lng != null ? String(r.lng) : '',
     });
     setInfoEditing(true);
   };
@@ -153,7 +158,13 @@ export default function OwnerDashboardPage() {
     e.preventDefault();
     setInfoLoading(true);
     try {
-      const res = await updateRestaurantInfoAction(infoForm);
+      const latNum = infoForm.lat.trim() !== '' ? parseFloat(infoForm.lat) : undefined;
+      const lngNum = infoForm.lng.trim() !== '' ? parseFloat(infoForm.lng) : undefined;
+      const res = await updateRestaurantInfoAction({
+        ...infoForm,
+        lat: latNum !== undefined && !isNaN(latNum) ? latNum : null,
+        lng: lngNum !== undefined && !isNaN(lngNum) ? lngNum : null,
+      });
       if (res.success) {
         toast.success(res.message);
         setInfoEditing(false);
@@ -1236,6 +1247,71 @@ export default function OwnerDashboardPage() {
                       />
                     </div>
                   </div>
+
+                  {/* Tọa độ vị trí quán X, Y */}
+                  <div className="p-3 bg-stone-50 rounded-xl border border-stone-200/80 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <label className="block text-xs font-bold text-stone-700">
+                        Tọa độ bản đồ (X, Y) <span className="text-stone-400 font-normal text-[11px]">(Không bắt buộc)</span>
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (typeof navigator !== 'undefined' && navigator.geolocation) {
+                            navigator.geolocation.getCurrentPosition(
+                              (pos) => {
+                                setInfoForm((prev) => ({
+                                  ...prev,
+                                  lng: pos.coords.longitude.toFixed(6),
+                                  lat: pos.coords.latitude.toFixed(6),
+                                }));
+                                toast.success('Đã lấy tọa độ GPS thành công!');
+                              },
+                              (err) => {
+                                toast.error('Không thể lấy vị trí: ' + (err.message || 'Quyền vị trí bị từ chối'));
+                              }
+                            );
+                          } else {
+                            toast.error('Trình duyệt không hỗ trợ GPS');
+                          }
+                        }}
+                        className="inline-flex items-center gap-1 text-[11px] text-[#0066CC] hover:underline font-semibold"
+                      >
+                        <MapPin className="w-3 h-3" />
+                        <span>Lấy vị trí hiện tại</span>
+                      </button>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2">
+                      <div>
+                        <span className="block text-[11px] font-semibold text-stone-600 mb-1">
+                          Tọa độ X (Kinh độ)
+                        </span>
+                        <input
+                          type="number"
+                          step="any"
+                          placeholder="VD: 107.881234"
+                          value={infoForm.lng}
+                          onChange={(e) => setInfoForm({ ...infoForm, lng: e.target.value })}
+                          className="w-full px-3 py-1.5 rounded-xl border border-stone-200 text-xs focus:outline-none focus:border-[#D9452B] bg-white font-mono"
+                        />
+                      </div>
+                      <div>
+                        <span className="block text-[11px] font-semibold text-stone-600 mb-1">
+                          Tọa độ Y (Vĩ độ)
+                        </span>
+                        <input
+                          type="number"
+                          step="any"
+                          placeholder="VD: 13.245678"
+                          value={infoForm.lat}
+                          onChange={(e) => setInfoForm({ ...infoForm, lat: e.target.value })}
+                          className="w-full px-3 py-1.5 rounded-xl border border-stone-200 text-xs focus:outline-none focus:border-[#D9452B] bg-white font-mono"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
                   <div className="pt-2 flex justify-end gap-2">
                     <button
                       type="button"
@@ -1275,6 +1351,14 @@ export default function OwnerDashboardPage() {
                   <div className="flex justify-between py-2 border-b border-stone-100">
                     <span className="text-stone-500 font-semibold">Giờ hoạt động:</span>
                     <span>{restaurant.openTime || '08:00'} – {restaurant.closeTime || '22:00'}</span>
+                  </div>
+                  <div className="flex justify-between py-2 border-b border-stone-100">
+                    <span className="text-stone-500 font-semibold">Tọa độ bản đồ (X, Y):</span>
+                    <span className="font-mono text-stone-700">
+                      {restaurant.lat && restaurant.lng
+                        ? `X: ${restaurant.lng}, Y: ${restaurant.lat}`
+                        : 'Chưa cập nhật'}
+                    </span>
                   </div>
                   <div className="flex justify-between py-2 border-b border-stone-100">
                     <span className="text-stone-500 font-semibold">Trạng thái kiểm duyệt:</span>

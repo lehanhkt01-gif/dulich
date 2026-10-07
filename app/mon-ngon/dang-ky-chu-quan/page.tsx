@@ -39,23 +39,13 @@ export default function DangKyChuQuanPage() {
     confirmPassword: '',
     restaurantName: '',
     restaurantAddress: '',
-    village: 'Buôn A2',
+    village: '',
+    lat: '',
+    lng: '',
     openTime: '08:00',
     closeTime: '21:30',
     coverImage: '/mon-ngon/ga-nuong.jpg',
   });
-
-  const villages = [
-    'Buôn A2',
-    'Buôn A1',
-    'Buôn B1',
-    'Thôn 1',
-    'Thôn 2',
-    'Thôn 3',
-    'Thôn 4',
-    'Khu vực Hồ Ea Súp Thượng',
-    'Trung tâm Thị trấn / Xã',
-  ];
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -76,7 +66,13 @@ export default function DangKyChuQuanPage() {
 
     setLoading(true);
     try {
-      const res = await registerOwnerAction(formData);
+      const latNum = formData.lat.trim() !== '' ? parseFloat(formData.lat) : undefined;
+      const lngNum = formData.lng.trim() !== '' ? parseFloat(formData.lng) : undefined;
+      const res = await registerOwnerAction({
+        ...formData,
+        lat: latNum !== undefined && !isNaN(latNum) ? latNum : null,
+        lng: lngNum !== undefined && !isNaN(lngNum) ? lngNum : null,
+      });
       if (res.success) {
         setSuccessInfo({
           name: formData.name,
@@ -205,37 +201,85 @@ export default function DangKyChuQuanPage() {
                   />
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-xs font-bold text-[#1C1917] mb-1.5">
-                      Thôn / Buôn tại Ea Súp <span className="text-red-500">*</span>
+                <div>
+                  <label className="block text-xs font-bold text-[#1C1917] mb-1.5">
+                    Địa chỉ cụ thể quán ăn/uống <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="VD: Số 45 Đường Hùng Vương, Buôn A2, Thị trấn Ea Súp"
+                    value={formData.restaurantAddress}
+                    onChange={(e) => setFormData({ ...formData, restaurantAddress: e.target.value })}
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-stone-200 text-xs focus:outline-none focus:border-[#D9452B] transition-all"
+                  />
+                </div>
+
+                {/* Tọa độ vị trí quán X, Y (Kinh độ, Vĩ độ) - Không bắt buộc */}
+                <div className="p-3.5 bg-stone-50 rounded-2xl border border-stone-200/80 space-y-2.5">
+                  <div className="flex items-center justify-between">
+                    <label className="block text-xs font-bold text-[#1C1917]">
+                      Tọa độ vị trí quán (X, Y) <span className="text-stone-400 font-normal text-[11px]">(Không bắt buộc)</span>
                     </label>
-                    <select
-                      value={formData.village}
-                      onChange={(e) => setFormData({ ...formData, village: e.target.value })}
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-stone-200 text-xs focus:outline-none focus:border-[#D9452B] bg-white transition-all"
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (navigator.geolocation) {
+                          navigator.geolocation.getCurrentPosition(
+                            (pos) => {
+                              setFormData((prev) => ({
+                                ...prev,
+                                lng: pos.coords.longitude.toFixed(6),
+                                lat: pos.coords.latitude.toFixed(6),
+                              }));
+                              toast.success('Đã lấy tọa độ GPS thành công!');
+                            },
+                            (err) => {
+                              toast.error('Không thể lấy vị trí: ' + (err.message || 'Quyền vị trí bị từ chối'));
+                            }
+                          );
+                        } else {
+                          toast.error('Trình duyệt không hỗ trợ GPS');
+                        }
+                      }}
+                      className="inline-flex items-center gap-1 text-[11px] text-[#0066CC] hover:underline font-semibold"
                     >
-                      {villages.map((v) => (
-                        <option key={v} value={v}>
-                          {v}
-                        </option>
-                      ))}
-                    </select>
+                      <MapPin className="w-3.5 h-3.5" />
+                      <span>Lấy vị trí hiện tại</span>
+                    </button>
                   </div>
 
-                  <div>
-                    <label className="block text-xs font-bold text-[#1C1917] mb-1.5">
-                      Địa chỉ cụ thể <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="VD: Số 45 Đường Hùng Vương, Buôn A2"
-                      value={formData.restaurantAddress}
-                      onChange={(e) => setFormData({ ...formData, restaurantAddress: e.target.value })}
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-stone-200 text-xs focus:outline-none focus:border-[#D9452B] transition-all"
-                    />
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <span className="block text-[11px] font-semibold text-stone-600 mb-1">
+                        Tọa độ X (Kinh độ / Longitude)
+                      </span>
+                      <input
+                        type="number"
+                        step="any"
+                        placeholder="VD: 107.881234"
+                        value={formData.lng}
+                        onChange={(e) => setFormData({ ...formData, lng: e.target.value })}
+                        className="w-full px-3.5 py-2 rounded-xl border border-stone-200 text-xs focus:outline-none focus:border-[#D9452B] bg-white font-mono"
+                      />
+                    </div>
+                    <div>
+                      <span className="block text-[11px] font-semibold text-stone-600 mb-1">
+                        Tọa độ Y (Vĩ độ / Latitude)
+                      </span>
+                      <input
+                        type="number"
+                        step="any"
+                        placeholder="VD: 13.245678"
+                        value={formData.lat}
+                        onChange={(e) => setFormData({ ...formData, lat: e.target.value })}
+                        className="w-full px-3.5 py-2 rounded-xl border border-stone-200 text-xs focus:outline-none focus:border-[#D9452B] bg-white font-mono"
+                      />
+                    </div>
                   </div>
+                  <p className="text-[10px] text-stone-500">
+                    💡 Giúp ghim quán chính xác trên bản đồ du lịch số Ea Súp và hỗ trợ du khách tìm đường.
+                  </p>
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">

@@ -120,6 +120,7 @@ docker compose up -d --build
 - [x] Bổ sung tính năng và nút "Ghim quán ăn lên trên" (Pin to top) trong Admin, sắp xếp ưu tiên quán ghim lên đầu và gắn huy hiệu `[📌 Nổi bật]` ngoài trang chủ.
 - [x] Khắc phục triệt để lỗi số liệu thống kê nút `[Khách Hàng (0)] [Chủ Quán (0)] [Cán Bộ (0)]` luôn bị số 0 ban đầu bằng API thống kê tức thì `/api/admin/users/stats`.
 - [x] Ẩn hoàn toàn khối "DÀNH CHO CHỦ QUÁN" trong dropdown menu và ngoài trang chủ khi đã đăng nhập vai trò Admin/Cán bộ.
+- [x] Loại bỏ chọn thôn/buôn và bổ sung ô nhập Tọa độ X, Y (Kinh độ, Vĩ độ) không bắt buộc kèm nút lấy GPS hiện tại khi khai thông tin Chủ Quán.
 - [ ] Mở rộng tính năng bình luận và đánh giá món ăn/quán ăn cho du khách.
 
 ## 8. Lưu ý quan trọng

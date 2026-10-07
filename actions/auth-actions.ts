@@ -26,6 +26,8 @@ export interface RegisterOwnerInput {
   openTime?: string;
   closeTime?: string;
   coverImage?: string;
+  lat?: number | null;
+  lng?: number | null;
 }
 
 /**
@@ -79,6 +81,8 @@ export async function registerOwnerAction(input: RegisterOwnerInput) {
         restaurantName: input.restaurantName,
         restaurantAddress: input.restaurantAddress,
         restaurantPhone: input.phone,
+        restaurantLat: input.lat !== undefined && input.lat !== null && !isNaN(Number(input.lat)) ? Number(input.lat) : null,
+        restaurantLng: input.lng !== undefined && input.lng !== null && !isNaN(Number(input.lng)) ? Number(input.lng) : null,
         password: hashedPassword,
         avatar: `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(input.name)}`,
       };
@@ -100,6 +104,8 @@ export async function registerOwnerAction(input: RegisterOwnerInput) {
         phone: input.phone,
         restaurantName: input.restaurantName,
         restaurantAddress: input.restaurantAddress,
+        restaurantLat: input.lat !== undefined && input.lat !== null && !isNaN(Number(input.lat)) ? Number(input.lat) : null,
+        restaurantLng: input.lng !== undefined && input.lng !== null && !isNaN(Number(input.lng)) ? Number(input.lng) : null,
       };
       if (input.password) {
         updateData.password = hashedPassword;
@@ -130,7 +136,9 @@ export async function registerOwnerAction(input: RegisterOwnerInput) {
       name: input.restaurantName,
       slug: `${slug}-${Math.random().toString(36).substring(2, 6)}`,
       address: input.restaurantAddress || 'Xã Ea Súp, Huyện Ea Súp, Tỉnh Đắk Lắk',
-      village: input.village || 'Buôn A2',
+      village: input.village || null,
+      lat: input.lat !== undefined && input.lat !== null && !isNaN(Number(input.lat)) ? Number(input.lat) : null,
+      lng: input.lng !== undefined && input.lng !== null && !isNaN(Number(input.lng)) ? Number(input.lng) : null,
       phone: input.phone,
       coverImage: input.coverImage || '/mon-ngon/ga-nuong.jpg',
       openTime: input.openTime || '08:00',

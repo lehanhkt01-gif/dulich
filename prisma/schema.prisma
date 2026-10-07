@@ -94,6 +94,8 @@ model Restaurant {
   village     String?     // Thôn/buôn tại Ea Súp (Buôn A2, Thôn 1, Thôn 2, Hồ Ea Súp...)
   phone       String?
   coverImage  String?
+  lat         Float?      // Tọa độ Y (Vĩ độ / Latitude)
+  lng         Float?      // Tọa độ X (Kinh độ / Longitude)
   openTime    String?     // VD: 08:00
   closeTime   String?     // VD: 22:00
   isApproved  Boolean     @default(false)
