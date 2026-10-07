@@ -482,9 +482,9 @@ export default function MonNgonClient() {
         </div>
       </section>
 
-      {/* ================= TABS (desktop/tablet) ================= */}
+      {/* ================= TABS ĐIỀU HƯỚNG ================= */}
       <div ref={contentRef} className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6 md:mt-8">
-        <div className="hidden md:flex items-center gap-1 p-1.5 rounded-full bg-[#F6EEE7] border border-[#EFE2D6] w-fit">
+        <div className="flex overflow-x-auto no-scrollbar max-w-full items-center gap-1 p-1.5 rounded-full bg-[#F6EEE7] border border-[#EFE2D6] w-fit">
           {(
             [
               { id: 'kham-pha', label: 'Khám phá món', icon: Compass },
@@ -498,7 +498,7 @@ export default function MonNgonClient() {
             
             // Màu sắc các nút:
             // - Khám phá món: nền xanh lá cây chữ trắng khi chưa chọn, khi chọn thì nền đỏ.
-            // - TÌM QUÁN ĂN/UỐNG: nền xanh dương đậm #0066CC chữ trắng khi chưa chọn để tạo sự chú ý riêng, khi chọn thì nền đỏ.
+            // - TÌM QUÁN ĂN/UỐNG: HIỆU ỨNG NỀN NHẤP NHÁY XANH LÁ - ĐỎ TƯƠI LIÊN TỤC (animate-blink-green-red), chữ và icon trắng tinh nổi bật.
             // - Các tab khác: chữ nâu, khi chọn thì chuyển sang nền màu đỏ.
             let buttonStyle = '';
             if (t.id === 'kham-pha') {
@@ -507,8 +507,8 @@ export default function MonNgonClient() {
                 : 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs font-bold';
             } else if (t.id === 'quan-an') {
               buttonStyle = active
-                ? 'bg-[#D9452B] text-white shadow-md font-bold'
-                : 'bg-[#0066CC] hover:bg-[#0052A3] text-white shadow-xs font-bold';
+                ? 'animate-blink-green-red text-white font-extrabold shadow-lg ring-2 ring-white scale-[1.02] drop-shadow-sm'
+                : 'animate-blink-green-red text-white font-extrabold shadow-md hover:scale-[1.02] ring-1 ring-white/60 drop-shadow-sm';
             } else {
               buttonStyle = active
                 ? 'bg-[#D9452B] text-white shadow-md font-bold'
@@ -520,9 +520,10 @@ export default function MonNgonClient() {
                 key={t.id}
                 id={`mn-tab-${t.id}`}
                 onClick={() => setTab(t.id)}
-                className={`flex items-center gap-2 rounded-full px-5 py-2.5 text-sm transition-all ${buttonStyle}`}
+                className={`flex items-center gap-2 rounded-full px-5 py-2.5 text-sm transition-all shrink-0 whitespace-nowrap ${buttonStyle}`}
               >
-                <Icon className="w-4 h-4" /> {t.label}
+                <Icon className={`w-4 h-4 ${t.id === 'quan-an' ? 'text-white drop-shadow-xs' : ''}`} />
+                <span className={t.id === 'quan-an' ? 'text-white font-bold drop-shadow-xs' : ''}>{t.label}</span>
                 {t.id === 'lich-hen' && mounted && upcomingMine > 0 && (
                   <span className={`ml-0.5 min-w-5 h-5 px-1.5 rounded-full text-[11px] grid place-items-center ${
                     active ? 'bg-white text-[#D9452B]' : 'bg-[#D9452B] text-white'
