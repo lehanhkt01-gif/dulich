@@ -10,6 +10,21 @@
 > **Lưu ý / việc còn dở:** …
 > ```
 
+## [2026-10-07] Tối Ưu Responsive Mobile-First Cho Bảng Chuông Thông Báo (Chống Tràn Viền & Cắt Chữ)
+
+**Yêu cầu:**
+- Sửa dứt điểm lỗi bảng thông báo chuông (Notification Popover) bị tràn viền màn hình và mất nội dung góc trái trên điện thoại di động (chiều rộng nhỏ 360px - 390px).
+
+**Đã làm:**
+- **Layout Mobile-First ([`components/NotificationBell.tsx`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/components/NotificationBell.tsx)):**
+  - Chuyển đổi định vị linh hoạt: Trên mobile sử dụng `fixed left-3 right-3 top-16 z-50 mx-auto w-auto max-w-[calc(100vw-24px)]` giúp bảng luôn nằm lọt lòng giữa màn hình, cách đều 2 cạnh 12px; trên máy tính (`sm:`) trả về `sm:absolute sm:right-0 sm:left-auto sm:top-full sm:mt-2 sm:w-96`.
+  - Bổ sung lớp nền mờ trên mobile (`fixed inset-0 bg-black/40 z-40 sm:hidden backdrop-blur-xs`) hỗ trợ chạm ngoài để đóng.
+  - Bổ sung nút đóng `X` ở góc trên bên phải header để thao tác 1 chạm thuận tiện trên điện thoại.
+  - Giới hạn chiều cao cuộn mượt: `max-h-[65vh] sm:max-h-[420px] overflow-y-auto overscroll-contain`.
+  - Chống co méo icon với `shrink-0 mt-0.5` và chống tràn chữ với `break-words whitespace-normal leading-relaxed line-clamp-3`.
+
+---
+
 ## [2026-10-07] Hoàn Thiện Hệ Thống Thông Báo Admin & Dịch Vụ Gửi Email Tự Động Non-Blocking Khi Có Chủ Quán Mới
 
 **Yêu cầu:**

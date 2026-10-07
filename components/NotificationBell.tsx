@@ -164,11 +164,19 @@ export default function NotificationBell({ currentUser }: NotificationBellProps)
         )}
       </button>
 
-      {/* Popover Danh Sách Thông Báo */}
+      {/* 1. Lớp nền mờ trên Mobile */}
       {open && (
-        <div className="absolute right-0 top-full mt-2 w-80 sm:w-96 bg-white rounded-2xl border border-[#E7E2D7] shadow-2xl p-0 z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150">
+        <div
+          className="fixed inset-0 bg-black/40 z-40 sm:hidden backdrop-blur-xs transition-opacity"
+          onClick={() => setOpen(false)}
+        />
+      )}
+
+      {/* 2. Khung Bảng Thông Báo Responsive Mobile-First */}
+      {open && (
+        <div className="fixed left-3 right-3 top-16 z-50 mx-auto w-auto max-w-[calc(100vw-24px)] sm:max-w-none sm:absolute sm:left-auto sm:right-0 sm:top-full sm:mt-2 sm:w-96 bg-white rounded-2xl border border-[#E7E2D7] shadow-2xl p-0 overflow-hidden flex flex-col animate-in fade-in zoom-in-95 sm:slide-in-from-top-2 duration-150">
           {/* Header */}
-          <div className="px-4 py-3 bg-[#FBF9F5] border-b border-[#E7E2D7] flex items-center justify-between">
+          <div className="px-4 py-3 bg-[#FBF9F5] border-b border-[#E7E2D7] flex items-center justify-between shrink-0">
             <div className="flex items-center gap-2">
               <span className="font-serif font-bold text-sm text-[#1C1917]">
                 {isAdmin ? 'Thông Báo Quản Trị' : 'Thông Báo'}
@@ -179,28 +187,39 @@ export default function NotificationBell({ currentUser }: NotificationBellProps)
                 </span>
               )}
             </div>
-            {unreadCount > 0 && (
+            <div className="flex items-center gap-2">
+              {unreadCount > 0 && (
+                <button
+                  type="button"
+                  onClick={handleMarkAllRead}
+                  disabled={loading}
+                  className="text-[11px] font-semibold text-[#0066CC] hover:text-[#0052A3] hover:underline flex items-center gap-1 disabled:opacity-50"
+                >
+                  <CheckCheck className="w-3.5 h-3.5" />
+                  <span>Đã đọc tất cả</span>
+                </button>
+              )}
               <button
                 type="button"
-                onClick={handleMarkAllRead}
-                disabled={loading}
-                className="text-[11px] font-semibold text-[#0066CC] hover:text-[#0052A3] hover:underline flex items-center gap-1 disabled:opacity-50"
+                onClick={() => setOpen(false)}
+                className="p-1 rounded-lg text-stone-400 hover:text-stone-700 hover:bg-stone-200/50 transition-colors"
+                aria-label="Đóng bảng thông báo"
+                title="Đóng"
               >
-                <CheckCheck className="w-3.5 h-3.5" />
-                <span>Đã đọc tất cả</span>
+                <X className="w-4 h-4" />
               </button>
-            )}
+            </div>
           </div>
 
-          {/* Body */}
-          <div className="max-h-[380px] overflow-y-auto divide-y divide-stone-100">
+          {/* Body cuộn nội dung */}
+          <div className="max-h-[65vh] sm:max-h-[420px] overflow-y-auto overscroll-contain divide-y divide-stone-100">
             {notifications.length === 0 ? (
               <div className="py-10 px-4 text-center">
                 <div className="w-10 h-10 rounded-full bg-stone-100 text-stone-400 flex items-center justify-center mx-auto mb-2">
                   <Bell className="w-5 h-5" />
                 </div>
                 <p className="text-xs font-bold text-stone-700">Chưa có thông báo nào</p>
-                <p className="text-[11px] text-stone-500 mt-0.5">
+                <p className="text-[11px] text-stone-500 mt-0.5 leading-relaxed">
                   {isAdmin
                     ? 'Khi có chủ quán mới đăng ký, cập nhật hồ sơ hoặc đơn đặt món mới, thông báo sẽ hiển thị tại đây.'
                     : isOwner
@@ -223,13 +242,13 @@ export default function NotificationBell({ currentUser }: NotificationBellProps)
                   <div
                     key={n.id}
                     onClick={() => handleItemClick(n)}
-                    className={`p-3.5 flex items-start gap-3 transition-colors cursor-pointer text-left ${
+                    className={`p-3.5 flex items-start gap-3 transition-colors cursor-pointer text-left w-full overflow-hidden ${
                       isUnread
                         ? 'bg-blue-50/50 hover:bg-blue-50'
                         : 'bg-white hover:bg-stone-50'
                     }`}
                   >
-                    {/* Icon đại diện */}
+                    {/* Icon đại diện cố định không co méo */}
                     <div
                       className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 mt-0.5 shadow-2xs ${
                         isOwnerRegistered
@@ -256,11 +275,11 @@ export default function NotificationBell({ currentUser }: NotificationBellProps)
                       )}
                     </div>
 
-                    {/* Nội dung */}
+                    {/* Nội dung chống tràn chữ */}
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-baseline justify-between gap-1">
+                      <div className="flex items-baseline justify-between gap-1.5">
                         <p
-                          className={`text-xs truncate ${
+                          className={`text-xs break-words ${
                             isUnread ? 'font-bold text-stone-900' : 'font-semibold text-stone-700'
                           }`}
                         >
@@ -270,7 +289,7 @@ export default function NotificationBell({ currentUser }: NotificationBellProps)
                           {timeAgo(n.createdAt)}
                         </span>
                       </div>
-                      <p className="text-[11px] text-stone-600 line-clamp-2 mt-0.5 leading-snug">
+                      <p className="text-[11px] text-stone-600 line-clamp-3 mt-0.5 leading-relaxed break-words whitespace-normal">
                         {bodyText}
                       </p>
                     </div>
@@ -286,7 +305,7 @@ export default function NotificationBell({ currentUser }: NotificationBellProps)
           </div>
 
           {/* Footer */}
-          <div className="p-2.5 bg-[#FBF9F5] border-t border-[#E7E2D7] text-center">
+          <div className="p-2.5 bg-[#FBF9F5] border-t border-[#E7E2D7] text-center shrink-0">
             {isAdmin ? (
               <button
                 type="button"

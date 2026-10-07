@@ -122,6 +122,7 @@ docker compose up -d --build
 - [x] Ẩn hoàn toàn khối "DÀNH CHO CHỦ QUÁN" trong dropdown menu và ngoài trang chủ khi đã đăng nhập vai trò Admin/Cán bộ.
 - [x] Loại bỏ chọn thôn/buôn và bổ sung ô nhập Tọa độ X, Y (Kinh độ, Vĩ độ) không bắt buộc kèm nút lấy GPS hiện tại khi khai thông tin Chủ Quán.
 - [x] Hoàn thiện hệ thống Chuông Thông Báo cho Quản trị viên (Admin) và dịch vụ gửi Email tự động non-blocking về Gmail Admin khi có chủ quán mới đăng ký.
+- [x] Tối ưu hóa Responsive Mobile-First cho bảng Chuông Thông Báo (chống tràn viền trái, thêm backdrop mờ và nút đóng X trên điện thoại).
 - [ ] Mở rộng tính năng bình luận và đánh giá món ăn/quán ăn cho du khách.
 
 ## 8. Lưu ý quan trọng
