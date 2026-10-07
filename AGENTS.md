@@ -121,6 +121,7 @@ docker compose up -d --build
 - [x] Khắc phục triệt để lỗi số liệu thống kê nút `[Khách Hàng (0)] [Chủ Quán (0)] [Cán Bộ (0)]` luôn bị số 0 ban đầu bằng API thống kê tức thì `/api/admin/users/stats`.
 - [x] Ẩn hoàn toàn khối "DÀNH CHO CHỦ QUÁN" trong dropdown menu và ngoài trang chủ khi đã đăng nhập vai trò Admin/Cán bộ.
 - [x] Loại bỏ chọn thôn/buôn và bổ sung ô nhập Tọa độ X, Y (Kinh độ, Vĩ độ) không bắt buộc kèm nút lấy GPS hiện tại khi khai thông tin Chủ Quán.
+- [x] Hoàn thiện hệ thống Chuông Thông Báo cho Quản trị viên (Admin) và dịch vụ gửi Email tự động non-blocking về Gmail Admin khi có chủ quán mới đăng ký.
 - [ ] Mở rộng tính năng bình luận và đánh giá món ăn/quán ăn cho du khách.
 
 ## 8. Lưu ý quan trọng

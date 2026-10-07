@@ -117,13 +117,18 @@ export interface Booking {
 
 export interface Notification {
   id: string;
-  userId: string;
-  title: string;
-  message: string;
+  recipientRole?: string; // ADMIN, OWNER, CUSTOMER
+  recipientId?: string | null;
+  userId?: string | null;
   type?: string | null;
+  title: string;
+  content?: string;
+  message?: string;
+  linkUrl?: string | null;
   link?: string | null;
   isRead: boolean;
   createdAt: string | Date;
+  updatedAt?: string | Date;
 }
 
 // Di tích & Thắng cảnh

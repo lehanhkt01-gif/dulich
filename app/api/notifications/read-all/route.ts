@@ -13,13 +13,31 @@ export async function PATCH(request: NextRequest) {
       );
     }
 
+    const isAdmin = user.role === 'ADMIN' || user.role === 'CADRE';
+    const whereCondition: any = isAdmin
+      ? {
+          OR: [
+            { userId: user.id },
+            { recipientId: user.id },
+            { recipientRole: 'ADMIN' },
+          ],
+          isRead: false,
+        }
+      : {
+          OR: [
+            { userId: user.id },
+            { recipientId: user.id },
+          ],
+          isRead: false,
+        };
+
     try {
       await prisma.notification.updateMany({
-        where: { userId: user.id, isRead: false },
+        where: whereCondition,
         data: { isRead: true },
       });
     } catch {
-      markAllStoredNotificationsAsRead(user.id);
+      markAllStoredNotificationsAsRead(user.id, user.role);
     }
 
     return NextResponse.json({ success: true, message: 'Đã đánh dấu tất cả là đã đọc' });

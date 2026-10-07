@@ -232,18 +232,24 @@ model Booking {
 // THÔNG BÁO HỆ THỐNG / HỘP THƯ (NOTIFICATION)
 // ==============================================================================
 model Notification {
-  id        String   @id @default(cuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  title     String
-  message   String   @db.Text
-  type      String?  // 'ORDER' | 'BOOKING' | 'CANCEL' | 'REVIEW' | 'SYSTEM'
-  link      String?
-  isRead    Boolean  @default(false)
-  createdAt DateTime @default(now())
+  id            String   @id @default(cuid())
+  recipientRole String   @default("ADMIN") // ADMIN, OWNER, CUSTOMER
+  recipientId   String?  // null nếu gửi chung cho toàn bộ Admin
+  userId        String?  // Tương thích ngược với schema cũ
+  user          User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type          String   @default("SYSTEM") // OWNER_REGISTERED, OWNER_UPDATED, CUSTOMER_REGISTERED, ORDER_NEW,...
+  title         String
+  content       String   @default("") @db.Text
+  message       String?  @db.Text // Tương thích ngược với schema cũ
+  linkUrl       String?  // Đường dẫn điều hướng nhanh khi click (ví dụ: /admin/restaurants?tab=pending)
+  link          String?  // Tương thích ngược với schema cũ
+  isRead        Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @default(now()) @updatedAt
 
+  @@index([recipientRole, isRead])
+  @@index([createdAt])
   @@index([userId])
-  @@index([isRead])
 }
 
 // ==============================================================================

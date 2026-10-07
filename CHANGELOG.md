@@ -10,6 +10,31 @@
 > **Lưu ý / việc còn dở:** …
 > ```
 
+## [2026-10-07] Hoàn Thiện Hệ Thống Thông Báo Admin & Dịch Vụ Gửi Email Tự Động Non-Blocking Khi Có Chủ Quán Mới
+
+**Yêu cầu:**
+- Nâng cấp hệ thống thông báo cho Quản trị viên (Admin) và thiết lập dịch vụ gửi email tự động về Gmail của Admin khi có chủ quán mới đăng ký.
+- Tuân thủ nghiêm ngặt 4 nguyên tắc: Zero Regression, Non-blocking Email, Bảo toàn Database và Cấu hình bảo mật qua biến môi trường (.env) fallback `lehanhkt01@gmail.com`.
+
+**Đã làm:**
+- **Mô hình Dữ liệu (`prisma/schema.prisma`, `lib/types.ts`, `lib/storage.ts`):**
+  - Mở rộng model `Notification` với các trường: `recipientRole` (default "ADMIN"), `recipientId`, `content`, `linkUrl`, `updatedAt` kèm các index `[recipientRole, isRead]`, `[createdAt]`.
+  - Giữ nguyên các trường tương thích ngược `userId`, `user`, `message`, `link` để các luồng thông báo trước không bị ảnh hưởng.
+  - Chạy `npx prisma generate` cập nhật Prisma Client.
+  - Cập nhật cơ chế lưu trữ JSON fallback (`lib/storage.ts`) để đồng bộ truy vấn theo `recipientRole`.
+- **API Thông Báo (`app/api/notifications/route.ts`, `app/api/notifications/read-all/route.ts`):**
+  - Hỗ trợ vai trò ADMIN lấy toàn bộ thông báo gửi tới ADMIN (`recipientRole === 'ADMIN'`) hoặc gửi riêng cho Admin ID.
+  - Hỗ trợ đánh dấu tất cả thông báo của Admin là đã đọc.
+- **Dịch vụ Email Non-blocking (`lib/email.ts`, `actions/auth-actions.ts`):**
+  - Cấu hình `DEFAULT_ADMIN_EMAIL` đọc từ `process.env.ADMIN_EMAIL` với fallback `lehanhkt01@gmail.com`.
+  - Đảm bảo luồng gửi email hồ sơ quán mới chạy nền phi đồng bộ (asynchronous non-blocking task), nếu lỗi SMTP chỉ ghi log cảnh báo, không làm gián đoạn form đăng ký của chủ quán.
+  - Chuẩn hóa link điều hướng trong email linh hoạt theo tên miền (`getBaseUrl()`).
+- **Giao diện Chuông Thông Báo Admin (`components/NotificationBell.tsx`, `app/admin/page.tsx`):**
+  - Tích hợp component `NotificationBell` trực tiếp lên Top Header của trang quản trị `/admin` bên cạnh nút Trang Chủ.
+  - Bổ sung nhận diện loại thông báo `OWNER_REGISTERED`, icon cửa hàng riêng biệt và nút điều hướng nhanh về Bảng Quản Trị Hệ Thống.
+
+---
+
 ## [2026-10-07] Loại Bỏ Chọn Thôn Buôn & Bổ Sung Ô Nhập Tọa Độ X, Y (Kinh Độ / Vĩ Độ) Cho Quán Ăn
 
 **Yêu cầu:**

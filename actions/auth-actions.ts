@@ -153,12 +153,19 @@ export async function registerOwnerAction(input: RegisterOwnerInput) {
       upsertStoredRestaurant(restaurantData);
     }
 
-    // 3. Tạo thông báo cho Ban Quản Trị
+    // 3. Tạo thông báo cho Ban Quản Trị (ADMIN)
+    const notifContent = `Chủ quán ${input.name} vừa đăng ký mở quán "${input.restaurantName}". Vui lòng kiểm tra và phê duyệt.`;
     const adminNotif = {
+      recipientRole: 'ADMIN',
+      recipientId: null,
       userId: 'user-admin-default',
+      type: 'OWNER_REGISTERED',
       title: 'Hồ sơ Chủ Quán mới đăng ký',
-      message: `Chủ quán ${input.name} vừa đăng ký mở quán "${input.restaurantName}" tại ${input.village || 'Ea Súp'}. Vui lòng phê duyệt.`,
-      link: '/admin/mon-ngon',
+      content: notifContent,
+      message: notifContent,
+      linkUrl: '/admin',
+      link: '/admin',
+      isRead: false,
     };
     try {
       await prisma.notification.create({ data: adminNotif });
@@ -166,14 +173,20 @@ export async function registerOwnerAction(input: RegisterOwnerInput) {
       addStoredNotification(adminNotif);
     }
 
-    // 4. Gửi email thông báo hồ sơ mới cho Admin (Lehanhkt01@gmail.com)
-    sendNewOwnerRegisteredEmail({
-      ownerName: input.name,
-      ownerEmail: emailNorm,
-      ownerPhone: input.phone,
-      restaurantName: input.restaurantName,
-      restaurantAddress: input.restaurantAddress,
-    }).catch(console.error);
+    // 4. Gửi email thông báo hồ sơ mới về Gmail Admin (Non-blocking asynchronous task)
+    try {
+      sendNewOwnerRegisteredEmail({
+        ownerName: input.name,
+        ownerEmail: emailNorm,
+        ownerPhone: input.phone,
+        restaurantName: input.restaurantName,
+        restaurantAddress: input.restaurantAddress,
+      }).catch((emailErr) => {
+        console.warn('⚠️ [EMAIL NON-BLOCKING WARNING] Lỗi gửi email thông báo admin:', emailErr?.message || emailErr);
+      });
+    } catch (emailErr) {
+      console.warn('⚠️ [EMAIL NON-BLOCKING WARNING]:', emailErr);
+    }
 
     return {
       success: true,

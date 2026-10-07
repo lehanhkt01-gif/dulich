@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { Destination, Category } from '@/lib/types';
 import GpsPickerModal from '@/components/GpsPickerModal';
+import NotificationBell from '@/components/NotificationBell';
 import {
   ShieldCheck,
   Plus,
@@ -860,6 +861,9 @@ export default function AdminPage() {
 
         {/* Nút tác vụ nhanh trên Header */}
         <div className="flex items-center gap-2.5">
+          {/* Chuông Thông Báo Quản Trị Viên */}
+          <NotificationBell currentUser={currentUser} />
+
           <Link
             href="/"
             className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white border border-[#E7E2D7] text-xs font-semibold text-stone-700 hover:bg-stone-50 hover:text-[#0066CC] transition-colors shadow-xs"

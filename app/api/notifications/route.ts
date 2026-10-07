@@ -13,15 +13,32 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    const isAdmin = user.role === 'ADMIN' || user.role === 'CADRE';
+    const whereCondition: any = isAdmin
+      ? {
+          OR: [
+            { userId: user.id },
+            { recipientId: user.id },
+            { recipientRole: 'ADMIN' },
+          ],
+        }
+      : {
+          OR: [
+            { userId: user.id },
+            { recipientId: user.id },
+            { recipientRole: user.role === 'OWNER' ? 'OWNER' : 'CUSTOMER' },
+          ],
+        };
+
     let notifications: any[] = [];
     try {
       notifications = await prisma.notification.findMany({
-        where: { userId: user.id },
+        where: whereCondition,
         orderBy: { createdAt: 'desc' },
-        take: 30,
+        take: 40,
       });
     } catch {
-      notifications = getStoredNotifications(user.id).slice(0, 30);
+      notifications = getStoredNotifications(user.id, user.role).slice(0, 40);
     }
 
     const unreadCount = notifications.filter((n) => !n.isRead).length;
@@ -50,10 +67,21 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { targetUserId, title, message, link, type } = body;
+    const {
+      targetUserId,
+      recipientRole,
+      recipientId,
+      title,
+      message,
+      content,
+      link,
+      linkUrl,
+      type,
+    } = body;
 
-    const notifUserId = targetUserId || user.id;
-    if (!title || !message) {
+    const notifUserId = targetUserId || recipientId || user.id;
+    const bodyContent = content || message;
+    if (!title || !bodyContent) {
       return NextResponse.json(
         { success: false, message: 'Thiếu thông tin tiêu đề hoặc nội dung' },
         { status: 400 }
@@ -62,10 +90,14 @@ export async function POST(request: NextRequest) {
 
     const notifData = {
       userId: notifUserId,
+      recipientRole: recipientRole || (user.role === 'ADMIN' ? 'ADMIN' : 'CUSTOMER'),
+      recipientId: recipientId || notifUserId,
       title,
-      message,
+      content: bodyContent,
+      message: bodyContent,
       type: type || 'SYSTEM',
-      link: link || null,
+      linkUrl: linkUrl || link || null,
+      link: linkUrl || link || null,
       isRead: false,
     };
 

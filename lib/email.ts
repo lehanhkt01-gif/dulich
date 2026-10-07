@@ -6,7 +6,14 @@ import nodemailer from 'nodemailer';
  * - Tự động phát hiện cấu hình SMTP trong env; nếu chưa có thì log mô phỏng an toàn.
  */
 
-export const DEFAULT_ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'Lehanhkt01@gmail.com';
+export const DEFAULT_ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'lehanhkt01@gmail.com';
+
+function getBaseUrl(): string {
+  if (process.env.APP_URL) return process.env.APP_URL.replace(/\/$/, '');
+  if (process.env.AUTH_URL) return process.env.AUTH_URL.replace(/\/$/, '');
+  if (process.env.NEXTAUTH_URL) return process.env.NEXTAUTH_URL.replace(/\/$/, '');
+  return 'https://dulich.easupso.com';
+}
 
 const SMTP_HOST = process.env.SMTP_HOST || 'smtp.gmail.com';
 const SMTP_PORT = Number(process.env.SMTP_PORT || 587);
@@ -265,7 +272,7 @@ export async function sendOrderStatusUpdatedEmail({
       <div style="font-size: 16px;">${statusBadge}</div>
     </div>
     <p style="text-align: center;">
-      <a href="http://localhost:3000/mon-ngon/lich-su-dat" class="btn">XEM LỊCH SỬ ĐẶT MÓN</a>
+      <a href="${getBaseUrl()}/mon-ngon/lich-su-dat" class="btn">XEM LỊCH SỬ ĐẶT MÓN</a>
     </p>
   `;
 
@@ -306,7 +313,7 @@ export async function sendNewOwnerRegisteredEmail({
     </div>
     <p>Trạng thái hiện tại: <span class="badge badge-pending">CHỜ ADMIN PHÊ DUYỆT</span></p>
     <p style="text-align: center;">
-      <a href="http://localhost:3000/admin" class="btn">VÀO CHUYÊN MỤC ADMIN ĐỂ PHÊ DUYỆT</a>
+      <a href="${getBaseUrl()}/admin" class="btn">VÀO CHUYÊN MỤC ADMIN ĐỂ PHÊ DUYỆT</a>
     </p>
   `;
 
@@ -352,7 +359,7 @@ export async function sendOwnerInfoChangedEmail({
       </tbody>
     </table>
     <p style="text-align: center;">
-      <a href="http://localhost:3000/admin" class="btn">XEM QUẢN TRỊ ADMIN</a>
+      <a href="${getBaseUrl()}/admin" class="btn">XEM QUẢN TRỊ ADMIN</a>
     </p>
   `;
 

@@ -12,14 +12,19 @@ import {
   Store,
   ExternalLink,
   X,
+  ShieldCheck,
 } from 'lucide-react';
 
 interface NotificationItem {
   id: string;
-  userId: string;
+  recipientRole?: string | null;
+  recipientId?: string | null;
+  userId?: string | null;
   title: string;
-  message: string;
+  content?: string;
+  message?: string;
   type?: string | null;
+  linkUrl?: string | null;
   link?: string | null;
   isRead: boolean;
   createdAt: string | Date;
@@ -107,8 +112,11 @@ export default function NotificationBell({ currentUser }: NotificationBellProps)
       } catch (e) {}
     }
     setOpen(false);
-    if (notif.link) {
-      router.push(notif.link);
+    const targetLink = notif.linkUrl || notif.link;
+    if (targetLink) {
+      router.push(targetLink);
+    } else if (currentUser?.role === 'ADMIN' || currentUser?.role === 'CADRE') {
+      router.push('/admin');
     }
   };
 
@@ -127,6 +135,7 @@ export default function NotificationBell({ currentUser }: NotificationBellProps)
 
   if (!currentUser) return null;
 
+  const isAdmin = currentUser.role === 'ADMIN' || currentUser.role === 'CADRE';
   const isOwner = currentUser.role === 'OWNER';
 
   return (
@@ -161,7 +170,9 @@ export default function NotificationBell({ currentUser }: NotificationBellProps)
           {/* Header */}
           <div className="px-4 py-3 bg-[#FBF9F5] border-b border-[#E7E2D7] flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <span className="font-serif font-bold text-sm text-[#1C1917]">Thông Báo</span>
+              <span className="font-serif font-bold text-sm text-[#1C1917]">
+                {isAdmin ? 'Thông Báo Quản Trị' : 'Thông Báo'}
+              </span>
               {unreadCount > 0 && (
                 <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-red-100 text-red-700">
                   {unreadCount} mới
@@ -188,9 +199,11 @@ export default function NotificationBell({ currentUser }: NotificationBellProps)
                 <div className="w-10 h-10 rounded-full bg-stone-100 text-stone-400 flex items-center justify-center mx-auto mb-2">
                   <Bell className="w-5 h-5" />
                 </div>
-                <p className="text-xs font-bold text-stone-700">Bạn chưa có thông báo nào</p>
+                <p className="text-xs font-bold text-stone-700">Chưa có thông báo nào</p>
                 <p className="text-[11px] text-stone-500 mt-0.5">
-                  {isOwner
+                  {isAdmin
+                    ? 'Khi có chủ quán mới đăng ký, cập nhật hồ sơ hoặc đơn đặt món mới, thông báo sẽ hiển thị tại đây.'
+                    : isOwner
                     ? 'Khi khách đặt món, đặt bàn hoặc hủy đơn, thông báo sẽ hiển thị tại đây.'
                     : 'Khi quán xác nhận đơn hoặc bàn đặt, thông báo sẽ hiển thị tại đây.'}
                 </p>
@@ -199,9 +212,12 @@ export default function NotificationBell({ currentUser }: NotificationBellProps)
               notifications.map((n) => {
                 const isUnread = !n.isRead;
                 const type = n.type || '';
-                const isOrder = type === 'ORDER' || n.title.includes('đặt món');
+                const isOwnerRegistered =
+                  type === 'OWNER_REGISTERED' || n.title.includes('Chủ Quán') || n.title.includes('mở quán');
+                const isOrder = type === 'ORDER' || type === 'ORDER_NEW' || n.title.includes('đặt món');
                 const isBooking = type === 'BOOKING' || n.title.includes('đặt bàn');
                 const isCancel = type === 'CANCEL' || n.title.includes('hủy');
+                const bodyText = n.content || n.message || '';
 
                 return (
                   <div
@@ -216,16 +232,20 @@ export default function NotificationBell({ currentUser }: NotificationBellProps)
                     {/* Icon đại diện */}
                     <div
                       className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 mt-0.5 shadow-2xs ${
-                        isCancel
+                        isOwnerRegistered
+                          ? 'bg-amber-100 text-amber-800'
+                          : isCancel
                           ? 'bg-rose-100 text-rose-700'
                           : isOrder
                           ? 'bg-blue-100 text-blue-700'
                           : isBooking
-                          ? 'bg-amber-100 text-amber-700'
-                          : 'bg-emerald-100 text-emerald-700'
+                          ? 'bg-emerald-100 text-emerald-700'
+                          : 'bg-indigo-100 text-indigo-700'
                       }`}
                     >
-                      {isCancel ? (
+                      {isOwnerRegistered ? (
+                        <Store className="w-4 h-4" />
+                      ) : isCancel ? (
                         <AlertCircle className="w-4 h-4" />
                       ) : isOrder ? (
                         <ShoppingBag className="w-4 h-4" />
@@ -251,7 +271,7 @@ export default function NotificationBell({ currentUser }: NotificationBellProps)
                         </span>
                       </div>
                       <p className="text-[11px] text-stone-600 line-clamp-2 mt-0.5 leading-snug">
-                        {n.message}
+                        {bodyText}
                       </p>
                     </div>
 
@@ -267,7 +287,19 @@ export default function NotificationBell({ currentUser }: NotificationBellProps)
 
           {/* Footer */}
           <div className="p-2.5 bg-[#FBF9F5] border-t border-[#E7E2D7] text-center">
-            {isOwner ? (
+            {isAdmin ? (
+              <button
+                type="button"
+                onClick={() => {
+                  setOpen(false);
+                  router.push('/admin');
+                }}
+                className="w-full py-1.5 px-3 rounded-xl text-xs font-semibold text-[#0066CC] hover:bg-blue-50 transition-colors flex items-center justify-center gap-1.5"
+              >
+                <ShieldCheck className="w-3.5 h-3.5" />
+                <span>Xem Trang Phê Duyệt & Quản Trị Admin</span>
+              </button>
+            ) : isOwner ? (
               <button
                 type="button"
                 onClick={() => {

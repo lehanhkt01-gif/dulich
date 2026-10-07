@@ -977,10 +977,15 @@ export function updateStoredBookingStatus(id: string, status: BookingStatus): Bo
 // =============================================================================
 const NOTIFICATIONS_FILE = 'notifications.json';
 
-export function getStoredNotifications(userId?: string): Notification[] {
+export function getStoredNotifications(userId?: string, role?: string): Notification[] {
   let items = readJsonFile<Notification[]>(NOTIFICATIONS_FILE, []);
-  if (userId) {
-    items = items.filter((n) => n.userId === userId);
+  if (userId || role) {
+    items = items.filter((n) => {
+      if (role === 'ADMIN' && n.recipientRole === 'ADMIN') return true;
+      if (userId && (n.userId === userId || n.recipientId === userId)) return true;
+      if (!userId && !role) return true;
+      return false;
+    });
   }
   return items.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 }
@@ -989,17 +994,34 @@ export function saveStoredNotifications(items: Notification[]): void {
   writeJsonFile(NOTIFICATIONS_FILE, items);
 }
 
-export function addStoredNotification(notif: { userId: string; title: string; message: string; link?: string; type?: string }): Notification {
+export function addStoredNotification(notif: {
+  userId?: string | null;
+  recipientRole?: string;
+  recipientId?: string | null;
+  title: string;
+  message?: string;
+  content?: string;
+  link?: string | null;
+  linkUrl?: string | null;
+  type?: string;
+}): Notification {
   const items = readJsonFile<Notification[]>(NOTIFICATIONS_FILE, []);
+  const bodyText = notif.content || notif.message || '';
+  const directLink = notif.linkUrl || notif.link || null;
   const newNotif: Notification = {
     id: `notif-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
-    userId: notif.userId,
+    recipientRole: notif.recipientRole || (notif.userId?.includes('admin') ? 'ADMIN' : 'CUSTOMER'),
+    recipientId: notif.recipientId || null,
+    userId: notif.userId || null,
     title: notif.title,
-    message: notif.message,
+    content: bodyText,
+    message: bodyText,
     type: notif.type || 'SYSTEM',
-    link: notif.link || null,
+    linkUrl: directLink,
+    link: directLink,
     isRead: false,
     createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
   };
   items.unshift(newNotif);
   saveStoredNotifications(items);
@@ -1011,18 +1033,23 @@ export function markStoredNotificationAsRead(id: string): boolean {
   const idx = items.findIndex((n) => n.id === id);
   if (idx >= 0) {
     items[idx].isRead = true;
+    items[idx].updatedAt = new Date().toISOString();
     saveStoredNotifications(items);
     return true;
   }
   return false;
 }
 
-export function markAllStoredNotificationsAsRead(userId: string): boolean {
+export function markAllStoredNotificationsAsRead(userId: string, role?: string): boolean {
   const items = readJsonFile<Notification[]>(NOTIFICATIONS_FILE, []);
   let changed = false;
   items.forEach((n) => {
-    if (n.userId === userId && !n.isRead) {
+    const isTarget =
+      (n.userId === userId || n.recipientId === userId) ||
+      (role === 'ADMIN' && n.recipientRole === 'ADMIN');
+    if (isTarget && !n.isRead) {
       n.isRead = true;
+      n.updatedAt = new Date().toISOString();
       changed = true;
     }
   });
