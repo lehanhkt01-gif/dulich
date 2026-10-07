@@ -124,7 +124,7 @@ docker compose up -d --build
 - [x] Hoàn thiện hệ thống Chuông Thông Báo cho Quản trị viên (Admin) và dịch vụ gửi Email tự động non-blocking về Gmail Admin khi có chủ quán mới đăng ký.
 - [x] Tối ưu hóa Responsive Mobile-First cho bảng Chuông Thông Báo (chống tràn viền trái, thêm backdrop mờ và nút đóng X trên điện thoại).
 - [x] Ẩn khối banner "Lịch Sử Đặt Món & Đặt Bàn" khi đăng nhập vai trò Chủ Quán (OWNER), tự động mở rộng banner Chủ Quán toàn chiều ngang (full-width).
-- [x] Tạo hiệu ứng nền nhấp nháy chuyển màu Xanh lá - Đỏ tươi liên tục (`animate-blink-green-red`) cho nút "TÌM QUÁN ĂN/UỐNG", giữ chữ và icon trắng tinh có bóng chữ, áp dụng đồng bộ cho mọi người dùng.
+- [x] Tạo hiệu ứng nền chuyển màu Gradient êm dịu, sang trọng liên tục (`btn-gentle-shift`) cho nút "TÌM QUÁN ĂN/UỐNG", giữ chữ và icon trắng tinh có bóng chữ, áp dụng đồng bộ cho mọi người dùng.
 - [ ] Mở rộng tính năng bình luận và đánh giá món ăn/quán ăn cho du khách.
 
 ## 8. Lưu ý quan trọng

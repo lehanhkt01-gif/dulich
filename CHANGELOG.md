@@ -10,23 +10,24 @@
 > **Lưu ý / việc còn dở:** …
 > ```
 
-## [2026-10-07] Tạo Hiệu Ứng Nền Nhấp Nháy Xanh Lá - Đỏ Tươi Cho Nút "TÌM QUÁN ĂN/UỐNG"
+## [2026-10-08] Nâng Cấp Hiệu Ứng Nút "TÌM QUÁN ĂN/UỐNG" Sang Chuyển Màu Nền Gradient Êm Dịu, Tinh Tế (Gentle Color Shift)
 
 **Yêu cầu:**
-- Bổ sung hiệu ứng chuyển màu nền (animation) nhấp nháy Xanh lá (`#16a34a`) – Đỏ tươi (`#dc2626`) liên tục cho nút/tab "TÌM QUÁN ĂN/UỐNG" trên trang Ẩm thực / Quán ăn (`/mon-ngon`).
-- Chuyển màu nhịp nhàng, mượt mà giữa hai màu với chu kỳ 1.8s lặp vô hạn (`ease-in-out`).
-- Chữ bên trong `TÌM QUÁN ĂN/UỐNG (X)` và icon cửa hàng/quán `🏪` luôn giữ màu trắng tinh (`text-white font-bold`), có bóng chữ (`drop-shadow`) rõ nét, tương phản hoàn hảo trên cả 2 nền màu.
+- Xóa bỏ hiệu ứng chớp tắt nhấp nháy cũ, thay thế bằng hiệu ứng chuyển màu nền chuyển động êm ái, mềm mại (Gentle Breathing Color Shift) với dải gradient sang trọng, không gây chói mắt.
+- Chu kỳ chuyển màu mượt mà qua các cung bậc màu du lịch & ẩm thực đặc sắc: Xanh dương hoàng gia (`#1d4ed8`), Xanh ngọc tươi mát (`#059669`), Đỏ san hô (`#e11d48`), Cam ấm áp (`#ea580c`).
+- Chữ bên trong `TÌM QUÁN ĂN/UỐNG (X)` và icon cửa hàng/quán `🏪` luôn giữ màu trắng tinh (`text-white font-extrabold`), có bóng chữ (`drop-shadow`) sắc nét, tương phản hoàn hảo ở mọi góc nhìn.
 - Áp dụng đồng bộ cho tất cả trạng thái người dùng (Khách vãng lai, Khách hàng, Chủ quán và Admin).
 
 **Đã làm:**
 - **CSS Animation ([`app/globals.css`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/app/globals.css)):**
-  - Khai báo `@keyframes blinkGreenRed` chuyển đổi nền giữa `#16a34a` (box-shadow xanh lá 14px) và `#dc2626` (box-shadow đỏ tươi 14px).
-  - Khai báo class `.animate-blink-green-red` kích hoạt animation 1.8s vô tận `ease-in-out infinite !important`.
+  - Xóa bỏ `@keyframes blinkGreenRed` và `.animate-blink-green-red`.
+  - Khai báo `@keyframes gentleColorShift` chuyển động vị trí background `background-position: 0% 50%` sang `100% 50%` và quay lại chu kỳ 5 giây `ease-in-out infinite`.
+  - Khai báo class `.btn-gentle-shift`: dải màu `linear-gradient(135deg, #1d4ed8, #059669, #e11d48, #ea580c, #1d4ed8)` kích thước `300% 300%`, hover phóng to nhẹ nhàng `scale(1.02)` và đổ bóng sang trọng `box-shadow: 0 4px 15px rgba(225, 29, 72, 0.35)`.
   - Hỗ trợ tắt animation khi người dùng bật chế độ giảm chuyển động (`prefers-reduced-motion`).
 - **Giao diện Tab ([`components/mon-ngon/MonNgonClient.tsx`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/components/mon-ngon/MonNgonClient.tsx)):**
-  - Gắn class `.animate-blink-green-red` kèm `text-white font-extrabold shadow-md scale-[1.02] drop-shadow-sm` cho tab `quan-an`.
-  - Icon `Store` và nhãn hiển thị luôn mang class `text-white font-bold drop-shadow-xs`.
-  - Nâng cấp container tabs từ `hidden md:flex` thành `flex overflow-x-auto no-scrollbar max-w-full` kèm `shrink-0 whitespace-nowrap` giúp thanh tabs và nút nhấp nháy hiển thị mượt mà trên cả điện thoại di động lẫn máy tính.
+  - Gắn class `.btn-gentle-shift` cho tab `quan-an` kèm viền trắng tinh tế (`ring-1 ring-white/60` khi chưa chọn, `ring-2 ring-white scale-[1.02]` khi đang chọn).
+  - Giữ icon `Store` và chữ luôn màu trắng tinh `text-white font-extrabold drop-shadow-xs`.
+  - Hiển thị mượt mà trên cả desktop và mobile qua thanh tabs vuốt cuộn `flex overflow-x-auto no-scrollbar`.
 
 ---
 

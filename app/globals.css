@@ -128,24 +128,33 @@ input[type="range"] {
 .no-scrollbar::-webkit-scrollbar { display: none; }
 
 @media (prefers-reduced-motion: reduce) {
-  .mn-fade-up, .mn-fade, .mn-sheet, .mn-pop, .mn-shake, .animate-blink-green-red { animation: none !important; }
+  .mn-fade-up, .mn-fade, .mn-sheet, .mn-pop, .mn-shake, .btn-gentle-shift { animation: none !important; }
 }
 
 /* ==========================================================================
-   HIỆU ỨNG NHẤP NHÁY CHUYỂN MÀU NỀN XANH LÁ - ĐỎ TƯƠI (Nút TÌM QUÁN ĂN/UỐNG)
+   HIỆU ỨNG CHUYỂN MÀU NỀN ÊM DỊU, SANG TRỌNG (Nút TÌM QUÁN ĂN/UỐNG)
    ========================================================================== */
-@keyframes blinkGreenRed {
-  0%, 100% {
-    background-color: #16a34a; /* Xanh lá rực rỡ */
-    box-shadow: 0 0 14px rgba(22, 163, 74, 0.55);
+@keyframes gentleColorShift {
+  0% {
+    background-position: 0% 50%;
   }
   50% {
-    background-color: #dc2626; /* Đỏ nổi bật */
-    box-shadow: 0 0 14px rgba(220, 38, 38, 0.55);
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
   }
 }
 
-.animate-blink-green-red {
-  animation: blinkGreenRed 1.8s ease-in-out infinite !important;
+.btn-gentle-shift {
+  background: linear-gradient(135deg, #1d4ed8, #059669, #e11d48, #ea580c, #1d4ed8) !important;
+  background-size: 300% 300% !important;
+  animation: gentleColorShift 5s ease-in-out infinite !important;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn-gentle-shift:hover {
+  transform: translateY(-1px) scale(1.02);
+  box-shadow: 0 4px 15px rgba(225, 29, 72, 0.35);
 }
 

@@ -498,7 +498,7 @@ export default function MonNgonClient() {
             
             // Màu sắc các nút:
             // - Khám phá món: nền xanh lá cây chữ trắng khi chưa chọn, khi chọn thì nền đỏ.
-            // - TÌM QUÁN ĂN/UỐNG: HIỆU ỨNG NỀN NHẤP NHÁY XANH LÁ - ĐỎ TƯƠI LIÊN TỤC (animate-blink-green-red), chữ và icon trắng tinh nổi bật.
+            // - TÌM QUÁN ĂN/UỐNG: HIỆU ỨNG NỀN CHUYỂN MÀU GRADIENT ÊM DỊU, SANG TRỌNG (btn-gentle-shift), chữ và icon trắng tinh nổi bật.
             // - Các tab khác: chữ nâu, khi chọn thì chuyển sang nền màu đỏ.
             let buttonStyle = '';
             if (t.id === 'kham-pha') {
@@ -507,8 +507,8 @@ export default function MonNgonClient() {
                 : 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs font-bold';
             } else if (t.id === 'quan-an') {
               buttonStyle = active
-                ? 'animate-blink-green-red text-white font-extrabold shadow-lg ring-2 ring-white scale-[1.02] drop-shadow-sm'
-                : 'animate-blink-green-red text-white font-extrabold shadow-md hover:scale-[1.02] ring-1 ring-white/60 drop-shadow-sm';
+                ? 'btn-gentle-shift text-white font-extrabold shadow-lg ring-2 ring-white scale-[1.02] drop-shadow-sm'
+                : 'btn-gentle-shift text-white font-extrabold shadow-md hover:scale-[1.02] ring-1 ring-white/60 drop-shadow-sm';
             } else {
               buttonStyle = active
                 ? 'bg-[#D9452B] text-white shadow-md font-bold'
