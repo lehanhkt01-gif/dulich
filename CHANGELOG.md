@@ -10,6 +10,21 @@
 > **Lưu ý / việc còn dở:** …
 > ```
 
+## [2026-10-07] Ẩn Khối Banner "Lịch Sử Đặt Món & Đặt Bàn" Khi Đăng Nhập Vai Trò Chủ Quán (OWNER)
+
+**Yêu cầu:**
+- Khi người dùng đăng nhập với vai trò Chủ Quán (`role === 'OWNER'`), ẩn khối card "Lịch Sử Đặt Món & Đặt Bàn Của Bạn".
+- Khối "Dành Cho Chủ Quán Ăn/Uống Ea Súp" tự động chiếm toàn bộ chiều ngang (`w-full`) giúp giao diện thoáng đẹp, tập trung vào bảng điều khiển quản lý quán.
+- Giữ nguyên khối "Lịch Sử Đặt Món & Đặt Bàn Của Bạn" (full width) cho khách hàng để tra cứu đơn đặt bình thường.
+
+**Đã làm:**
+- **Component [`components/mon-ngon/MonNgonClient.tsx`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/components/mon-ngon/MonNgonClient.tsx):**
+  - Tách bạch điều kiện hiển thị banner tiện ích theo `isOwnerOnly`:
+    + Nếu là Chủ Quán (`isOwnerOnly === true`): Ẩn hoàn toàn banner khách, hiển thị banner Quản lý Quán chiếm toàn bộ chiều rộng màn hình (`w-full`), kèm các nút điều hướng nhanh "Mở Quán" và "Quản lý quán".
+    + Nếu là Khách Hàng: Hiển thị duy nhất banner "Lịch Sử Đặt Món & Đặt Bàn Của Bạn" full width với nút "Xem đơn", không hiển thị banner Chủ quán.
+
+---
+
 ## [2026-10-07] Tối Ưu Responsive Mobile-First Cho Bảng Chuông Thông Báo (Chống Tràn Viền & Cắt Chữ)
 
 **Yêu cầu:**

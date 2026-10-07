@@ -543,34 +543,10 @@ export default function MonNgonClient() {
             const isOwnerOnly = userRole === 'OWNER';
 
             return (
-              <div className={`gap-3 mb-6 ${isOwnerOnly ? 'grid grid-cols-1 sm:grid-cols-2' : 'flex flex-col'}`}>
-                {/* Banner Khách */}
-                <div className="p-3.5 sm:p-4 rounded-2xl bg-gradient-to-r from-[#EFF6FF] to-[#DBEAFE] border border-blue-200 flex items-center justify-between gap-3 shadow-xs">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center shrink-0 shadow-xs">
-                      <ShoppingBag className="w-5 h-5" />
-                    </div>
-                    <div>
-                      <p className="text-xs sm:text-sm font-bold text-stone-900">
-                        Lịch Sử Đặt Món & Đặt Bàn Của Bạn
-                      </p>
-                      <p className="text-[11px] sm:text-xs text-stone-600">
-                        Theo dõi tiến độ đơn hàng và thông báo xác nhận từ quán.
-                      </p>
-                    </div>
-                  </div>
-                  <Link
-                    href="/mon-ngon/lich-su-dat"
-                    className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition-all shadow-xs shrink-0"
-                  >
-                    <span>Xem đơn</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </Link>
-                </div>
-
-                {/* Banner Chủ quán (CHỈ hiển thị cho riêng Chủ Quán OWNER, ẩn hoàn toàn với Khách hàng và Admin) */}
-                {isOwnerOnly && (
-                  <div className="p-3.5 sm:p-4 rounded-2xl bg-gradient-to-r from-[#FDEDE8] to-[#FFF6ED] border border-[#EADBD0] flex items-center justify-between gap-3 shadow-xs">
+              <div className="mb-6">
+                {/* 1. Nếu là CHỦ QUÁN (OWNER): ẨN HOÀN TOÀN banner Khách hàng, Banner Chủ Quán chiếm toàn bộ chiều ngang */}
+                {isOwnerOnly ? (
+                  <div className="p-3.5 sm:p-4 rounded-2xl bg-gradient-to-r from-[#FDEDE8] to-[#FFF6ED] border border-[#EADBD0] flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs w-full">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-xl bg-[#D9452B] text-white flex items-center justify-center shrink-0 shadow-xs">
                         <Store className="w-5 h-5" />
@@ -580,24 +556,49 @@ export default function MonNgonClient() {
                           Dành Cho Chủ Quán Ăn/Uống Ea Súp
                         </p>
                         <p className="text-[11px] sm:text-xs text-[#7D6B62]">
-                          Đăng ký mở quán, quản lý món ăn/uống và tiếp nhận đơn đặt.
+                          Quản lý thực đơn món ăn/uống, cấu hình bàn ăn và tiếp nhận đơn đặt trực tuyến từ du khách.
                         </p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-1.5 shrink-0">
+                    <div className="flex items-center gap-2 shrink-0">
                       <Link
                         href="/mon-ngon/dang-ky-chu-quan"
-                        className="inline-flex items-center justify-center px-3 py-2 rounded-xl bg-[#D9452B] hover:bg-[#BF3A22] text-white text-xs font-bold transition-all shadow-xs"
+                        className="inline-flex items-center justify-center px-3.5 py-2 rounded-xl bg-white border border-[#EADBD0] hover:border-[#D9452B] text-[#2B1D16] text-xs font-bold transition-all shadow-xs"
                       >
                         <span>Mở Quán</span>
                       </Link>
                       <Link
                         href="/chu-quan/dashboard"
-                        className="inline-flex items-center justify-center px-3 py-2 rounded-xl bg-white border border-[#EADBD0] hover:border-[#D9452B] text-[#2B1D16] text-xs font-bold transition-all shadow-xs"
+                        className="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-[#D9452B] hover:bg-[#BF3A22] text-white text-xs font-bold transition-all shadow-xs"
                       >
-                        <span>Quản lý</span>
+                        <Store className="w-3.5 h-3.5" />
+                        <span>Quản lý quán</span>
                       </Link>
                     </div>
+                  </div>
+                ) : (
+                  /* 2. Nếu là KHÁCH HÀNG (hoặc tài khoản khác): Hiển thị Lịch Sử Đặt Món & Đặt Bàn toàn chiều ngang */
+                  <div className="p-3.5 sm:p-4 rounded-2xl bg-gradient-to-r from-[#EFF6FF] to-[#DBEAFE] border border-blue-200 flex items-center justify-between gap-3 shadow-xs w-full">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+                        <ShoppingBag className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <p className="text-xs sm:text-sm font-bold text-stone-900">
+                          Lịch Sử Đặt Món & Đặt Bàn Của Bạn
+                        </p>
+                        <p className="text-[11px] sm:text-xs text-stone-600">
+                          Theo dõi tiến độ đơn hàng và thông báo xác nhận từ quán.
+                        </p>
+                      </div>
+                    </div>
+                    <Link
+                      href="/mon-ngon/lich-su-dat"
+                      className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition-all shadow-xs shrink-0"
+                    >
+                      <span>Xem đơn</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </Link>
                   </div>
                 )}
               </div>
