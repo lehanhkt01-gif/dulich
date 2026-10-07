@@ -33,6 +33,8 @@ export interface Restaurant {
   openTime?: string | null;
   closeTime?: string | null;
   isApproved: boolean;
+  isPinned?: boolean;
+  pinnedAt?: string | Date | null;
   ownerId: string;
   owner?: User;
   menuItems?: MenuItem[];
@@ -116,6 +118,7 @@ export interface Notification {
   userId: string;
   title: string;
   message: string;
+  type?: string | null;
   link?: string | null;
   isRead: boolean;
   createdAt: string | Date;

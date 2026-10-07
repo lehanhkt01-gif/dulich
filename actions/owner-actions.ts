@@ -467,12 +467,26 @@ export async function updateBookingStatusAction(bookingId: string, status: Booki
     updateStoredBookingStatus(bookingId, status);
   }
 
-  // TẠO THÔNG BÁO CHO KHÁCH HÀNG KHI DUYỆT BÀN
+  // TẠO THÔNG BÁO CHO KHÁCH HÀNG KHI DUYỆT HOẶC TỪ CHỐI BÀN
   if (status === 'APPROVED' && targetUserId) {
     const notifData = {
       userId: targetUserId,
       title: 'Đặt bàn đã được xác nhận!',
       message: `Quán "${restaurant.name}" đã xác nhận giữ bàn cho ${guestCount} khách vào lúc ${bookingTimeStr}. Chúc bạn có bữa ăn ấm cúng!`,
+      type: 'BOOKING',
+      link: '/mon-ngon/lich-su-dat',
+    };
+    try {
+      await prisma.notification.create({ data: notifData });
+    } catch {
+      addStoredNotification(notifData);
+    }
+  } else if (status === 'REJECTED' && targetUserId) {
+    const notifData = {
+      userId: targetUserId,
+      title: 'Lịch đặt bàn chưa được tiếp nhận',
+      message: `Quán "${restaurant.name}" rất tiếc chưa thể nhận lịch đặt bàn vào lúc ${bookingTimeStr} do kín bàn hoặc có lịch sự kiện đột xuất.`,
+      type: 'BOOKING',
       link: '/mon-ngon/lich-su-dat',
     };
     try {

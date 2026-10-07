@@ -391,3 +391,77 @@ export async function resetOwnerPasswordAction(userId: string) {
     newPassword: newRandomPassword,
   };
 }
+
+/**
+ * Ghim / Bỏ ghim quán ăn lên đầu trang chủ
+ */
+export async function toggleRestaurantPinAction(restaurantId: string) {
+  await requireAdmin();
+
+  let updatedRestaurant: any = null;
+  try {
+    const existing = await prisma.restaurant.findUnique({ where: { id: restaurantId } });
+    if (!existing) {
+      return { success: false, message: 'Không tìm thấy quán ăn.' };
+    }
+    const nextPinned = !existing.isPinned;
+    updatedRestaurant = await prisma.restaurant.update({
+      where: { id: restaurantId },
+      data: {
+        isPinned: nextPinned,
+        pinnedAt: nextPinned ? new Date() : null,
+      },
+    });
+  } catch {
+    const { toggleStoredRestaurantPin } = await import('@/lib/storage');
+    const toggled = toggleStoredRestaurantPin(restaurantId);
+    if (!toggled) {
+      return { success: false, message: 'Không tìm thấy quán ăn.' };
+    }
+    updatedRestaurant = toggled;
+  }
+
+  revalidatePath('/');
+  revalidatePath('/mon-ngon');
+  revalidatePath('/admin');
+
+  return {
+    success: true,
+    message: updatedRestaurant.isPinned
+      ? `Đã ghim quán "${updatedRestaurant.name}" lên đầu trang chủ!`
+      : `Đã bỏ ghim quán "${updatedRestaurant.name}".`,
+    restaurant: updatedRestaurant,
+  };
+}
+
+/**
+ * Lấy số lượng thống kê tài khoản quản trị ngay lập tức
+ */
+export async function getAccountStatsAction() {
+  await requireAdmin();
+  const { computeCounts } = await import('@/lib/account-sync');
+  let dbUsers: any[] = [];
+  let dbRestaurants: any[] = [];
+  try {
+    dbUsers = await prisma.user.findMany();
+  } catch {}
+  try {
+    dbRestaurants = await prisma.restaurant.findMany();
+  } catch {}
+
+  const mergedUsers = mergeByKey<any>(dbUsers, getStoredUsers(), (u) => u.email?.toLowerCase());
+  const mergedRestaurants = mergeByKey<any>(
+    dbRestaurants.map(stripRestaurantRelations),
+    getStoredRestaurants(),
+    (r) => r.slug
+  );
+
+  const counts = computeCounts(mergedUsers, mergedRestaurants);
+  return {
+    success: true,
+    customerCount: counts.customers,
+    ownerCount: counts.owners,
+    staffCount: counts.cadres,
+    counts,
+  };
+}

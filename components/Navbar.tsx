@@ -19,6 +19,7 @@ import {
   X as CloseIcon,
 } from 'lucide-react';
 import AuthModal, { AuthModalMode } from '@/components/AuthModal';
+import NotificationBell from '@/components/NotificationBell';
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -201,9 +202,11 @@ export default function Navbar() {
 
   const isTraveler =
     currentUser?.role === 'TRAVELER' || currentUser?.role === 'USER';
+  const isOwner = currentUser?.role === 'OWNER';
 
-  // Khách hàng đã đăng nhập thì ẨN HOÀN TOÀN nút Chủ Quán
-  const showOwnerLink = !isTraveler;
+  // Ẩn hoàn toàn mục "Dành cho chủ quán" khi đã đăng nhập Admin/Cán bộ hoặc Khách hàng.
+  // Chỉ hiển thị cho khách vãng lai chưa đăng nhập hoặc tài khoản Chủ Quán (OWNER).
+  const showOwnerLink = !currentUser || isOwner;
 
   const showAdminLink =
     !currentUser ||
@@ -306,6 +309,9 @@ export default function Navbar() {
                     {currentUser.role === 'ADMIN' ? 'Admin' : currentUser.role === 'OWNER' ? 'Quán' : 'Khách'}
                   </span>
                 </div>
+
+                {/* Chuông Thông Báo cho [QUÁN] và [KHÁCH] */}
+                <NotificationBell currentUser={currentUser} />
 
                 {/* Nút Đăng Xuất thay thế vị trí nút Đăng Nhập */}
                 <button

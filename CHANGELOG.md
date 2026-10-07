@@ -10,6 +10,41 @@
 > **Lưu ý / việc còn dở:** …
 > ```
 
+## [2026-10-07] Hoàn Tất 07 Hạng Mục Nâng Cấp & Tối Ưu Hệ Thống dulich.easupso.com
+
+**Yêu cầu:**
+1. Hạng mục 1: Loại bỏ nút "Đăng Nhập Nhanh Bằng Tài Khoản Google Admin" và dòng "HOẶC" tại cổng quản trị `/admin`.
+2. Hạng mục 2: Bổ sung thanh tìm kiếm quán ăn/uống tinh tế, linh hoạt theo tên quán, địa chỉ, thôn buôn, SĐT, hoặc thực đơn món.
+3. Hạng mục 3 & 4: Xây dựng hệ thống Chuông Thông Báo (Bell Icon) cho cả tài khoản Chủ Quán `[QUÁN]` và Khách Hàng `[KHÁCH]` kèm badge đỏ, dropdown popover, đánh dấu đã đọc và điều hướng nhanh.
+4. Hạng mục 5: Bổ sung tính năng và nút "Ghim quán ăn lên trên" (Pin to top) trong Admin và gắn huy hiệu `[📌 Nổi bật]` ngoài trang chủ.
+5. Hạng mục 6: Sửa lỗi số liệu thống kê trong các nút `[Khách Hàng (0)] [Chủ Quán (0)] [Cán Bộ (0)]` luôn bị số 0 lúc ban đầu.
+6. Hạng mục 7: Ẩn hoàn toàn khối "DÀNH CHO CHỦ QUÁN" trong menu và trang chủ khi đã đăng nhập tài khoản Admin.
+
+**Đã làm:**
+- **Hạng mục 1 ([`app/admin/page.tsx`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/app/admin/page.tsx)):**
+  - Xóa bỏ hoàn toàn nút Google Admin và dải phân cách `Hoặc`, giữ nguyên form Email & Mật khẩu chuẩn nội bộ, nút Đăng nhập Quản trị viên và liên kết quay về trang chủ. Không ảnh hưởng đến Google OAuth ngoài trang chủ.
+- **Hạng mục 2 ([`components/mon-ngon/MonNgonClient.tsx`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/components/mon-ngon/MonNgonClient.tsx)):**
+  - Bổ sung Search Bar tinh tế với icon kính lúp, nút Xóa tìm kiếm `(X)` khi có dữ liệu.
+  - Lọc mềm linh hoạt: tên quán, địa chỉ, thôn buôn, SĐT và toàn bộ món ăn trong thực đơn của quán.
+  - Hiển thị thông báo thân thiện khi không tìm thấy quán phù hợp kèm nút xóa nhanh bộ lọc. Giữ nguyên vẹn số đếm quán trên tab `TÌM QUÁN ĂN/UỐNG (${restaurants.length})`.
+- **Hạng mục 3 & 4 ([`components/NotificationBell.tsx`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/components/NotificationBell.tsx), [`components/Navbar.tsx`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/components/Navbar.tsx), [`app/api/notifications/route.ts`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/app/api/notifications/route.ts), [`actions/customer-actions.ts`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/actions/customer-actions.ts), [`actions/owner-actions.ts`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/actions/owner-actions.ts)):**
+  - Thiết kế component `NotificationBell` đặt cạnh khối thông tin tài khoản (trước nút Đăng xuất).
+  - Tích hợp Badge đỏ hiển thị số lượng chưa đọc, Popover danh sách thông báo phân loại sinh động theo icon (đơn hàng, đặt bàn, hủy đơn, đánh giá...), thời gian tương đối bằng tiếng Việt, và nút "Đã đọc tất cả".
+  - Thêm API `GET /api/notifications`, `PATCH /api/notifications/[id]/read`, `PATCH /api/notifications/read-all`.
+  - Tự động kích hoạt thông báo khi có đơn mới, đặt bàn mới, khách hủy đơn, quán duyệt/hủy đơn/bàn.
+- **Hạng mục 5 ([`prisma/schema.prisma`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/prisma/schema.prisma), [`lib/types.ts`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/lib/types.ts), [`lib/storage.ts`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/lib/storage.ts), [`app/api/admin/restaurants/[id]/pin/route.ts`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/app/api/admin/restaurants/[id]/pin/route.ts), [`actions/admin-actions.ts`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/actions/admin-actions.ts), [`app/admin/page.tsx`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/app/admin/page.tsx), [`components/mon-ngon/MonNgonClient.tsx`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/components/mon-ngon/MonNgonClient.tsx)):**
+  - Bổ sung `isPinned: Boolean @default(false)` và `pinnedAt: DateTime?` vào bảng `Restaurant`.
+  - Sắp xếp ưu tiên `orderBy: [{ isPinned: 'desc' }, { pinnedAt: 'desc' }, { createdAt: 'desc' }]`.
+  - Bổ sung nút `[📌 Ghim / Bỏ Ghim]` tại cột Thao Tác trong bảng danh sách quán admin, badge `📌 Đã ghim đầu` tại tên quán.
+  - Ngoài trang chủ / tab Tìm quán: Các quán ghim đứng đầu danh sách và mang badge `[📌 Nổi bật]` sang trọng.
+- **Hạng mục 6 ([`app/api/admin/users/stats/route.ts`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/app/api/admin/users/stats/route.ts), [`actions/admin-actions.ts`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/actions/admin-actions.ts), [`app/admin/page.tsx`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/app/admin/page.tsx)):**
+  - Tạo endpoint `/api/admin/users/stats` trả về số lượng tài khoản tổng quan.
+  - Chạy `fetchAllAdminData()` và `fetchAccountStats()` ngay trong `useEffect` mount lần đầu.
+  - Đồng bộ số lượng Tab Cán Bộ theo `counts.cadres` giúp cả 3 nút hiển thị chính xác số liệu ngay lập tức mà không cần click chuột chuyển tab.
+- **Hạng mục 7 ([`components/Navbar.tsx`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/components/Navbar.tsx), [`components/mon-ngon/MonNgonClient.tsx`](file:///d:/1.%20VPS%20Maydell/4.%20Antigravity/10.%20Dulich/components/mon-ngon/MonNgonClient.tsx)):**
+  - Cấu hình `showOwnerLink = !currentUser || isOwner`: Ẩn hoàn toàn cụm "Dành Cho Chủ Quán" trong dropdown menu khi đăng nhập với vai trò Admin / Cán bộ / Khách hàng; chỉ hiển thị cho khách vãng lai hoặc chính Chủ Quán `OWNER`.
+  - Ẩn banner "Dành Cho Chủ Quán Ăn/Uống Ea Súp" ngoài trang chủ khi đăng nhập tài khoản Admin.
+
 ## [2026-10-05] Tách Biệt Đăng Nhập Khách Hàng Và Chuyển Cụm Đăng Nhập/Đăng Ký Chủ Quán Vào Menu 3 Gạch
 
 **Yêu cầu:**

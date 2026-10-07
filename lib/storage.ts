@@ -505,7 +505,30 @@ const INITIAL_RESTAURANTS: Restaurant[] = [
 ];
 
 export function getStoredRestaurants(): Restaurant[] {
-  return readJsonFile<Restaurant[]>(RESTAURANTS_FILE, INITIAL_RESTAURANTS);
+  const items = readJsonFile<Restaurant[]>(RESTAURANTS_FILE, INITIAL_RESTAURANTS);
+  return items.sort((a, b) => {
+    const pinA = a.isPinned ? 1 : 0;
+    const pinB = b.isPinned ? 1 : 0;
+    if (pinA !== pinB) return pinB - pinA;
+    if (a.isPinned && b.isPinned) {
+      const timeA = a.pinnedAt ? new Date(a.pinnedAt).getTime() : 0;
+      const timeB = b.pinnedAt ? new Date(b.pinnedAt).getTime() : 0;
+      if (timeB !== timeA) return timeB - timeA;
+    }
+    return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+  });
+}
+
+export function toggleStoredRestaurantPin(id: string): Restaurant | null {
+  const items = readJsonFile<Restaurant[]>(RESTAURANTS_FILE, INITIAL_RESTAURANTS);
+  const idx = items.findIndex((r) => r.id === id);
+  if (idx < 0) return null;
+  const currentPin = !!items[idx].isPinned;
+  items[idx].isPinned = !currentPin;
+  items[idx].pinnedAt = !currentPin ? new Date().toISOString() : null;
+  items[idx].updatedAt = new Date().toISOString();
+  saveStoredRestaurants(items);
+  return items[idx];
 }
 
 export function saveStoredRestaurants(items: Restaurant[]): void {
@@ -966,13 +989,14 @@ export function saveStoredNotifications(items: Notification[]): void {
   writeJsonFile(NOTIFICATIONS_FILE, items);
 }
 
-export function addStoredNotification(notif: { userId: string; title: string; message: string; link?: string }): Notification {
+export function addStoredNotification(notif: { userId: string; title: string; message: string; link?: string; type?: string }): Notification {
   const items = readJsonFile<Notification[]>(NOTIFICATIONS_FILE, []);
   const newNotif: Notification = {
     id: `notif-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
     userId: notif.userId,
     title: notif.title,
     message: notif.message,
+    type: notif.type || 'SYSTEM',
     link: notif.link || null,
     isRead: false,
     createdAt: new Date().toISOString(),
@@ -991,4 +1015,19 @@ export function markStoredNotificationAsRead(id: string): boolean {
     return true;
   }
   return false;
+}
+
+export function markAllStoredNotificationsAsRead(userId: string): boolean {
+  const items = readJsonFile<Notification[]>(NOTIFICATIONS_FILE, []);
+  let changed = false;
+  items.forEach((n) => {
+    if (n.userId === userId && !n.isRead) {
+      n.isRead = true;
+      changed = true;
+    }
+  });
+  if (changed) {
+    saveStoredNotifications(items);
+  }
+  return changed;
 }

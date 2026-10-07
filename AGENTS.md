@@ -114,6 +114,12 @@ docker compose up -d --build
 - [x] Ẩn nút "Chủ Quán" màu đỏ trong menu dropdown khi người dùng đăng nhập với vai trò Khách hàng (thay bằng link Lịch sử đặt món).
 - [x] Ẩn nút "Đổi ảnh bìa quán" đối với giao diện Khách hàng (chỉ hiển thị cho Chủ quán / Admin) và gắn link Google Maps chỉ đường trực tiếp tại vị trí địa chỉ quán.
 - [x] Tách biệt Đăng nhập Khách hàng chuyên biệt (bỏ tab Chủ quán trên modal chính) và đưa cụm "Đăng nhập Chủ quán" + "Đăng ký làm chủ quán mới" vào menu 3 gạch.
+- [x] Loại bỏ nút "Đăng Nhập Nhanh Bằng Tài Khoản Google Admin" và dòng "HOẶC" tại màn hình đăng nhập quản trị `/admin`.
+- [x] Bổ sung thanh tìm kiếm Quán ăn/uống tinh tế, linh hoạt theo tên quán, địa chỉ, thôn buôn, SĐT hoặc món trong thực đơn; nút Clear tìm kiếm và thông báo thân thiện khi không có kết quả.
+- [x] Xây dựng hệ thống Chuông Thông Báo (Bell Icon) cho tài khoản [QUÁN] và [KHÁCH] với badge đỏ, popover thông báo mới, nút "Đã đọc tất cả" và đồng bộ real-time / DB.
+- [x] Bổ sung tính năng và nút "Ghim quán ăn lên trên" (Pin to top) trong Admin, sắp xếp ưu tiên quán ghim lên đầu và gắn huy hiệu `[📌 Nổi bật]` ngoài trang chủ.
+- [x] Khắc phục triệt để lỗi số liệu thống kê nút `[Khách Hàng (0)] [Chủ Quán (0)] [Cán Bộ (0)]` luôn bị số 0 ban đầu bằng API thống kê tức thì `/api/admin/users/stats`.
+- [x] Ẩn hoàn toàn khối "DÀNH CHO CHỦ QUÁN" trong dropdown menu và ngoài trang chủ khi đã đăng nhập vai trò Admin/Cán bộ.
 - [ ] Mở rộng tính năng bình luận và đánh giá món ăn/quán ăn cho du khách.
 
 ## 8. Lưu ý quan trọng

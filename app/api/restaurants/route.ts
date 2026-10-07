@@ -12,7 +12,11 @@ export async function GET() {
           menuItems: { where: { isAvailable: true } },
           tables: true,
         },
-        orderBy: { createdAt: 'desc' },
+        orderBy: [
+          { isPinned: 'desc' },
+          { pinnedAt: 'desc' },
+          { createdAt: 'desc' },
+        ],
       });
     } catch {
       const stored = getStoredRestaurants();

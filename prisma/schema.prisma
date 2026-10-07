@@ -97,6 +97,8 @@ model Restaurant {
   openTime    String?     // VD: 08:00
   closeTime   String?     // VD: 22:00
   isApproved  Boolean     @default(false)
+  isPinned    Boolean     @default(false)
+  pinnedAt    DateTime?
   ownerId     String
   owner       User        @relation(fields: [ownerId], references: [id], onDelete: Cascade)
 
@@ -111,6 +113,7 @@ model Restaurant {
   @@index([slug])
   @@index([ownerId])
   @@index([isApproved])
+  @@index([isPinned])
 }
 
 // ==============================================================================
@@ -232,6 +235,7 @@ model Notification {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   title     String
   message   String   @db.Text
+  type      String?  // 'ORDER' | 'BOOKING' | 'CANCEL' | 'REVIEW' | 'SYSTEM'
   link      String?
   isRead    Boolean  @default(false)
   createdAt DateTime @default(now())

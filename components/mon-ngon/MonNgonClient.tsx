@@ -35,6 +35,7 @@ import {
   ExternalLink,
   ShieldCheck,
   AlertTriangle,
+  Pin,
 } from 'lucide-react';
 import {
   CATEGORIES,
@@ -122,6 +123,23 @@ export default function MonNgonClient() {
   // Dữ liệu & Quán ăn
   const [restaurants, setRestaurants] = useState<any[]>([]);
   const [openRestaurantFor, setOpenRestaurantFor] = useState<string | null>(null);
+  const [restaurantQuery, setRestaurantQuery] = useState('');
+
+  // Lọc quán ăn theo từ khóa tìm kiếm linh hoạt (tên quán, địa chỉ, thôn buôn, SĐT, hoặc món ăn trong thực đơn)
+  const filteredRestaurants = useMemo(() => {
+    const q = restaurantQuery.trim().toLowerCase();
+    if (!q) return restaurants;
+    return restaurants.filter((r) => {
+      const matchName = r.name?.toLowerCase().includes(q);
+      const matchAddress = r.address?.toLowerCase().includes(q);
+      const matchVillage = r.village?.toLowerCase().includes(q);
+      const matchPhone = (r.phone || r.owner?.phone || '').toLowerCase().includes(q);
+      const matchMenu = r.menuItems?.some((m: any) =>
+        m.name?.toLowerCase().includes(q) || m.description?.toLowerCase().includes(q)
+      );
+      return matchName || matchAddress || matchVillage || matchPhone || matchMenu;
+    });
+  }, [restaurants, restaurantQuery]);
 
   // Thông tin quán ăn phục vụ từng món (ưu tiên dữ liệu máy chủ gắn sẵn, dự phòng tra theo danh sách quán)
   const resolveRestaurant = useCallback(
@@ -522,10 +540,10 @@ export default function MonNgonClient() {
           {/* Banner tiện ích: Khách đặt món & Chủ quán (Chỉ hiện khi đã đăng nhập) */}
           {isLoggedIn && (() => {
             const userRole = customUser?.role || (session?.user as any)?.role || 'TRAVELER';
-            const isOwnerOrAdmin = userRole === 'OWNER' || userRole === 'ADMIN';
+            const isOwnerOnly = userRole === 'OWNER';
 
             return (
-              <div className={`gap-3 mb-6 ${isOwnerOrAdmin ? 'grid grid-cols-1 sm:grid-cols-2' : 'flex flex-col'}`}>
+              <div className={`gap-3 mb-6 ${isOwnerOnly ? 'grid grid-cols-1 sm:grid-cols-2' : 'flex flex-col'}`}>
                 {/* Banner Khách */}
                 <div className="p-3.5 sm:p-4 rounded-2xl bg-gradient-to-r from-[#EFF6FF] to-[#DBEAFE] border border-blue-200 flex items-center justify-between gap-3 shadow-xs">
                   <div className="flex items-center gap-3">
@@ -550,8 +568,8 @@ export default function MonNgonClient() {
                   </Link>
                 </div>
 
-                {/* Banner Chủ quán (Chỉ hiển thị cho Chủ Quán / Ban Quản Trị, ẩn hoàn toàn với Khách hàng) */}
-                {isOwnerOrAdmin && (
+                {/* Banner Chủ quán (CHỈ hiển thị cho riêng Chủ Quán OWNER, ẩn hoàn toàn với Khách hàng và Admin) */}
+                {isOwnerOnly && (
                   <div className="p-3.5 sm:p-4 rounded-2xl bg-gradient-to-r from-[#FDEDE8] to-[#FFF6ED] border border-[#EADBD0] flex items-center justify-between gap-3 shadow-xs">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-xl bg-[#D9452B] text-white flex items-center justify-center shrink-0 shadow-xs">
@@ -706,18 +724,65 @@ export default function MonNgonClient() {
                 </div>
               </div>
 
+              {/* THANH TÌM KIẾM QUÁN ĂN / UỐNG TINH TẾ */}
+              <div className="relative mb-5">
+                <div className="relative flex items-center">
+                  <Search className="absolute left-4 w-4 h-4 text-[#7D6B62]/70 pointer-events-none" />
+                  <input
+                    type="text"
+                    value={restaurantQuery}
+                    onChange={(e) => setRestaurantQuery(e.target.value)}
+                    placeholder="Tìm theo tên quán, địa chỉ, thôn buôn, SĐT, hoặc món đặc trưng..."
+                    className="w-full pl-11 pr-10 py-3 rounded-2xl bg-white border border-[#EADBD0] text-sm text-[#2B1D16] placeholder:text-[#7D6B62]/60 focus:outline-none focus:ring-2 focus:ring-[#D9452B]/30 focus:border-[#D9452B] transition-all shadow-xs"
+                  />
+                  {restaurantQuery && (
+                    <button
+                      type="button"
+                      onClick={() => setRestaurantQuery('')}
+                      className="absolute right-3 p-1.5 rounded-full hover:bg-stone-100 text-stone-400 hover:text-stone-600 transition-colors"
+                      title="Xóa tìm kiếm"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  )}
+                </div>
+                {restaurantQuery && (
+                  <div className="flex items-center justify-between text-xs text-[#7D6B62] mt-2 px-1">
+                    <span>
+                      Tìm thấy <strong>{filteredRestaurants.length}</strong> quán phù hợp với từ khóa &ldquo;<strong>{restaurantQuery}</strong>&rdquo;
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setRestaurantQuery('')}
+                      className="text-[#D9452B] hover:underline font-semibold"
+                    >
+                      Xóa tìm kiếm
+                    </button>
+                  </div>
+                )}
+              </div>
+
               {restaurants.length === 0 ? (
                 <EmptyState
                   icon={Store}
                   title="Đang cập nhật danh sách quán ăn/uống"
                   desc="Hệ thống đang đồng bộ dữ liệu quán từ máy chủ. Vui lòng quay lại sau ít phút."
                 />
+              ) : filteredRestaurants.length === 0 ? (
+                <EmptyState
+                  icon={Store}
+                  title="Không tìm thấy quán ăn/uống phù hợp với từ khóa"
+                  desc={`Không tìm thấy kết quả nào khớp với "${restaurantQuery}". Bạn có thể thử tìm theo tên thôn/buôn hoặc xóa từ khóa để xem toàn bộ danh sách.`}
+                  action={{ label: 'Xóa tìm kiếm', onClick: () => setRestaurantQuery('') }}
+                />
               ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mt-5">
-                  {restaurants.map((r, i) => (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mt-4">
+                  {filteredRestaurants.map((r, i) => (
                     <article
                       key={r.id}
-                      className="mn-fade-up group flex flex-col rounded-3xl bg-white border border-[#F1E4D8] overflow-hidden hover:shadow-[0_20px_40px_-20px_rgba(217,69,43,0.3)] transition-all duration-300"
+                      className={`mn-fade-up group flex flex-col rounded-3xl bg-white border ${
+                        r.isPinned ? 'border-amber-300 ring-2 ring-amber-200/60 shadow-md' : 'border-[#F1E4D8]'
+                      } overflow-hidden hover:shadow-[0_20px_40px_-20px_rgba(217,69,43,0.3)] transition-all duration-300`}
                       style={{ animationDelay: `${i * 60}ms` }}
                     >
                       <div className="relative aspect-[16/9] overflow-hidden bg-stone-100">
@@ -728,6 +793,11 @@ export default function MonNgonClient() {
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                         />
                         <div className="absolute top-3 left-3 flex flex-wrap gap-1">
+                          {r.isPinned && (
+                            <span className="rounded-full bg-gradient-to-r from-amber-500 to-amber-600 text-white px-2.5 py-1 text-[11px] font-bold shadow-xs flex items-center gap-1">
+                              <span>📌</span> Nổi bật
+                            </span>
+                          )}
                           <span className="rounded-full bg-emerald-600/90 backdrop-blur text-white px-2.5 py-1 text-[11px] font-bold">
                             Đã xác thực
                           </span>

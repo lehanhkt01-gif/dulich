@@ -273,31 +273,66 @@ export async function cancelOrderAction(orderId: string) {
   const user = await requireAuth();
 
   try {
-    const order = await prisma.order.findUnique({ where: { id: orderId } });
-    if (!order || order.userId !== user.id) {
-      return { success: false, message: 'Bạn không có quyền thao tác trên đơn hàng này.' };
-    }
-    if (order.status !== 'PENDING') {
-      return { success: false, message: 'Đơn hàng đã được quán xử lý, không thể tự hủy lúc này.' };
+    try {
+      const order = await prisma.order.findUnique({ where: { id: orderId } });
+      if (!order || order.userId !== user.id) {
+        return { success: false, message: 'Bạn không có quyền thao tác trên đơn hàng này.' };
+      }
+      if (order.status !== 'PENDING') {
+        return { success: false, message: 'Đơn hàng đã được quán xử lý, không thể tự hủy lúc này.' };
+      }
+
+      await prisma.order.update({
+        where: { id: orderId },
+        data: { status: 'CANCELLED' },
+      });
+    } catch {
+      const order = getStoredOrders().find((o) => o.id === orderId);
+      if (!order || order.userId !== user.id) {
+        return { success: false, message: 'Bạn không có quyền thao tác trên đơn hàng này.' };
+      }
+      if (order.status !== 'PENDING') {
+        return { success: false, message: 'Đơn hàng đã được quán xử lý, không thể tự hủy lúc này.' };
+      }
+      updateStoredOrderStatus(orderId, 'CANCELLED');
     }
 
-    await prisma.order.update({
-      where: { id: orderId },
-      data: { status: 'CANCELLED' },
-    });
-  } catch {
-    const order = getStoredOrders().find((o) => o.id === orderId);
-    if (!order || order.userId !== user.id) {
-      return { success: false, message: 'Bạn không có quyền thao tác trên đơn hàng này.' };
-    }
-    if (order.status !== 'PENDING') {
-      return { success: false, message: 'Đơn hàng đã được quán xử lý, không thể tự hủy lúc này.' };
-    }
-    updateStoredOrderStatus(orderId, 'CANCELLED');
+    revalidatePath('/mon-ngon/lich-su-dat');
+    revalidatePath('/chu-quan/dashboard');
+
+    // Báo cho chủ quán biết khách đã hủy đơn
+    try {
+      let restaurantId = '';
+      try {
+        const o = await prisma.order.findUnique({ where: { id: orderId } });
+        restaurantId = o?.restaurantId || '';
+      } catch {
+        const o = getStoredOrders().find((x) => x.id === orderId);
+        restaurantId = o?.restaurantId || '';
+      }
+      if (restaurantId) {
+        const r = getStoredRestaurants().find((x) => x.id === restaurantId);
+        if (r?.ownerId) {
+          const notifData = {
+            userId: r.ownerId,
+            title: 'Khách hàng vừa hủy đơn đặt món',
+            message: `Khách hàng ${user.name || 'Du khách'} vừa hủy đơn đặt món #${orderId.slice(-6)}.`,
+            type: 'CANCEL',
+            link: '/chu-quan/dashboard',
+          };
+          try {
+            await prisma.notification.create({ data: notifData });
+          } catch {
+            addStoredNotification(notifData);
+          }
+        }
+      }
+    } catch {}
+
+    return { success: true, message: 'Đã hủy đơn đặt món thành công.' };
+  } catch (err: any) {
+    return { success: false, message: err.message || 'Lỗi khi hủy đơn' };
   }
-
-  revalidatePath('/mon-ngon/lich-su-dat');
-  return { success: true, message: 'Đã hủy đơn đặt món thành công.' };
 }
 
 /**
@@ -307,31 +342,64 @@ export async function cancelBookingAction(bookingId: string) {
   const user = await requireAuth();
 
   try {
-    const booking = await prisma.booking.findUnique({ where: { id: bookingId } });
-    if (!booking || booking.userId !== user.id) {
-      return { success: false, message: 'Bạn không có quyền thao tác trên đặt bàn này.' };
-    }
-    if (booking.status !== 'PENDING') {
-      return { success: false, message: 'Lịch đặt bàn đã được quán duyệt, vui lòng liên hệ quán nếu muốn hủy.' };
+    let restaurantId = '';
+    let customerName = user.name || 'Du khách';
+
+    try {
+      const booking = await prisma.booking.findUnique({ where: { id: bookingId } });
+      if (!booking || booking.userId !== user.id) {
+        return { success: false, message: 'Bạn không có quyền thao tác trên đặt bàn này.' };
+      }
+      if (booking.status !== 'PENDING') {
+        return { success: false, message: 'Lịch đặt bàn đã được quán duyệt, vui lòng liên hệ quán nếu muốn hủy.' };
+      }
+      restaurantId = booking.restaurantId;
+      customerName = booking.customerName || customerName;
+
+      await prisma.booking.update({
+        where: { id: bookingId },
+        data: { status: 'CANCELLED' },
+      });
+    } catch {
+      const booking = getStoredBookings().find((b) => b.id === bookingId);
+      if (!booking || booking.userId !== user.id) {
+        return { success: false, message: 'Bạn không có quyền thao tác trên đặt bàn này.' };
+      }
+      if (booking.status !== 'PENDING') {
+        return { success: false, message: 'Lịch đặt bàn đã được quán duyệt.' };
+      }
+      restaurantId = booking.restaurantId;
+      customerName = booking.customerName || customerName;
+      updateStoredBookingStatus(bookingId, 'CANCELLED');
     }
 
-    await prisma.booking.update({
-      where: { id: bookingId },
-      data: { status: 'CANCELLED' },
-    });
-  } catch {
-    const booking = getStoredBookings().find((b) => b.id === bookingId);
-    if (!booking || booking.userId !== user.id) {
-      return { success: false, message: 'Bạn không có quyền thao tác trên đặt bàn này.' };
+    // Báo cho chủ quán
+    if (restaurantId) {
+      try {
+        const r = getStoredRestaurants().find((x) => x.id === restaurantId);
+        if (r?.ownerId) {
+          const notifData = {
+            userId: r.ownerId,
+            title: 'Khách hàng vừa hủy lịch đặt bàn',
+            message: `Khách hàng ${customerName} vừa hủy lịch đặt bàn.`,
+            type: 'CANCEL',
+            link: '/chu-quan/dashboard',
+          };
+          try {
+            await prisma.notification.create({ data: notifData });
+          } catch {
+            addStoredNotification(notifData);
+          }
+        }
+      } catch {}
     }
-    if (booking.status !== 'PENDING') {
-      return { success: false, message: 'Lịch đặt bàn đã được quán duyệt.' };
-    }
-    updateStoredBookingStatus(bookingId, 'CANCELLED');
+
+    revalidatePath('/mon-ngon/lich-su-dat');
+    revalidatePath('/chu-quan/dashboard');
+    return { success: true, message: 'Đã hủy lịch đặt bàn thành công.' };
+  } catch (err: any) {
+    return { success: false, message: err.message || 'Lỗi khi hủy đặt bàn' };
   }
-
-  revalidatePath('/mon-ngon/lich-su-dat');
-  return { success: true, message: 'Đã hủy lịch đặt bàn thành công.' };
 }
 
 /**
